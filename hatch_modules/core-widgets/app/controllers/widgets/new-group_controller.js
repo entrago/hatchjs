@@ -31,6 +31,7 @@ action(function createGroup() {
         } else {
             // TODO: this should be replaced with user.join(group)
             // add user to members of new group to be able to edit it
+            user.membership = user.membership || [];
             user.membership.push({
                 groupId: newGroup.id,
                 role: 'owner',

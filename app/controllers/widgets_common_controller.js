@@ -4,6 +4,7 @@ before('init env', function (c) {
     var locals = this;
     locals.group = req.group;
     locals.user = req.user;
+    locals.data = body.data && JSON.parse(body.data).data;
     locals.inlineEditAllowed = true;
     locals.canEdit = true;
 

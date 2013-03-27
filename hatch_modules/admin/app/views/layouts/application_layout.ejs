@@ -17,10 +17,10 @@
 
     <!-- TODO: implement contentFor('footer') helper and put following line to footer -->
     <script type="text/javascript">
-        canEdit = <%- (request.member && request.user.canEdit) ? "true":"false" %>;
+        canEdit = <%- (req.member && req.user.canEdit) ? "true":"false" %>;
     </script>
     <%- javascriptIncludeTag.call({controller: {app: req.app.parent.parent}}, 'jquery', 'bootstrap', 'bootstrap-typeahead', 'jquery-easyticker', 'jquery-hoverintent', 'jquery-blink', 'jquery-valadd', 'jquery-textarea-autogrow', 'jquery-noty', 'jquery-cookie', 'jquery-pjax', 'jquery-hovercard', 'jquery-highlight', 'uploader', 'rails', 'hatch-search', 'hatch', 'hatch-io', 'jquery-zoom', 'application') %>
-    <% if (request.member && request.user.canEdit) { %>
+    <% if (req.member && req.user.canEdit) { %>
     <%- javascriptIncludeTag.call({controller: {app: req.app.parent.parent}}, 'jquery-ui.min', 'chosen.jquery', 'jquery-rule', 'jquery-datatables', 'jquery-selectrange', 'jquery-blockui', 'jquery-spectrum', 'jquery-colorscheme', 'hatch-dragdrop', 'hatch-css-properties', 'hatch-styleeditor', 'hatch-inline-edit', 'hatch-management') %>
         <script src="/javascripts/redactor/redactor.js"></script>
         <link rel="stylesheet" href="/javascripts/redactor/redactor.css" />
@@ -52,7 +52,7 @@
                     <div class="pull-right">
                         <%- contentFor('layout.topBar.left') %>
                         <%- contentFor('layout.topBar.middle') %>
-                        <% if (request.user) { var user = request.user; %>
+                        <% if (req.user) { var user = req.user; %>
                         <ul class="nav">
                             <li class="dropdown" id="menu1">
                                 <a class="dropdown-toggle" data-toggle="dropdown" href="/">
@@ -93,7 +93,7 @@
                         }) %>
 
                         <li class="pull-right">
-                            <%- linkTo(icon('chevron-left') + t('back'), '//' + group.url, {rel: "nopjax"}) %>
+                            <%- linkTo(icon('chevron-left') + t('back'), '//' + group.homepage.url, {rel: "nopjax"}) %>
                         </li>
                     </ul>
                 </div>

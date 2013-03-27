@@ -159,6 +159,7 @@ module.exports = function (compound, Group) {
         var hp = {};
         for (var i in g.homepage) hp[i] = g.homepage[i];
         g.homepage = hp;
+        g.url = newUrl;
         g.homepage.url = newUrl;
         g.pagesCache = [];
         g.name = newName;
@@ -168,9 +169,7 @@ module.exports = function (compound, Group) {
 
         var pages, group;
 
-        Page.findOne({where: {
-            url: newUrl.indexOf('/') === -1 ? newUrl + '/' : newUrl
-        }}, function (err, p) {
+        Page.findOne({where: { url: newUrl }}, function (err, p) {
             if (p) {
                 return cb(new Error('URL already taken'));
             }
@@ -179,31 +178,38 @@ module.exports = function (compound, Group) {
 
         function createGroup() {
             Group.create(g, function (err, gg) {
-                group = gg;
-                oldGroup.pages(function (err, ps) {
-                    if (ps.length === 0) {
-                        return cb(null, group);
-                    }
-                    pages = Page.tree(ps).map(function (page) {
-                        var p = page.toObject();
-                        p.url = p.url.replace(oldUrl, newUrl + '/');
-                        p.groupId = group.id;
-                        return p;
+                if (!oldGroup.subgroups) oldGroup.subgroups = [];
+                oldGroup.subgroups.push({path: gg.path});
+                oldGroup.save(function() {
+
+                    group = gg;
+                    oldGroup.pages(function (err, ps) {
+                        if (ps.length === 0) {
+                            return cb(null, group);
+                        }
+                        pages = Page.tree(ps).map(function (page) {
+                            var p = page.toObject();
+                            p.url = p.url.replace(oldUrl, newUrl + '/');
+                            p.groupId = group.id;
+                            return p;
+                        });
+                        createHomepage(
+                            createTemplates.bind(null, createPages)
+                        );
                     });
-                    createHomepage(
-                        createTemplates.bind(null, createPages)
-                    );
                 });
             });
         }
 
         function createHomepage(done) {
+            console.log('createHomepage', pages);
             pages.forEach(function (p) {
                 if (p.url === newUrl + '/') {
                     p.url = newUrl;
                     var oldId = p.id;
                     delete p.id;
                     Page.create(p, function (err, page) {
+                        console.log('dasda');
                         group.homepage.id = page.id;
                         group.save(done);
                         pages.forEach(function (p) {
@@ -217,6 +223,7 @@ module.exports = function (compound, Group) {
         }
 
         function createTemplates(done) {
+            console.log('createTemplates');
             var wait = 1;
             pages.forEach(function (p) {
                 if (p.type === 'template') {
@@ -244,6 +251,7 @@ module.exports = function (compound, Group) {
         }
 
         function createPages() {
+            console.log('createPages');
             var p = pages.shift();
             if (!p) {
                 Page.updateGroup(group.id);

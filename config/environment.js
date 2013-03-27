@@ -21,6 +21,7 @@ module.exports = function (compound) {
         app.use(express.cookieParser('secret'));
         app.use(express.session({secret: 'secret'}));
         app.use(express.methodOverride());
+        app.use(hatch.rewrite(compound));
         app.use('/do', hatch.modules(compound));
         app.use(hatch.middleware(compound));
         app.use(app.router);

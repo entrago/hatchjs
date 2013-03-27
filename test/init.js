@@ -1,5 +1,7 @@
 require('should');
 
+process.env.NODE_ENV = 'test';
+
 var express = require('express');
 
 if (!process.env.TRAVIS) {
@@ -13,10 +15,6 @@ if (!process.env.TRAVIS) {
 }
 
 global.getApp = function() {
-    var app = require('./app')();
-    app.configure(function() {
-        app.use(express.cookieParser());
-        app.use(express.session({secret: 'ptss'}));
-    });
+    var app = require('../')();
     return app;
 };

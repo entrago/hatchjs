@@ -10,7 +10,7 @@
         <td>
             <%- linkTo(__('Edit'), pathTo.editPage(req.group, page), {class: '' }) %>
             &nbsp;
-            <%- linkTo('<i class="icon-remove"></i>', pathTo.groupPage(req.group, page), {remote: true, method: 'delete', rel: 'tooltip', 'data-original-title': __('Delete this page'), rel: 'delete-page'}) %>
+            <%- linkTo('<i class="icon-remove"></i>', pathTo.page(page), {remote: true, method: 'delete', rel: 'tooltip', 'data-original-title': __('Delete this page'), rel: 'delete-page'}) %>
         </td>
     </tr>
 <% }); %>
@@ -23,7 +23,7 @@
 
 <tr class="new-page-form" style="display : none;">
     <td colspan="5">
-        <%- formTagBegin({action: pathTo.groupPages({group_id: req.group.id, format: 'json'}), remote: true, id: 'newPageFormInline' }) %>
+        <%- formTagBegin({action: pathTo.pages({group_id: req.group.id, format: 'json'}), remote: true, id: 'newPageFormInline' }) %>
             <input type="hidden" name="parentId" id="parentId" />
             <input type="hidden" name="order" id="order" />
             <input type="hidden" name="inline" value="true" />

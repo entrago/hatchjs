@@ -4,18 +4,18 @@
 
         <li class="nav-header"><%- __('Pages') %></li>
             <li<%- pageName === 'manage' ? ' class="active"' : '' %>>
-                <%- linkTo('<i class="icon-sitemap"></i> ' + __('Sitemap'), pathTo.groupPages(req.group.id)) %>
+                <%- linkTo('<i class="icon-sitemap"></i> ' + __('Sitemap'), pathTo.pages()) %>
             </li>
             <li<%- pageName === 'specials' ? ' class="active"' : '' %>>
-                <%- linkTo('<i class="icon-star"></i> ' + __('Special pages'), pathTo.groupSpecialPages(req.group.id)) %>
+                <%- linkTo('<i class="icon-star"></i> ' + __('Special pages'), pathTo.specialPages()) %>
             </li>
 
         <li class="nav-header"><%- __('Actions') %></li>
         <li<%- pageName === 'new-page' ? ' class="active"' : '' %>>
-            <%- linkTo('<i class="icon-plus"></i> ' + __('Add new page'), pathTo.newGroupPage(req.group.id)) %>
+            <%- linkTo('<i class="icon-plus"></i> ' + __('Add new page'), pathTo.newPage()) %>
         </li>
         <li<%- pageName === 'new-special' ? ' class="active"' : '' %>>
-            <%- linkTo('<i class="icon-star"></i> ' + __('Add special page'), pathTo.newSpecial(req.group.id)) %>
+            <%- linkTo('<i class="icon-star"></i> ' + __('Add special page'), pathTo.newSpecial()) %>
         </li>
         <!--
         <li<%- pageName === 'new-special-template' ? ' class="active"' : '' %>>

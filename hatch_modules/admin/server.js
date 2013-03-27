@@ -10,11 +10,11 @@
 var app = module.exports = function getServerInstance(parent) {
     app = require('compound').createServer({root: __dirname});
     app.compound.tabs = [
-        { name: 'community', url: 'groupCommunity', rank: 10 },
-        { name: 'content',   url: 'groupContent',   rank: 20 },
-        { name: 'pages',     url: 'groupPages',     rank: 30 },
+        { name: 'community', url: 'community', rank: 10 },
+        { name: 'content',   url: 'content',   rank: 20 },
+        { name: 'pages',     url: 'pages',     rank: 30 },
         { name: 'group',     url: 'group',          rank: 40 },
-        { name: 'modules',   url: 'groupModules',   rank: 50 }
+        { name: 'modules',   url: 'modules',   rank: 50 }
     ];
     return app;
 };
