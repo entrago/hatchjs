@@ -232,7 +232,7 @@ module.exports = function (compound, Tag) {
      * are updated.
      * 
      * @param  {string}   url      - pingback url to be posted to on updates
-     * @param  {[type]}   lease    - subscriber lease time in ms
+     * @param  {Number}   lease    - subscriber lease time in ms
      * @param  {Function} callback - callback function
      */
     Tag.prototype.subscribe = function (url, lease, callback) {
@@ -304,7 +304,7 @@ module.exports = function (compound, Tag) {
      * Get all of the matching tags for the specified object by running the
      * tag filter functions (see above) to find matches.
      * 
-     * @param  {object}     obj      - object to get matching tags for
+     * @param  {Object}     obj      - object to get matching tags for
      * @param  {Function}   callback - callback function
      */
     Tag.getMatchingTags = function (obj, callback) {
@@ -330,7 +330,7 @@ module.exports = function (compound, Tag) {
      * Apply matching tags to this object by running the
      * tag filter functions to find matches (see above).
      * 
-     * @param  {object}     obj      - object to apply matching tags for
+     * @param  {Object}     obj      - object to apply matching tags for
      * @param  {Function}   callback - callback function
      */
     Tag.applyMatchingTags = function (obj, callback) {
