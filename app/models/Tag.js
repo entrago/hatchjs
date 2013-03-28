@@ -69,7 +69,7 @@ module.exports = function (compound, Tag) {
     };
 
     /**
-     * Rebuilds the index for this tag. This should be used if the sort order
+     * Rebuild the index for this tag. This should be used if the sort order
      * for this tag has been modified.
      * 
      * @param  {Tag} tag - tag to rebuild index for
