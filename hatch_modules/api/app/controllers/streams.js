@@ -17,11 +17,39 @@
 //
 
 'use strict';
+module.exports = StreamsController;
 
-exports.routes = function (map) {
-    map.get('/tags/:name/get', 'tags#get');
-    map.get('/tags/:name/ping', 'tags#ping');
-    map.get('/tags/:name/subscribe', 'tags#subscribe');
+function StreamsController(init) {
+    init.before(findByHash);
+}
 
-    map.get('/streams/:hash/run', 'streams#run');
+function handleError(c, err) {
+    return c.send({
+        status: 'error',
+        message: err.message
+    });
+}
+
+function findByHash(c) {
+    c.ImportStream.findByHash(c.req.params.hash, function (err, stream) {
+        if (!stream) {
+            return handleError(c, new Error('Could not find stream'));
+        }
+
+        c.stream = stream;
+        c.next();
+    });
+}
+
+/**
+ * Ping an import stream and start it running.
+ * 
+ * @param  {context} c - http context
+ */
+StreamsController.prototype.run = function (c) {
+    c.stream.run();
+    c.send({
+        status: 'success',
+        message: 'Import stream started'
+    });
 };

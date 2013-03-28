@@ -42,7 +42,7 @@ module.exports = function (compound, Tag) {
     /**
      * Get the results of this tag by querying the database.
      * 
-     * @param  {JSON}     params     - standard jugglingdb query params
+     * @param  {Object}   params     - standard jugglingdb query params
      * @param  {Function} callback   - callback function
      */
     Tag.prototype.getResults = function (params, callback) {
@@ -60,6 +60,9 @@ module.exports = function (compound, Tag) {
         };
 
         model.all(query, function (err, results) {
+            //set the type so that the subscriber knows what it is getting
+            results.type = tag.type;
+
             callback(err, results);
         });
     };
@@ -67,8 +70,8 @@ module.exports = function (compound, Tag) {
     /**
      * Check to see if this tag has been updated since the specified date.
      * 
-     * @param  {Date} since - date to check
-     * @return {Boolean}    - whether the tag has been updated
+     * @param  {Date}    since - date to check
+     * @return {Boolean}       - whether the tag has been updated
      */
     Tag.ping = function (since) {
         since = new Date(since).getTime();

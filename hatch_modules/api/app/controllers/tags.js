@@ -115,7 +115,7 @@ TagController.prototype.ping = function ping(c) {
  *
  * Examples:
  *     http://localhost:3000/do/api/tags/popular/subscribe?lease=60000&url=
- *         http://mysubscriber.com/do/api/import/12345678/ping
+ *         http://mysubscriber.com/do/api/streams/12345678/run
  * 
  * @param  {context} c - http context
  */

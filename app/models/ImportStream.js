@@ -16,6 +16,8 @@
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
 
+var crypto = require('crypto');
+
 module.exports = function (compound, ImportStream) {
     var ticker;
     var Group = compound.models.Group;
@@ -23,10 +25,28 @@ module.exports = function (compound, ImportStream) {
 
     ImportStream.validatesPresenceOf('title', 'query');
 
+
+    ImportStream.beforeCreate = function (next) {
+        this.hash = calcSha(this.url + '-' + new Date().getTime());
+        next();
+    };
+
+    /**
+     * Get an ImportStream by it's secret hash code
+     * 
+     * @param  {String}   hash     - hash to retrieve stream
+     * @param  {Function} callback - callback function
+     */
+    ImportStream.getByHash = function (hash, callback) {
+        ImportStream.all({ where: { hash: hash }}, function (err, streams) {
+            callback(err, streams[0]);
+        });
+    };
+
     /**
      * runs this import stream and imports the data
      */
-    ImportStream.prototype.run = function() {
+    ImportStream.prototype.run = function () {
         var stream = this;
 
         Group.find(stream.groupId, function(err, group) {
@@ -78,4 +98,17 @@ module.exports = function (compound, ImportStream) {
     ImportStream.prototype.shouldRun = function() {
         return new Date().getTime() - (this.lastRun || 0) > this.interval;
     };
+
+
+    /**
+     * calculates a sha1 of the specified string
+     * 
+     * @param  {[String]} payload 
+     * @return {[String]}         
+     */
+    function calcSha(payload) {
+        if (!payload) return '';
+        if (payload.length == 64) return payload;
+        return crypto.createHash('sha256').update(payload).update(api.app.config.passwordSalt || '').digest('hex');
+    }
 };

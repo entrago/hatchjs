@@ -140,6 +140,7 @@ var Notification = define('Notification', function () {
 
 var ImportStream = define('ImportStream', function () {
     property('groupId', Number, {index: true});
+    property('hash', String, {index: true});
     property('type', String, {index: true});
     property('title', String);
     property('query', String);
@@ -154,6 +155,7 @@ var Tag = define('Tag', function () {
     property('groupId', Number, {index: true});
     property('userId', Number, {index: true});
     property('type', String, {index: true});
+    property('category', String, {index: true});
     property('name', String, {index: true});
     property('title', String);
     property('description', String);
