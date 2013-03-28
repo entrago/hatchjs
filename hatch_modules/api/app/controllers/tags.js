@@ -26,13 +26,15 @@ function TagController(init) {
 function handleError(c, err) {
     return c.send({
         status: 'error',
-        message: err.toString()
+        message: err.message
     });
 }
 
 function findTag(c) {
     c.Tag.findByName(c.req.params.name, function (err, tag) {
-        if(err) return handleError(c, err);
+        if (!tag) {
+            return handleError(c, new Error('Tag not found'));
+        }
 
         // TODO: authenticate the user and check permissions vs this tag
 
@@ -85,7 +87,7 @@ TagController.prototype.get = function get(c) {
             status: 'success',
             params: params,
             results: results
-        })
+        });
     });
 };
 
