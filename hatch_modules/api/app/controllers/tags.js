@@ -23,16 +23,16 @@ function TagController(init) {
     init.before(findTag);
 }
 
-function findTag(c) {
-    c.Tag.all({ where: { name: c.req.params.name }}, function (err, tags) {
-        var tag = tags[0];
+function handleError(c, err) {
+    return c.send({
+        status: 'error',
+        message: err.toString()
+    });
+}
 
-        if (!tag) {
-            return c.send({
-                status: 'error',
-                message: 'Tag not found'
-            });
-        }
+function findTag(c) {
+    c.Tag.findByName(c.req.params.name, function (err, tag) {
+        if(err) return handleError(c, err);
 
         // TODO: authenticate the user and check permissions vs this tag
 
@@ -75,24 +75,17 @@ function findTag(c) {
  * @param  {context} c - http context
  */
 TagController.prototype.get = function get(c) {
-    var model = c[c.tag.type];
-
-    var offset = c.req.query.offset || 0;
-    var limit = c.req.query.limit || 10;
-    var cond = { tags: c.tag.name };
-
-    var query = {
-        offset: offset,
-        limit: limit,
-        where: cond
+    var params = {
+        offset: c.req.query.offset || 0,
+        limit: c.req.query.limit || 10
     };
 
-    model.all(query, function (err, results) {
-        return c.send({
+    c.tag.getResults(params, function (err, results) {
+        c.send({
             status: 'success',
-            query: query,
+            params: params,
             results: results
-        });
+        })
     });
 };
 
@@ -110,17 +103,8 @@ TagController.prototype.get = function get(c) {
  * @param  {context} c - http context
  */
 TagController.prototype.ping = function ping(c) {
-    var since = c.req.query.since;
-
-    if (!since) {
-        return c.send({
-            status: 'error',
-            message: 'Please specify a date with "since" querystring parameter'
-        });
-    }
-
     return c.send({
-        status: c.tag.updatedAt > since ? 'updated' : 'same'
+        status: c.tag.ping(c.req.query.since) ? 'updated' : 'same'
     });
 };
 
@@ -137,28 +121,11 @@ TagController.subscribe = function subscribe(c) {
     var url = c.req.query.url;
     var lease = parseInt(c.req.query.lease, 10);
 
-    if (!url) {
-        return c.send({
-            status: 'error',
-            message: 'Please specify a URL with "url" querystring parameter'
-        });
-    }
+    c.tag.subscribe(url, lease, function (err) {
+        if (err) {
+            return handleError(c, err);
+        }
 
-    if (!lease) {
-        return c.send({
-            status: 'error',
-            message: 'Please specify a lease with "lease" querystring parameter'
-        });
-    }
-
-    if (lease < 60000) {
-        return c.send({
-            status: 'error',
-            message: 'Lease should be at least 60000ms'
-        });
-    }
-
-    c.tag.subscribe(url, lease, function () {
         return c.send({
             status: 'success',
             message: 'Subscribed to tag'

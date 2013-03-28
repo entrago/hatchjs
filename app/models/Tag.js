@@ -28,6 +28,54 @@ module.exports = function (compound, Tag) {
     Tag.validatesUniquenessOf('name', {message: 'This tag name is taken'});
 
     /**
+     * Find a tag by it's name.
+     * 
+     * @param  {string}   name     - name of the tag
+     * @param  {Function} callback - callback function
+     */
+    Tag.findByName = function (name, callback) {
+        Tag.all({ where: { name: name }}, function (err, tags) {
+            callback(err, tags[0]);
+        });
+    };
+
+    /**
+     * Get the results of this tag by querying the database.
+     * 
+     * @param  {JSON}     params     - standard jugglingdb query params
+     * @param  {Function} callback   - callback function
+     */
+    Tag.prototype.getResults = function (params, callback) {
+        var tag = this;
+        var model = compound.models[tag.type];
+
+        var offset = params.offset || 0;
+        var limit = params.limit || 10;
+        var cond = { tags: tag.name };
+
+        var query = {
+            offset: offset,
+            limit: limit,
+            where: cond
+        };
+
+        model.all(query, function (err, results) {
+            callback(err, results);
+        });
+    };
+
+    /**
+     * Check to see if this tag has been updated since the specified date.
+     * 
+     * @param  {Date} since - date to check
+     * @return {Boolean}    - whether the tag has been updated
+     */
+    Tag.ping = function (since) {
+        since = new Date(since).getTime();
+        return this.updatedAt > since;
+    };
+
+    /**
      * Update the compound model for the specified tag to make sure the custom
      * sort order is defined for the specified tag.
      *
@@ -188,6 +236,14 @@ module.exports = function (compound, Tag) {
      * @param  {Function} callback - callback function
      */
     Tag.prototype.subscribe = function (url, lease, callback) {
+        //validate
+        if (!url) {
+            callback(new Error('Please specify a pingback URL'));
+        }
+        if (!lease || parseInt(lease, 10) < 60000) {
+            callback(new Error('Please specify a lease of at least 60000'));
+        }
+
         var now = new Date().getTime();
 
         var subscriber = {
@@ -233,7 +289,7 @@ module.exports = function (compound, Tag) {
                     if (res.statusCode !== 200) {
                         subscriber.invalid = true;
                     }
-                    
+
                     done();
                 });
             });
