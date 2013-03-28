@@ -28,6 +28,8 @@ describe('tags', function() {
             sortOrder: 'createdAt'
         });
 
+        popular.save();
+
         popular.updateModel();
 
         Content.create({
@@ -110,6 +112,29 @@ describe('tags', function() {
                 });
             });
         })
+    });
+
+    it('should subscribe to a tag and check that it can ping', function (done) {
+        var now = new Date().getTime();
+
+        compound.models.Tag.all({ where: { name: 'popular' }}, function (err, tags) {
+            var tag = tags[0];
+
+            //purposely subscribe an invalid responder
+            tag.subscribe('http://www.google.com/do/api/import/1/ping', 60000, function () {
+                tag.subscribers.length.should.equal(1);
+                tag.updateCount(function () {
+                    tag.subscribers.length.should.equal(1);
+                    tag.subscribers.items[0].lastPing.should.above(now);
+
+                    tag.pingSubscribers(function () {
+                        tag.subscribers.length.should.equal(0);
+
+                        done();
+                    });
+                });
+            });
+        });
     });
 
 });

@@ -110,6 +110,8 @@ var Content = define('Content', function () {
     property('fulltext', String);
     property('importData', JSON);
     property('tags', [], {index: true});
+
+    set('ignoreNullValues', true);
 });
 
 Content.schema.adapter.defineFulltextIndex('Content', 'fulltext');
@@ -157,5 +159,9 @@ var Tag = define('Tag', function () {
     property('description', String);
     property('sortOrder', String);
     property('count', Number);
+    property('updatedAt', Number);
     property('filter', String);
+    property('subscribers', []);
+
+    set('ignoreNullValues', true);
 });

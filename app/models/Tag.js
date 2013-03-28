@@ -17,6 +17,8 @@
 //
 
 var async = require('async');
+var httpPost = require('http-post');
+var _ = require('underscore');
 
 module.exports = function (compound, Tag) {
     'use strict';
@@ -133,9 +135,15 @@ module.exports = function (compound, Tag) {
      * @param  {Function} callback - callback function
      */
     Tag.prototype.updateCount = function (callback) {
-        compound.models[this.type].count({ tags: this.name }, function (err, count) {
-            this.count = count;
-            this.save(callback);
+        var tag = this;
+
+        compound.models[this.type].count({ tags: tag.name }, function (err, count) {
+            tag.count = count;
+            tag.updatedAt = new Date();
+
+            tag.pingSubscribers(function () {
+                tag.save(callback);
+            });
         });
     };
 
@@ -168,6 +176,71 @@ module.exports = function (compound, Tag) {
                     callback();
                 }
             });
+        });
+    };
+
+    /**
+     * Subscribe to this tag and receive pingbacks when the contents of this tag
+     * are updated.
+     * 
+     * @param  {string}   url      - pingback url to be posted to on updates
+     * @param  {[type]}   lease    - subscriber lease time in ms
+     * @param  {Function} callback - callback function
+     */
+    Tag.prototype.subscribe = function (url, lease, callback) {
+        var now = new Date().getTime();
+
+        var subscriber = {
+            url: url,
+            lease: lease,
+            createdAt: now
+        };
+
+        //remove any duplicate subscribers
+        this.subscribers = _.reject(this.subscribers, function (subscriber) {
+            return subscriber.url === url;
+        });
+
+        this.subscribers.push(subscriber);
+        this.save(callback);
+    };
+
+    /**
+     * Ping all of the subscribers to this tag. This should happen after the
+     * contents of this tag have been updated in the database.
+     *
+     * The subscribers will then decide whether to re-query the API and retrieve
+     * the new contents of this tag.
+     * 
+     * @param  {Function} callback - callback function
+     */
+    Tag.prototype.pingSubscribers = function (callback) {
+        var tag = this;
+        var now = new Date().getTime();
+
+        //remove expired subscribers
+        this.subscribers.items = _.reject(this.subscribers.items, function (subscriber) {
+            return !subscriber || subscriber.invalid ||
+                subscriber.createdAt + subscriber.lease < now;
+        });
+
+        async.forEach(this.subscribers, function (subscriber, done) {
+            //ping the subscriber and remove those with invalid responses
+            httpPost(subscriber.url, { updated: tag.updatedAt }, function (res) {
+                res.on('data', function () {
+                    subscriber.lastPing = new Date().getTime();
+
+                    if (res.statusCode !== 200) {
+                        subscriber.invalid = true;
+                    }
+                    
+                    done();
+                });
+            });
+        }, function (err, results) {
+            if (callback) {
+                callback();
+            }
         });
     };
 
