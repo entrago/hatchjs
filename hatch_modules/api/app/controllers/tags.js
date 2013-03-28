@@ -151,6 +151,13 @@ TagController.subscribe = function subscribe(c) {
         });
     }
 
+    if (lease < 60000) {
+        return c.send({
+            status: 'error',
+            message: 'Lease should be at least 60000ms'
+        });
+    }
+
     c.tag.subscribe(url, lease, function () {
         return c.send({
             status: 'success',
