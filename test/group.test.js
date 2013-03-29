@@ -1,7 +1,7 @@
 var Group, Page, app, compound;
 var should = require('should');
 
-describe.only('Group', function() {
+describe('Group', function() {
 
     before(function (done) {
         app = getApp();

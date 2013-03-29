@@ -17,6 +17,8 @@
 //
 
 var async = require('async');
+var httpPost = require('http-post');
+var _ = require('underscore');
 
 module.exports = function (compound, Tag) {
     'use strict';
@@ -24,6 +26,57 @@ module.exports = function (compound, Tag) {
 
     Tag.validatesPresenceOf('title', {message: 'Please enter a title'});
     Tag.validatesUniquenessOf('name', {message: 'This tag name is taken'});
+
+    /**
+     * Find a tag by it's name.
+     * 
+     * @param  {string}   name     - name of the tag
+     * @param  {Function} callback - callback function
+     */
+    Tag.findByName = function (name, callback) {
+        Tag.all({ where: { name: name }}, function (err, tags) {
+            callback(err, tags[0]);
+        });
+    };
+
+    /**
+     * Get the results of this tag by querying the database.
+     * 
+     * @param  {Object}   params     - standard jugglingdb query params
+     * @param  {Function} callback   - callback function
+     */
+    Tag.prototype.getResults = function (params, callback) {
+        var tag = this;
+        var model = compound.models[tag.type];
+
+        var offset = params.offset || 0;
+        var limit = params.limit || 10;
+        var cond = { tags: tag.name };
+
+        var query = {
+            offset: offset,
+            limit: limit,
+            where: cond
+        };
+
+        model.all(query, function (err, results) {
+            //set the type so that the subscriber knows what it is getting
+            results.type = tag.type;
+
+            callback(err, results);
+        });
+    };
+
+    /**
+     * Check to see if this tag has been updated since the specified date.
+     * 
+     * @param  {Date}    since - date to check
+     * @return {Boolean}       - whether the tag has been updated
+     */
+    Tag.ping = function (since) {
+        since = new Date(since).getTime();
+        return this.updatedAt > since;
+    };
 
     /**
      * Update the compound model for the specified tag to make sure the custom
@@ -69,7 +122,7 @@ module.exports = function (compound, Tag) {
     };
 
     /**
-     * Rebuilds the index for this tag. This should be used if the sort order
+     * Rebuild the index for this tag. This should be used if the sort order
      * for this tag has been modified.
      * 
      * @param  {Tag} tag - tag to rebuild index for
@@ -133,9 +186,15 @@ module.exports = function (compound, Tag) {
      * @param  {Function} callback - callback function
      */
     Tag.prototype.updateCount = function (callback) {
-        compound.models[this.type].count({ tags: this.name }, function (err, count) {
-            this.count = count;
-            this.save(callback);
+        var tag = this;
+
+        compound.models[this.type].count({ tags: tag.name }, function (err, count) {
+            tag.count = count;
+            tag.updatedAt = new Date();
+
+            tag.pingSubscribers(function () {
+                tag.save(callback);
+            });
         });
     };
 
@@ -172,10 +231,83 @@ module.exports = function (compound, Tag) {
     };
 
     /**
+     * Subscribe to this tag and receive pingbacks when the contents of this tag
+     * are updated.
+     * 
+     * @param  {string}   url      - pingback url to be posted to on updates
+     * @param  {Number}   lease    - subscriber lease time in ms
+     * @param  {Function} callback - callback function
+     */
+    Tag.prototype.subscribe = function (url, lease, callback) {
+        //validate
+        if (!url) {
+            callback(new Error('Please specify a pingback URL'));
+        }
+        if (!lease || parseInt(lease, 10) < 60000) {
+            callback(new Error('Please specify a lease of at least 60000'));
+        }
+
+        var now = new Date().getTime();
+
+        var subscriber = {
+            url: url,
+            lease: lease,
+            createdAt: now
+        };
+
+        //remove any duplicate subscribers
+        this.subscribers = _.reject(this.subscribers, function (subscriber) {
+            return subscriber.url === url;
+        });
+
+        this.subscribers.push(subscriber);
+        this.save(callback);
+    };
+
+    /**
+     * Ping all of the subscribers to this tag. This should happen after the
+     * contents of this tag have been updated in the database.
+     *
+     * The subscribers will then decide whether to re-query the API and retrieve
+     * the new contents of this tag.
+     * 
+     * @param  {Function} callback - callback function
+     */
+    Tag.prototype.pingSubscribers = function (callback) {
+        var tag = this;
+        var now = new Date().getTime();
+
+        //remove expired subscribers
+        this.subscribers.items = _.reject(this.subscribers.items, function (subscriber) {
+            return !subscriber || subscriber.invalid ||
+                subscriber.createdAt + subscriber.lease < now;
+        });
+
+        async.forEach(this.subscribers, function (subscriber, done) {
+            //ping the subscriber and remove those with invalid responses
+            httpPost(subscriber.url, { updated: tag.updatedAt }, function (res) {
+                res.on('data', function () {
+                    subscriber.lastPing = new Date().getTime();
+
+                    if (res.statusCode !== 200) {
+                        subscriber.invalid = true;
+                    }
+
+                    done();
+                });
+            });
+        }, function (err, results) {
+            if (callback) {
+                callback();
+            }
+        });
+    };
+
+    /**
      * Get all of the matching tags for the specified object by running the
      * tag filter functions (see above) to find matches.
      * 
-     * @param  {object}     obj      - object to get matching tags for
+     * @param  {Object}     obj      - object to get matching tags for
      * @param  {Function}   callback - callback function
      */
     Tag.getMatchingTags = function (obj, callback) {
@@ -201,7 +333,7 @@ module.exports = function (compound, Tag) {
      * Apply matching tags to this object by running the
      * tag filter functions to find matches (see above).
      * 
-     * @param  {object}     obj      - object to apply matching tags for
+     * @param  {Object}     obj      - object to apply matching tags for
      * @param  {Function}   callback - callback function
      */
     Tag.applyMatchingTags = function (obj, callback) {
