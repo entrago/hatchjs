@@ -16,8 +16,6 @@
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
 
-#!/usr/bin/env node
-
 /**
  * Server module exports method which returns new instance of application
  * server
