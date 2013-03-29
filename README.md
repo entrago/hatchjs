@@ -44,9 +44,9 @@ for some feature development into separate branch, then publish it and make pull
 request to the `master` branch. It is recommended to start feature branches with
 `feature-` refix.
 
-This project uses Makefile to organize workflow.
+This project uses Makefile to organize workflow as easy as [1][pull], [2][feature], [3][pr]
 
-### `make pull`: pulling changes
+### 1.1. `make pull`: pulling changes
 
 To get changes from `origin` remote use:
 
@@ -54,7 +54,7 @@ To get changes from `origin` remote use:
 
 this command just does `git pull origin $current-branch` command.
 
-### `make update`: smart pulling changes
+### 1.2. `make update`: smart pulling changes
 
 To pull changes and perform some additional stuff use:
 
@@ -62,7 +62,7 @@ To pull changes and perform some additional stuff use:
 
 it will pull changes, install dependencies and run tests.
 
-### `make safe-update`: safe pulling changes
+### 1.3. `make safe-update`: safe pulling changes
 
 To pull changes safely use:
 
@@ -71,7 +71,7 @@ To pull changes safely use:
 it will pull changes with --no-commit flag, update dependencies and then run
 tests and only commit merge when nothing was broken in tests.
 
-### `make feature`: working on feature
+### 2. `make feature`: working on feature
 
 Run this command before start working on new feature (before first commit):
 
@@ -79,7 +79,7 @@ Run this command before start working on new feature (before first commit):
 
 this command will create new branch named `feature-name-of-thing`.
 
-### `make pr`: make pull request
+### 3. `make pr`: make pull request
 
 When feature is done, run
 
@@ -91,3 +91,6 @@ command to create pull request in GitHub
 [modules]: https://github.com/marcusgreenwood/hatch-compound/tree/master/hatch_modules
 [compound-api]: http://compoundjs.github.com/guides
 [gitflow]: http://nvie.com/posts/a-successful-git-branching-model/
+[pull]: https://github.com/marcusgreenwood/hatchjs/edit/master/README.md#11-make-pull-pulling-changes
+[feature]: https://github.com/marcusgreenwood/hatchjs/edit/master/README.md#2-make-feature-working-on-feature
+[pr]: https://github.com/marcusgreenwood/hatchjs/edit/master/README.md#3-make-pr-make-pull-request
