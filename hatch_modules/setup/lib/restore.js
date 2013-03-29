@@ -79,6 +79,9 @@ exports.run = function(c, path, domain, done) {
 
             // import all of the data
             async.forEachSeries(modelData.data, function(entity, next) {
+                if (typeof entity === 'undefined') {
+                    return;
+                }
                 fixDomain(entity);
                 
                 //abandon entity import if it takes more than 1000 ms
