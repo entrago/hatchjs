@@ -91,6 +91,6 @@ command to create pull request in GitHub
 [modules]: https://github.com/marcusgreenwood/hatch-compound/tree/master/hatch_modules
 [compound-api]: http://compoundjs.github.com/guides
 [gitflow]: http://nvie.com/posts/a-successful-git-branching-model/
-[pull]: https://github.com/marcusgreenwood/hatchjs/edit/master/README.md#11-make-pull-pulling-changes
-[feature]: https://github.com/marcusgreenwood/hatchjs/edit/master/README.md#2-make-feature-working-on-feature
-[pr]: https://github.com/marcusgreenwood/hatchjs/edit/master/README.md#3-make-pr-make-pull-request
+[pull]: https://github.com/marcusgreenwood/hatchjs/blob/master/README.md#11-make-pull-pulling-changes
+[feature]: https://github.com/marcusgreenwood/hatchjs/blob/master/README.md#2-make-feature-working-on-feature
+[pr]: https://github.com/marcusgreenwood/hatchjs/blob/master/README.md#3-make-pr-make-pull-request
