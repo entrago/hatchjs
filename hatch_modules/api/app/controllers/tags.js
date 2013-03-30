@@ -119,7 +119,7 @@ TagController.prototype.ping = function ping(c) {
  * 
  * @param  {context} c - http context
  */
-TagController.subscribe = function subscribe(c) {
+TagController.prototype.subscribe = function subscribe(c) {
     var url = c.req.query.url;
     var lease = parseInt(c.req.query.lease, 10);
 
