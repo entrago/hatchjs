@@ -20,6 +20,7 @@ var User = define('User', function () {
     property('fulltext', String);
     property('tags', [], {index: true});
 
+    set('ignoreNullValues', true);
     set('safe', true);
 });
 
@@ -48,6 +49,8 @@ var Group = define('Group', function () {
     property('memberLists', JSON);
     property('tags', [], {index: true});
     property('importStreams', JSON);
+
+    set('ignoreNullValues', true);
 });
 
 var Stylesheet = define('Stylesheet', function () {
@@ -56,6 +59,8 @@ var Stylesheet = define('Stylesheet', function () {
     property('version', Number);
     property('lastUpdate', Date);
     property('less', JSON);
+
+    set('ignoreNullValues', true);
 });
 
 // function Widget(data, list) { };
@@ -78,6 +83,8 @@ var Page = define('Page', function () {
     property('parentId', Number, {index: true});
     property('groupId', Number, {index: true});
     property('tags', [], {index: true});
+
+    set('ignoreNullValues', true);
 });
 
 var Content = define('Content', function () {
@@ -120,6 +127,8 @@ var ContentFeedItem = define('ContentFeedItem', function () {
     property('userId', Number, {index: true });
     property('contentId',  Number ),
     property('createdAt', Date, {index: true} );
+
+    set('ignoreNullValues', true);
 });
 
 var Media = define('Media', function () {
@@ -127,6 +136,8 @@ var Media = define('Media', function () {
     property('userId', Number, {index: true});
     property('createdAt', Date, {index: true, sort: true});
     property('url', String);
+
+    set('ignoreNullValues', true);
 });
 
 var Notification = define('Notification', function () {
@@ -136,6 +147,8 @@ var Notification = define('Notification', function () {
     property('isActioned', Boolean);
     property('url', String);
     property('html', String);
+
+    set('ignoreNullValues', true);
 });
 
 var ImportStream = define('ImportStream', function () {
@@ -149,6 +162,8 @@ var ImportStream = define('ImportStream', function () {
     property('interval', Number);
     property('enabled', Boolean, {index: true});
     property('lastRun', Date);
+
+    set('ignoreNullValues', true);
 });
 
 var Tag = define('Tag', function () {
