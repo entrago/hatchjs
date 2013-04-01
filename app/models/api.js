@@ -7,7 +7,15 @@ module.exports = function (compound) {
     };
 
     /**
-     * Perform a method call on the specified db model entity.
+     * Perform a method call on the specified db model entity. Automatically 
+     * maps named paramters into function arguments by looking at the method
+     * signature on the object and checks vs allowedApiActions whitelist to
+     * see if the method you are trying to call is allowed via the API.
+     *
+     * Examples:
+     *     api.perform(page, 'like', { user: 1 }, function (err, result) {
+     *         ...
+     *     });
      * 
      * @param  {Object}   obj        - the object to perform method call on
      * @param  {String}   methodName - name of the method to execute
