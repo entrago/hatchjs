@@ -1,5 +1,6 @@
 'use strict';
 var _ = require('underscore');
+var api = require('../../models/HatchAPI');
 
 module.exports = UriController;
 
@@ -8,11 +9,13 @@ function UriController(init) {
 }
 
 function findObject(c) {
-    //case-insensitive model find
-    c.modelName = _.find(Object.keys(c.compound.models), function (key) {
+    var self = this;
+
+    // case-insensitive model find
+    self.modelName = _.find(Object.keys(c.compound.models), function (key) {
         return key.toLowerCase() === c.req.params.modelName.toLowerCase();
     });
-    var model = c.compound.models[c.modelName];
+    var model = c.compound.models[self.modelName];
 
     model.find(c.req.params.id, function (err, obj) {
         if (!obj) {
@@ -22,7 +25,7 @@ function findObject(c) {
             });
         }
 
-        c.obj = obj;
+        self.obj = obj;
         c.next();
     });
 }
@@ -33,7 +36,7 @@ function findObject(c) {
  * @param  {context} c - http context
  */
 UriController.prototype.get = function get(c) {
-    c.send((c.obj.toPublicObject && c.obj.toPublicObject()) || c.obj);
+    c.send((this.obj.toPublicObject && this.obj.toPublicObject()) || this.obj);
 };
 
 /**
@@ -45,63 +48,24 @@ UriController.prototype.get = function get(c) {
  * @param  {context} c - http context containing parameters
  */
 UriController.prototype.perform = function perform(c) {
+    var self = this;
     var body = c.req.body;
-    var callback = false;
-    var result;
 
-    //create the callback
-    var next = body.next = body.callback = body.done = function (err, output) {
+    // perform the method call via the HatchAPI model
+    api.perform(self.obj, c.req.params.action, body, function (err, result) {
         if (err) {
             return c.send({
                 status: 'error',
-                error: err
+                message: err.message
             });
-        }
-
-        if (output) {
-            result = output;
         }
 
         c.send({
             status: 'success',
             message: c.req.params.action + ' executed',
             result: result,
-            object: c.obj
+            object: self.obj
         });
-    };
-
-    var func = c.obj[c.req.params.action];
-    var pattern = /function[^(]*\(([^)]*)\)/;
-
-    //check that the function actually exists
-    if (!func) {
-        return c.send({
-            status: 'error',
-            message: 'Method ' + c.req.params.action + ' not found'
-        });
-    }
-
-    //convert named parameters into function arguments
-    var args = func.toString().match(pattern)[1].split(/,\s*/);
-    var params = [];
-
-    args.forEach(function (arg) {
-        //check to see if there is a callback argument
-        if (['next', 'callback', 'done'].indexOf(arg) > -1) {
-            callback = true;
-        }
-        params.push(body[arg]);
     });
-
-    try {
-        result = func.call(c.obj, params);
-    } catch (err) {
-        return callback(err);
-    }
-
-    //if there is no callback, call next to send result to browser
-    if (!callback) {
-        return next();
-    }
 };
 
