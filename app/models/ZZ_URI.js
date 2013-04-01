@@ -3,6 +3,8 @@
 module.exports = function (compound) {
     Object.keys(compound.models).forEach(function (modelName) {
         var model = compound.models[modelName];
+        if(!model.schema) return;
+        
         var schema = model.schema.definitions[modelName];
         var redis = model.schema.adapter;
 

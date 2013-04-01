@@ -1,6 +1,5 @@
 'use strict';
 var _ = require('underscore');
-var api = require('../../models/HatchAPI');
 
 module.exports = UriController;
 
@@ -11,7 +10,7 @@ function UriController(init) {
 function findObject(c) {
     var self = this;
 
-    // case-insensitive model find
+    // TODO: change case-insensitive model find to compound.getModel when implemented
     self.modelName = _.find(Object.keys(c.compound.models), function (key) {
         return key.toLowerCase() === c.req.params.modelName.toLowerCase();
     });
@@ -21,7 +20,7 @@ function findObject(c) {
         if (!obj) {
             return c.send({
                 status: 'error',
-                message: c.modelName + ' not found'
+                message: self.modelName + ' not found'
             });
         }
 
@@ -52,7 +51,7 @@ UriController.prototype.perform = function perform(c) {
     var body = c.req.body;
 
     // perform the method call via the HatchAPI model
-    api.perform(self.obj, c.req.params.action, body, function (err, result) {
+    c.compound.models.api.perform(self.obj, c.req.params.action, body, function (err, result) {
         if (err) {
             return c.send({
                 status: 'error',
