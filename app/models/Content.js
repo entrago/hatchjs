@@ -34,7 +34,7 @@ module.exports = function (compound, Content) {
     /**
      * gets the popularity score for this content
      * 
-     * @return {[Number]} 
+     * @return {Number} 
      */
     Content.getter.score = function() {
         return Math.min(Math.floor(((this.likes || []).length + (this.comments || []).length) / 2), 5);

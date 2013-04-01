@@ -36,7 +36,7 @@ module.exports = function (compound) {
         };
 
         function generateUri(id) {
-            return '/do/api/get/' + modelName + '/' + id;
+            return '/do/api/' + modelName.toLowerCase() + '/' + id;
         }
     });
 };
