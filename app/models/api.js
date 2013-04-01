@@ -1,7 +1,20 @@
 module.exports = function (compound) {
-    var api = compound.models.api = {};
+    'use strict';
 
-    api.perform = function (obj, methodName, params, callback) {
+    // define the Api type
+    var Api = compound.models.Api = function () {
+
+    };
+
+    /**
+     * Perform a method call on the specified db model entity.
+     * 
+     * @param  {Object}   obj        - the object to perform method call on
+     * @param  {String}   methodName - name of the method to execute
+     * @param  {Object}   params     - the parameters of the method call
+     * @param  {Function} callback   - callback function
+     */
+    Api.prototype.perform = function (obj, methodName, params, callback) {
         var hasCallback = false;
         var result;
 
@@ -23,10 +36,13 @@ module.exports = function (compound) {
         }
 
         // check the whitelist for functions that can be run via the API
-        if (obj.constructor.apiWhitelist) {
-            if (obj.constructor.apiWhitelist.indexOf(methodName) === -1) {
+        if (obj.constructor.allowedApiActions) {
+            if (!~obj.constructor.allowedApiActions.indexOf(methodName)) {
                 return callback(new Error('Method ' + methodName + ' not allowed.'));
             }
+        } else {
+            console.log('WARNING: no allowedApiActions whitelist defined for ' +
+                obj.constructor);
         }
 
         // convert named parameters into function arguments
@@ -52,4 +68,4 @@ module.exports = function (compound) {
             return next();
         }
     };
-}
+};

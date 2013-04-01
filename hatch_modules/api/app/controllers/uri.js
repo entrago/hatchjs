@@ -49,9 +49,10 @@ UriController.prototype.get = function get(c) {
 UriController.prototype.perform = function perform(c) {
     var self = this;
     var body = c.req.body;
+    var api = new c.compound.models.Api();
 
     // perform the method call via the HatchAPI model
-    c.compound.models.api.perform(self.obj, c.req.params.action, body, function (err, result) {
+    api.perform(self.obj, c.req.params.action, body, function (err, result) {
         if (err) {
             return c.send({
                 status: 'error',

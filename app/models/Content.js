@@ -31,7 +31,7 @@ module.exports = function (compound, Content) {
     Content.validatesPresenceOf('createdAt', 'title', 'text');
 
     // register the functions which can be called from the REST api
-    Content.apiWhitelist = ['like', 'vote', 'doesLike', 'doesDislike'];
+    Content.allowedApiActions = ['like', 'vote', 'doesLike', 'doesDislike'];
 
 
     /**
