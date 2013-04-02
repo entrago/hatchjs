@@ -11,10 +11,10 @@ module.exports = function (compound) {
         app.set('upload path', app.root + '/public/upload');
 
         // TODO move render speed hook to proper place
-        app.stack.unshift({route: '', handle: function timeLogger(req, res, next) {
+        compound.injectMiddlewareAt(2, function timeLogger(req, res, next) {
             req.startedAt = Date.now();
             next();
-        }});
+        });
 
         app.use(express.static(app.root + '/public', { maxAge: 86400000 }));
         app.use(express.bodyParser());

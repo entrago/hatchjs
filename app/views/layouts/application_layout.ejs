@@ -180,7 +180,7 @@
                 <div class="pull-right">
                     <i class="icon-bolt"></i>
                     <span id="pagetimer">
-                        <%- t(['layout.renderSpeed', (new Date() - req.startedAt) / 1000]) %>
+                        <%- t(['layout.renderSpeed', (Date.now() - startedAt) / 1000]) %>
                     </span>
                 </div>
 
