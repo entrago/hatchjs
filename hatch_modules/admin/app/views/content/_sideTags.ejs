@@ -3,7 +3,7 @@
 
 <%- li('manage-tags') %>
     <%- linkTo(icon('tags') + t('content.manageTags'),
-        pathTo.groupTags(group)) %>
+        pathTo.tags) %>
 <%- liEnd %>
 
 <% tags.forEach(function(tag) { %>
@@ -12,12 +12,12 @@
             <%- linkTo(icon('tag') + tag.name +
                 '<span class="badge pull-right">' +
                 formatNumber(tag.contentCount),
-                pathTo.filteredGroupContent(tag.id.toString())) %>
+                pathTo.filteredContent(tag.id.toString())) %>
         <%- liEnd %>
     <% } %>
 <% }) %>
 
 <%- li('new-tag') %>
     <%- linkTo(icon('plus') + t('tag.new'),
-        pathTo.newGroupTag(group)) %>
+        pathTo.newTag) %>
 <%- liEnd %>

@@ -14,8 +14,8 @@ exports.routes = function (map) {
     });
     map.resources('content', {as: 'content', suffix: 'entry'}, function (item) {
         item.collection(function (items) {
-            items.get('filter/:filter.:format?', '#index', {as: 'filteredGroupContent' });
-            items.del('destroyAll', {as: 'destroySelectedGroupContent'});
+            items.get('filter/:filter.:format?', '#index', {as: 'filteredContent' });
+            items.del('destroyAll', {as: 'destroySelectedContent'});
         });
     });
     map.resources('tags', function (tag) {

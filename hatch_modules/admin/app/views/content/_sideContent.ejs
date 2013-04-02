@@ -2,14 +2,14 @@
 
 <%- li('new') %>
     <%- linkTo(icon('pencil') + t('content.new'),
-        pathTo.newGroupContentEntry(group)) %>
+        pathTo.newContentEntry) %>
 <%- liEnd %>
 
 <li class="nav-header"><%= t('content.header.filter') %></li>
 
 <%- li('content') %>
     <%- linkTo(icon('star') + t('content.all'),
-        pathTo.groupContent(group)) %>
+        pathTo.content) %>
 <%- liEnd %>
 
 <% var iconFor = {
@@ -24,6 +24,6 @@
     <%- li('content-' + f) %>
         <%- linkTo(
             icon(iconFor[f]) + t('content.' + f),
-            pathTo.filteredGroupContent(group, f)) %>
+            pathTo.filteredContent(f)) %>
     <%- liEnd %>
 <% }) %>

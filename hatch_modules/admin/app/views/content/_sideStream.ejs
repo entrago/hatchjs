@@ -2,11 +2,11 @@
 
 <%- li('manage-streams') %>
     <%- linkTo(icon('signin') + t('stream.manage'),
-        pathTo.groupStreams(group)) %>
+        pathTo.streams) %>
 <%- liEnd %>
 
 <%- li('new-stream') %>
     <%- linkTo(icon('plus') + t('stream.add'),
-        pathTo.newGroupStream(group)) %>
+        pathTo.newStream) %>
 <%- liEnd %>
 

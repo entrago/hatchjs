@@ -8,14 +8,14 @@
                 <h3><%= t('tag.add') %></h3>
                 <hr/>
 
-                <%- formTagBegin({action: pathTo.groupTags(req.group), remote: true, id: 'tag-form' }) %>
+                <%- formTagBegin({action: pathTo.tags, remote: true, id: 'tag-form' }) %>
                     <input type="hidden" name="id" value="<%- tag && tag.id %>" />
 
                     <% include _form %>
 
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary"><%= t('tag.add') %></button>
-                        <a href="<%- pathTo.groupTags(req.group) %>" class="btn"><%= t('common.cancel') %></a>
+                        <a href="<%- pathTo.tags %>" class="btn"><%= t('common.cancel') %></a>
                     </div>
                 <%- formTagEnd() %>
 
