@@ -3,8 +3,8 @@
     <% include ../content/_sidebar %>
 
     <% var form = formFor(post, {
-        action: pathTo.groupContent(group, {format: 'json'}),
         remote: true,
+        action: pathTo.content({format: 'json'}),
         id: 'content-form',
         class: 'content-form'
     }) %>

@@ -109,7 +109,7 @@
                             });
 
                             function refreshFilterResults() {
-                                var url = '<%- pathTo.countGroupTag(tag) %>';
+                                var url = '<%- pathTo.groupTag %>';
                                 $('#filter-results-count').load(url, {
                                     type: 'POST',
                                     filter: $('#filterValue').val()
@@ -140,9 +140,11 @@
         $('#tag-form').bind('ajax:success', function(e, data) {
             $.noty({text: '<i class="icon-' + data.icon + '"></i> ' + data.message, type: data.status});
 
-            if(data.status == "success") {
-                //refresh the page
-                setTimeout(function() { window.location = '<%- pathTo.groupTags(req.group) %>'; }, 1000);
+            if (data.status === "success") {
+                // refresh the page
+                setTimeout(function() {
+                    window.location = '<%- pathTo.tags %>';
+                }, 1000);
             }
         });
     });
