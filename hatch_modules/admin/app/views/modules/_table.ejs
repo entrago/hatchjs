@@ -40,12 +40,12 @@
                                 pathTo.moduleSettings(module.info.name)
                             ) %>
                         <% } %>
-                        <a rel="tooltip" data-original-title="<%- __('Disable this module') %>" href="<%- pathTo.disableGroupModule(group, module.info.name) %>">
+                        <a rel="tooltip" data-original-title="<%- __('Disable this module') %>" href="<%- pathTo.disableModule(module.info.name) %>">
                             <i class="icon-remove"></i></a>
                     <% } else { %>
                         <%- linkTo(
                             __('Enable'),
-                            pathTo.enableGroupModule(group, module.info.name)
+                            pathTo.enableModule(module.info.name)
                         ) %>
                     <% } %>
                 </td>

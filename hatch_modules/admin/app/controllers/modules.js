@@ -53,18 +53,15 @@ ModulesController.prototype.enable = function enable(c) {
 
     group.modules.push(groupModule);
     group.save(function () {
-        // c.api.module.initializeModule(group, groupModule);
-        // loadModules(locals, c.compound.hatch);
-        c.redirect(c.pathTo.groupModules(group));
+        c.redirect(c.pathTo.modules);
     });
 };
 
 ModulesController.prototype.disable = function (c) {
-    console.log(this.groupModuleIndex);
     this.group.modules.remove(this.groupModuleIndex);
     this.group.save(function (err, group) {
         if (!err) {
-            c.redirect(c.pathTo.groupModules(group));
+            c.redirect(c.pathTo.modules);
         }
     });
 };

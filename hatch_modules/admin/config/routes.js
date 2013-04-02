@@ -3,13 +3,11 @@ exports.routes = function (map) {
 
     map.root('pages#index');
     
-    map.resources('groups', function (group) {
-
-    });
+    map.resources('groups');
 
     map.resources('modules', function (module) {
         module.collection(function (modules) {
-            modules.get('marketplace', {as: 'groupModulesMarketplace'});
+            modules.get('marketplace', {as: 'modulesMarketplace'});
         });
         module.get('disable');
         module.get('enable');

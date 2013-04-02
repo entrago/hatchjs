@@ -27,37 +27,21 @@ var Application = module.exports = function Application(init) {
             }
         }
 
-        var id = c.params.group_id || c.params.groupId || c.controllerName === 'groups' && c.params.id || c.req.query.groupId;
-        if (id != c.req.group.id) {
-            c.Group.find(id, function (err, group) {
-                if (!err) {
-                    return c.next(err);
-                }
-                group.parent = c.req.group;
-                c.req.group = group;
-                initGroup();
+        locals.group = c.req.group;
+        loadGroupTags();
+        if (c.req.query.pageId && isNaN(parseInt(c.req.query.pageId, 10))) {
+            var url = c.req.query.pageId.replace(/^.*?\//, '/');
+            c.req.group.definePage(url, c, function(err, page) {
+                c.req.page = page;
+                c.next();
+            });
+        } else if (c.req.query.pageId) {
+            c.Page.find(c.req.query.pageId, function (err, page) {
+                c.req.page = page;
+                c.next();
             });
         } else {
-            initGroup();
-        }
-
-        function initGroup() {
-            locals.group = c.req.group;
-            loadGroupTags();
-            if (c.req.query.pageId && isNaN(parseInt(c.req.query.pageId, 10))) {
-                var url = c.req.query.pageId.replace(/^.*?\//, '/');
-                c.req.group.definePage(url, c, function(err, page) {
-                    c.req.page = page;
-                    c.next();
-                });
-            } else if (c.req.query.pageId) {
-                c.Page.find(c.req.query.pageId, function (err, page) {
-                    c.req.page = page;
-                    c.next();
-                });
-            } else {
-                c.next();
-            }
+            c.next();
         }
     });
 };

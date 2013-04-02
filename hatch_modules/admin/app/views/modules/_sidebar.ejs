@@ -3,10 +3,10 @@
     <ul class="nav nav-list">
       <li class="nav-header"><%- __('Actions') %></li>
       <li<%- pageName === 'manage' ? ' class="active"' : '' %>>
-        <%- linkTo('<i class="icon-cogs"></i> ' + __('Manage modules'), pathTo.groupModules(group)) %>
+        <%- linkTo('<i class="icon-cogs"></i> ' + __('Manage modules'), pathTo.modules) %>
       </li>
       <li<%- pageName === 'marketplace' ? ' class="active"' : '' %>>
-        <%- linkTo('<i class="icon-search"></i> ' + __('Marketplace'), pathTo.groupModulesMarketplace(group)) %>
+        <%- linkTo('<i class="icon-search"></i> ' + __('Marketplace'), pathTo.modulesMarketplace) %>
       </li>
     </ul>
   </div>
