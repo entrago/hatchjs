@@ -1,0 +1,12 @@
+title: LinkedIn OAuth
+description: Authenticate user with LinkedIn
+icon: linkedin-sign
+settings:
+  intro: Please enter your LinkedIn Application details
+  fields:
+    apiKey:
+      type: text
+      title: LinkedIn App ID
+    secret:
+      type: text
+      title: LinkedIn App Secret

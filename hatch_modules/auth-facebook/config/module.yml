@@ -1,0 +1,12 @@
+title: Facebook OAuth
+description: Authenticate user with Facebook
+icon: facebook-sign
+settings:
+  intro: Please enter your Facebook Application details
+  fields:
+    apiKey:
+      type: text
+      title: Facebook App ID
+    secret:
+      type: text
+      title: Facebook App Secret

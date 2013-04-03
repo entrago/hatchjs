@@ -1,0 +1,38 @@
+<div id="<%- content.id %>" class="tweet content-item">
+  <div class="tweet-border">
+    <div class="h-card p-author">
+        <!--<iframe class="follow-button" allowtransparency="true" frameborder="0" scrolling="no" src="//platform.twitter.com/widgets/follow_button.html#align=right&amp;button=grey&amp;screen_name=<%- content.importData.from_user %>&amp;show_count=false&amp;show_screen_name=false&amp;lang=en"></iframe>-->
+        <div class="follow-button">
+          <a href="https://twitter.com/intent/follow?region=follow_link&amp;screen_name=<%- content.importData.from_user %>&amp;tw_p=followbutton&amp;variant=2.0" rel="popup"><img src="/img/twitter-follow-button.png" alt="follow <%- content.importData.from_user %>" /></a>
+        </div>
+        <a class="screen-name u-url" href="https://twitter.com/<%- content.importData.from_user %>" data-screen-name="twitterapi">
+          <span class="avatar pull-left"><img src="<%- content.importData.profile_image_url_https %>" class="u-photo img-rounded" alt=""/></span>
+          <span class="p-name"><%- content.importData.from_user_name %></span>
+          <span class="p-nickname">@<%- content.importData.from_user %></span>
+        </a>
+    </div>
+    <div class="tweet-content">
+      <p><%- parseHashtags(parseUsernames(parseLinks(content.text), { url: 'https://twitter.com/' }), { url: 'https://twitter.com/search?q=' }) %></p>
+    </div>
+    <div class="tweet-footer">
+        <ul class="tweet-actions">
+          <li>
+            <a href="https://twitter.com/intent/tweet?in_reply_to=<%- content.importData.id_str %>" class="reply-action twt-intent" title="Reply" rel="popup"><i class="icon-share-alt"></i>Reply</a>
+          </li>
+          <li>
+            <a href="https://twitter.com/intent/retweet?tweet_id=<%- content.importData.id_str %>" class=" retweet-action  twt-intent" title="Retweet" rel="popup"><i class="icon-retweet"></i>Retweet</a>
+          </li>
+          <li>
+            <a href="https://twitter.com/intent/favorite?tweet_id=<%- content.importData.id_str %>" class=" favorite-action  twt-intent" title="Favorite" rel="popup"><i class="icon-star"></i>Favorite</a>
+          </li>
+        </ul>
+
+        <a class="view-details" href="//<%- content.url %>">
+          <span class="dt-updated " title="<%- content.createdAt %>">
+          <span class="value-title" title="<%- content.createdAt %>"></span>
+            <%- timeSince(content.createdAt) %>
+          </span>
+        </a>
+    </div>
+  </div>
+</div>

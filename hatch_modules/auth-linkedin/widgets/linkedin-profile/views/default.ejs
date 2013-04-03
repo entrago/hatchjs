@@ -1,0 +1,16 @@
+<% if(widget.settings.title.length) { %>
+    <h2><%- widget.settings.title %></h2>
+<% } %>
+
+<div class="content">
+    <% if(user.linkedinId && apiKey) { %>
+        <script type="text/javascript" src="http://platform.linkedin.com/in.js">
+            api_key: <%- apiKey %>
+        </script>
+        <script type="IN/FullMemberProfile" data-id="<%- user.linkedinId %>"></script>
+    <% } else { %>
+        <p>
+            <%- __('This user has not connected their LinkedIn profile to their account.') %>
+        </p>
+    <% } %>
+</div>

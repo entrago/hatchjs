@@ -1,0 +1,18 @@
+title: Twitter OAuth
+description: Authenticate user with Twitter
+icon: twitter-sign
+settings:
+  intro: Please enter your Twitter Application details
+  fields:
+    apiKey:
+      type: text
+      title: Twitter App ID
+    secret:
+      type: text
+      title: Twitter App Secret
+    accessToken:
+      type: text
+      title: Access token
+    accessTokenSecret:
+      type: text
+      title: Access token secret
