@@ -17,27 +17,26 @@
         </tr>
         </thead>
         <tbody>
-          <% modulesAvailable.forEach(function (module) { if (module && !module.info.system) { %>
+            <% modulesAvailable.forEach(function (module) { if (module && !module.info.system) { %>
             <tr>
                 <td width="2%">
-                    <i class="<%= module.info.icon || "icon-cog" %>"></i>
+                    <%- icon(module.info.icon || 'cog') %>
                 </td>
                 <td>
-                    <%= __(module.info.name || module.name) %>
+                    <%= module.info.title || module.info.name %>
                 </td>
                 <td>
-                    <%= __(module.info.description) || __('No description') %>
+                    <%= module.info.description || 'No description' %>
                 </td>
                 <td>
-                    <%- module.info.name %>
-                    <%- moduleEnabled(module.info.name) ? __('Yes') : __('No') %>
+                    <%- moduleEnabled(module.info.name) ? 'Yes' : 'No' %>
                 </td>
                 <td nowrap="nowrap" align="right">
                     <% if (moduleEnabled(module.info.name)) { %>
-                        <% if(module.info.settings) { %>
+                        <% if (module.info.settings) { %>
                             <%- linkTo(
                                 __('Edit'),
-                                pathTo.moduleSettings(module.info.name)
+                                pathTo.setupModule(module.info.name)
                             ) %>
                         <% } %>
                         <a rel="tooltip" data-original-title="<%- __('Disable this module') %>" href="<%- pathTo.disableModule(module.info.name) %>">

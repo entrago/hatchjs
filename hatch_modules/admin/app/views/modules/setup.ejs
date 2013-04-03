@@ -1,0 +1,50 @@
+<div class="row">
+
+    <% include _sidebar %>
+
+    <div class="span10">
+        <div class="module">
+            <div class="content">
+                <h3><%- inst.module.info.title || inst.module.info.name %> settings</h3>
+
+                <% if(inst.module.info.settings.intro) { %>
+                    <p>
+                        <%- __(inst.module.info.settings.intro) %>
+                    </p>
+                <% } %>
+
+                <hr/>
+
+                <%- formTagBegin({
+                    action: pathTo.module(inst.module.info.name),
+                    method: 'PUT',
+                    id: 'settingsForm',
+                    class: 'form-horizontal'
+                }) %>
+
+                    <% Object.keys(inst.module.info.settings.fields).forEach(function(settingName) { 
+                        var setting = inst.module.info.settings.fields[settingName]; 
+                        setting.name = settingName;
+                    %>
+                        <%- formInput(setting, inst.contract && inst.contract[settingName] || '') %>
+                    <% }) %>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"><%- __('Save settings') %></button>
+                    </div>
+
+                <% formTagEnd() %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    //bind the form ajax
+    $('#settingsForm').bind('ajax:success', function(e, data) {
+        $.noty({text: '<i class="icon-' + data.icon + '"></i> ' + data.message, type: data.status});
+
+        //refresh the page
+        setTimeout(function() { window.location = window.location; }, 1000);
+    });
+</script>

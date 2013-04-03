@@ -9,6 +9,7 @@ exports.routes = function (map) {
         module.collection(function (modules) {
             modules.get('marketplace', {as: 'modulesMarketplace'});
         });
+        module.get('setup');
         module.get('disable');
         module.get('enable');
     });
