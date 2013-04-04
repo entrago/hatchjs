@@ -1,0 +1,2 @@
+exports.registration = function(user) {
+};

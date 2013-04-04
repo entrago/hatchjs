@@ -27,8 +27,8 @@
     "co-assets-compiler": "0.0.1",
     "unzip": "~0.1.5",
     "stream-buffers": "~0.2.4",
-    "async": "latest",
-    "http-post": "latest"
+    "http-post": "latest",
+    "co-mailer": "0.0.2-1"
   },
   "devDependencies": {
     "mocha": "1.8.1",
