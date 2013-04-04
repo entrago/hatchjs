@@ -1,11 +1,15 @@
 'use strict';
 var _ = require('underscore');
+var ApiController = require('./apiController');
 
 module.exports = UriController;
 
 function UriController(init) {
+    ApiController.call(this, init);
     init.before(findObject);
 }
+
+require('util').inherits(UriController, ApiController);
 
 function findObject(c) {
     var self = this;

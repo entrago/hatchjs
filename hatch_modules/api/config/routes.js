@@ -19,6 +19,7 @@
 'use strict';
 
 exports.routes = function (map) {
+    map.get('/tags/:name', 'tags#get');
     map.get('/tags/:name/get', 'tags#get');
     map.get('/tags/:name/ping', 'tags#ping');
     map.get('/tags/:name/subscribe', 'tags#subscribe');

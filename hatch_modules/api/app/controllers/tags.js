@@ -18,10 +18,14 @@
 
 'use strict';
 module.exports = TagController;
+var ApiController = require('./apiController');
 
 function TagController(init) {
+    ApiController.call(this, init);
     init.before(findTag);
 }
+
+require('util').inherits(TagController, ApiController);
 
 function handleError(c, err) {
     return c.send({
@@ -31,15 +35,23 @@ function handleError(c, err) {
 }
 
 function findTag(c) {
+    var self = this;
+    self.modelContext = c.compound.hatch.modelContext.getNewContext(c);
+
     c.Tag.findByName(c.req.params.name, function (err, tag) {
         if (!tag) {
             return handleError(c, new Error('Tag not found'));
         }
 
-        // TODO: authenticate the user and check permissions vs this tag
+        // authenticate the user and check permissions vs this tag
+        self.modelContext.checkPermission(tag, 'view', function (err, result) {
+            if (!result) {
+                return handleError(c, new Error('Permission denied. You do not have access to this tag.'));
+            }
 
-        c.tag = tag;
-        c.next();
+            self.tag = tag;
+            c.next();
+        });
     });
 }
 
@@ -82,7 +94,7 @@ TagController.prototype.get = function get(c) {
         limit: c.req.query.limit || 10
     };
 
-    c.tag.getResults(params, function (err, results) {
+    this.tag.getResults(params, function (err, results) {
         c.send({
             status: 'success',
             params: params,
@@ -105,8 +117,10 @@ TagController.prototype.get = function get(c) {
  * @param  {context} c - http context
  */
 TagController.prototype.ping = function ping(c) {
+    var self = this;
+
     return c.send({
-        status: c.tag.ping(c.req.query.since) ? 'updated' : 'same'
+        status: self.tag.ping(c.req.query.since) ? 'updated' : 'same'
     });
 };
 
@@ -123,7 +137,7 @@ TagController.prototype.subscribe = function subscribe(c) {
     var url = c.req.query.url;
     var lease = parseInt(c.req.query.lease, 10);
 
-    c.tag.subscribe(url, lease, function (err) {
+    this.tag.subscribe(url, lease, function (err) {
         if (err) {
             return handleError(c, err);
         }

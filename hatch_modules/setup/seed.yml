@@ -91,3 +91,8 @@
         role: owner
         joinedAt: "2000-01-01T00:00:01.000Z"
         state: approved
+
+- Token:
+    id: 1
+    userId: 1
+    token: test123

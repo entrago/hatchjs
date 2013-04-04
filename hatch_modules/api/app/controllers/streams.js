@@ -18,10 +18,14 @@
 
 'use strict';
 module.exports = StreamsController;
+var ApiController = require('./apiController');
 
 function StreamsController(init) {
+    //ApiController.call(this, init);
     init.before(findByHash);
 }
+
+require('util').inherits(StreamsController, ApiController);
 
 function handleError(c, err) {
     return c.send({

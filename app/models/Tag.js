@@ -244,7 +244,7 @@ module.exports = function (compound, Tag) {
             callback(new Error('Please specify a pingback URL'));
         }
         if (!lease || parseInt(lease, 10) < 60000) {
-            callback(new Error('Please specify a lease of at least 60000'));
+            callback(new Error('Please specify a lease of at least 60000 milliseconds'));
         }
 
         var now = new Date().getTime();
