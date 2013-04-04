@@ -16,15 +16,17 @@
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
 
-var _ = require('underscore');
 var fs = require('fs');
 var path = require('path');
-var unzip = require('unzip');
-var async = require('async');
-var streamBuffers = require('stream-buffers');
 
 // runs a restore from the specified data
 exports.run = function(c, path, domain, done) {
+
+    var _ = require('underscore');
+    var unzip = require('unzip');
+    var streamBuffers = require('stream-buffers');
+    var async = require('async');
+
     // disable hooks
     // c.compound.hooks.enabled = false;
 
