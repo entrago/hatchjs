@@ -1,4 +1,3 @@
-//
 // Hatch.js is a CMS and social website building framework built in Node.js 
 // Copyright (C) 2013 Inventures Software Ltd
 // 
@@ -16,13 +15,40 @@
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
 
+'use strict';
+
+var fs = require('fs');
+var fsTools = require('fs-tools');
+var path = require('path');
+var util = require('util');
+var im = require('imagemagick');
+
+module.exports = UploadController;
+
+function UploadController(init) {
+    
+}
+
 /**
- * Server module exports method which returns new instance of application
- * server
- *
- * @param {Compound} parent - railway/express parent webserver.
- * @returns CompoundJS powered express webserver
+ * Upload a file and return it's URL.
+ * 
+ * @param  {HttpContext} c - http context
  */
-var app = module.exports = function getServerInstance(parent) { 
-    return require('compound').createServer({root: __dirname});
+UploadController.prototype.upload = function (c) {
+    c.compound.hatch.upload.upload(c.req, function (err, urls) {
+        c.res.contentType('text/html');
+
+        if (urls.length === 1) {
+            c.send({
+                status: 'success',
+                url: urls[0]
+            });
+        } else {
+            c.send({
+                status: 'success',
+                urls: urls
+            });
+        }
+    });
 };
+
