@@ -54,6 +54,8 @@
         name: upload
       -
         name: content
+      -
+        name: api
 
 - Page:
     id: 1

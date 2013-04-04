@@ -30,11 +30,14 @@ module.exports = function (compound, Content) {
 
     Content.validatesPresenceOf('createdAt', 'title', 'text');
 
+    // register the functions which can be called from the REST api
+    Content.allowedApiActions = ['like', 'vote', 'doesLike', 'doesDislike'];
+
 
     /**
      * gets the popularity score for this content
      * 
-     * @return {[Number]} 
+     * @return {Number} 
      */
     Content.getter.score = function() {
         return Math.min(Math.floor(((this.likes || []).length + (this.comments || []).length) / 2), 5);

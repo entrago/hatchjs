@@ -24,4 +24,7 @@ exports.routes = function (map) {
     map.get('/tags/:name/subscribe', 'tags#subscribe');
 
     map.get('/streams/:hash/run', 'streams#run');
+
+    map.get('/:modelName/:id', 'uri#get');
+    map.post('/:modelName/:id/:action', 'uri#perform');
 };
