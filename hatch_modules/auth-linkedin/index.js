@@ -41,7 +41,7 @@ module.exports = function (c) {
     });
 
     c.on('render', function(viewContext) {
-        if (!viewContext.group.modules.find('auth-linkedin', 'name')) {
+        if (!viewContext.group || !viewContext.group.modules.find('auth-linkedin', 'name')) {
             return;
         }
         with (viewContext) {

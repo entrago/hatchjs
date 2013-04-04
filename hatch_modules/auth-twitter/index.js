@@ -44,7 +44,7 @@ module.exports = function (c) {
     c.hatch.importStream.registerImporter('twitter', 'Twitter', 'twitter', require('./import/twitter')());
 
     c.on('render', function(viewContext) {
-        if (!viewContext.group.modules.find('auth-twitter', 'name')) {
+        if (!viewContext.group || !viewContext.group.modules.find('auth-twitter', 'name')) {
             return;
         }
         with (viewContext) {

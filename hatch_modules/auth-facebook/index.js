@@ -40,7 +40,7 @@ module.exports = function (c) {
     });
 
     c.on('render', function(viewContext) {
-        if (!viewContext.group.modules.find('auth-facebook', 'name')) {
+        if (!viewContext.group || !viewContext.group.modules.find('auth-facebook', 'name')) {
             return;
         }
         with (viewContext) {
