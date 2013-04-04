@@ -21,6 +21,13 @@ function findObject(c) {
     });
     var model = c.compound.models[self.modelName];
 
+    if (!model) {
+        return c.send({
+            status: 'error',
+            message: 'Could not find model "' + c.req.params.modelName + '"'
+        });
+    }
+
     model.find(c.req.params.id, function (err, obj) {
         if (!obj) {
             return c.send({
