@@ -26,6 +26,15 @@ var User = define('User', function () {
 
 User.schema.adapter.defineFulltextIndex('User', 'fulltext');
 
+var Token = define('Token', function () {
+    property('userId', Number, {index: true});
+    property('applicationId', Number, {index: true});
+    property('token', String, {index: true});
+    property('expiryDate', Date);
+
+    set('ignoreNullValues', true);
+});
+
 var Group = define('Group', function () {
     property('url', String, {index: true});
     property('path', String);
