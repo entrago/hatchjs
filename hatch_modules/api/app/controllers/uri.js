@@ -9,6 +9,7 @@ function UriController(init) {
 
 function findObject(c) {
     var self = this;
+    self.modelContext = c.compound.hatch.modelContext.getNewContext(c);
 
     // TODO: change case-insensitive model find to compound.getModel when implemented
     self.modelName = _.find(Object.keys(c.compound.models), function (key) {
@@ -24,8 +25,18 @@ function findObject(c) {
             });
         }
 
-        self.obj = obj;
-        c.next();
+        // check view permission on this object
+        self.modelContext.checkPermission(obj, 'view', function (err, result) {
+            if (!result) {
+                return c.send({
+                    status: 'error',
+                    message: 'permission denied'
+                });       
+            }
+
+            self.obj = obj;
+            c.next();
+        });
     });
 }
 
@@ -49,10 +60,9 @@ UriController.prototype.get = function get(c) {
 UriController.prototype.perform = function perform(c) {
     var self = this;
     var body = c.req.body;
-    var api = new c.compound.models.Api();
-
+    
     // perform the method call via the HatchAPI model
-    api.perform(self.obj, c.req.params.action, body, function (err, result) {
+    self.modelContext.perform(self.obj, c.req.params.action, body, function (err, result) {
         if (err) {
             return c.send({
                 status: 'error',

@@ -1,0 +1,53 @@
+'use strict';
+
+/**
+ * URI.js automatically adds an auto-generated 'uri' to all database entities.
+ * This can be used to reference the original entity which may have been 
+ * imported from another Hatch application instance.
+ */
+module.exports = function (compound) {
+    process.nextTick(function () {
+        Object.keys(compound.models).forEach(function (modelName) {
+            var model = compound.models[modelName];
+            if (!model.schema) {
+                return;
+            }
+            
+            var schema = model.schema.definitions[modelName];
+            var redis = model.schema.adapter;
+
+            //add the uri property to each schema
+            schema.properties.uri = { type: String, index: true };
+
+            //generate the uri value whenever an object is saved
+            var beforeSave = model.beforeSave;
+            model.beforeSave = function (done) {
+                var obj = this;
+
+                if (obj.uri) {
+                    next();
+                } else if (obj.id) {
+                    obj.uri = generateUri(obj.id);
+                    next();
+                } else {
+                    redis.get('id:' + redis.modelName(modelName), function (err, id) {
+                        obj.uri = generateUri(parseInt(id || 0, 10) + 1);
+                        next();
+                    });
+                }
+
+                function next() {
+                    if (beforeSave) {
+                        beforeSave(done);
+                    } else {
+                        done();
+                    }
+                }
+            };
+
+            function generateUri(id) {
+                return '/do/api/' + modelName.toLowerCase() + '/' + id;
+            }
+        });
+    });
+};

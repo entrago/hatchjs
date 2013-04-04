@@ -28,7 +28,7 @@ module.exports = function (compound, Page) {
     Page.validatesUniquenessOf('url');
 
     // register the functions which can be called from the REST api
-    Page.allowedApiActions = ['getUrlName'];
+    Page.allowedApiActions = ['getUrlName', 'toMinimalObject'];
 
     /**
      * gets the last part of the url of this page after the last '/'
