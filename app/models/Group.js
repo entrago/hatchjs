@@ -78,12 +78,15 @@ module.exports = function (compound, Group) {
 
         if (!found) {
             var special = compound.hatch.page.match(this, pathname);
-            if (special && special.defaultPage) {
-                found = group.pages.build(special.defaultPage);
+            var page = special[0];
+            var params = special[1];
+            if (page && page.defaultPage) {
+                found = group.pages.build(page.defaultPage);
                 found.url = fullPagePath;
                 found.type = special.type;
                 found.grid = found.grid || '02-two-columns';
-                found.handler = special.handler;
+                found.handler = page.handler;
+                found.specialPageParams = params;
             }
         }
 
@@ -98,7 +101,7 @@ module.exports = function (compound, Group) {
         // special page out of this group (sp.defaultPage)
         if (page && page.type !== 'page' && !page.id) {
             if (page.handler) {
-                return page.handler(c, gotPage(this, null, page));
+                return page.handler(c, gotPage.bind(this, null, page));
             }
         }
 

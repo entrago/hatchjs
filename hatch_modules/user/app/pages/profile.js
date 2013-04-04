@@ -32,9 +32,9 @@ exports.defaultPage = {
 };
 
 exports.handler = function (env, done) {
-    if (env.req.specialPageParams.username) {
+    if (this.specialPageParams && this.specialPageParams.username) {
         env.User.all({
-            where: { username: env.req.specialPageParams.username }
+            where: { username: this.specialPageParams.username }
         }, function (err, users) {
             if (err || !users || !users[0]) {
                 return env.next(new Error(404));
