@@ -21,6 +21,7 @@ module.exports = StreamsController;
 var ApiController = require('./apiController');
 
 function StreamsController(init) {
+    // authentication is not required - auth is by stream hash
     //ApiController.call(this, init);
     init.before(findByHash);
 }

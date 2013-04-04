@@ -601,7 +601,74 @@ module.exports = function (compound, User) {
         } else {
             return setting == true;
         }
-    }
+    };
+
+
+    /**
+     * checks whether this user has the specified permission
+     */
+    User.prototype.hasPermission = function(group, permission) {
+        var user = this;
+        var membership = _.find(this.membership || [], function(membership) {
+            return membership.groupId == group.id;
+        });
+
+        if(!membership) return false;
+        // special case for 'view' permission - only need to be a member
+        else if(permission === 'view') return true;
+
+        //owner and editor can do everything
+        if(membership.role === 'owner' || membership.role === 'editor') return true;  
+
+        var found = false;
+        var parent = (api.permissions.getParent(permission) || {}).name;
+
+        //loop through each custom user list in the group and check for the permission
+        _.forEach(group.memberLists || [], function(list) {
+            if(user.customListIds && user.customListIds.indexOf(group.id + '-' + list.id) > -1 &&
+                api.permissions.match(list.permissions, permission)) found = true;
+        });
+
+        return found;
+    };
+
+
+
+    /**
+     * gets the permission for this user within a group
+     * 
+     * @param  {[Group]} group [group to get permissions for]
+     * @return {[list]}        [list of permissions]
+     */
+    User.prototype.getPermissions = function(group, filter) {
+        var user = this;
+        var membership = _.find(this.membership || [], function(membership) {
+            return membership.groupId == group.id;
+        });
+
+        if(!membership) return [];
+
+        //owner and editor can do everything
+        if(membership.role === 'owner' || membership.role === 'editor') return ['*'];  
+
+        var permissions = [];
+
+        //loop through each custom user list in the group and check for the permission
+        _.forEach(group.memberLists || [], function(list) {
+            if(user.customListIds && user.customListIds.indexOf(group.id + '-' + list.id) > -1) {
+                _.forEach(list.permissions, function(permission) {
+                    if(permissions.indexOf(permission) == -1) {
+                        if(!filter || new RegExp(filter).exec(permission)) {
+                            permissions.push(permission);
+                        }
+                    }
+                });
+            }
+        });
+
+        return permissions;
+    };
+
 
     /**
      * encrypts a password
