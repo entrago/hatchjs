@@ -3,7 +3,8 @@ module.exports = function (compound) {
         require('ejs-ext'),
         require('jugglingdb'),
         require('seedjs'),
-        require('co-assets-compiler')
+        require('co-assets-compiler'),
+        require('co-mailer')
     ];
 };
 

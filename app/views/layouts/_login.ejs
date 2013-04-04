@@ -1,4 +1,4 @@
-<%- formTagBegin({action: pathFor('user').login() + '.json', id: 'loginForm', class: 'form-vertical', method: 'post' }) %>
+<%- formTagBegin({remote: true, action: pathFor('user').login() + '.json', id: 'loginForm', class: 'form-vertical', method: 'post' }) %>
     <div class="modal fade" id="login" style="display : none; overflow : visible; width : 400px; margin-left : -200px;">
         <div class="modal-header">
             <a class="close" data-dismiss="modal">×</a>

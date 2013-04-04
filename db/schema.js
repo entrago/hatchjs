@@ -12,7 +12,7 @@ var User = define('User', function () {
     property('lastnameLetter', String, {index: true});
     property('displayName', String, {sort: true});
     property('oneLiner', String);
-    property('membership', JSON);
+    property('membership', []);
     property('customListIds', JSON, {index: true});
     property('ifollow', JSON); // array of ids of user who followed by user
     property('otherFields', JSON);

@@ -125,20 +125,13 @@ module.exports = function (compound, User) {
         //send a notification email and create a notification at the same time
         async.parallel([
             function(done) {
-                if(api.mailer.isDefined(type)) {
-                    console.log('sending email notification');
-                    api.mailer.send({
-                        type: type,
-                        to: user.email,
-                        data:_.extend({ user: user }, params || [])
-                    }, done);
-                }
-                else done();
+                compound.mailer.send('user/registration', user);
+                done();
             },
             function(done) {
-                if(api.notifications.isDefined(type)) {
+                if (compound.hatch.notification.isDefined(type)) {
                     console.log('creating notification entity');
-                    api.notifications.create(type, user, params || [], done);
+                    compound.hatch.notification.create(type, user, params || [], done);
                 }
                 else done();
             }
@@ -463,7 +456,7 @@ module.exports = function (compound, User) {
      * @param  {Function}          cb [continuation function]
      */
     User.prototype.resetPassword = function (c, cb) {
-        api.db.models.ResetPassword.upgrade(this, function (err, rp) {
+        compound.models.ResetPassword.upgrade(this, function (err, rp) {
             this.notify('resetpassword', _.extend({ token: rp.token }, c));
             cb();
         }.bind(this));
@@ -617,12 +610,12 @@ module.exports = function (compound, User) {
     /**
      * calculates a sha1 of the specified string
      * 
-     * @param  {[String]} payload 
-     * @return {[String]}         
+     * @param  {[String]} payload
+     * @return {[String]}
      */
     function calcSha(payload) {
         if (!payload) return '';
         if (payload.length == 64) return payload;
-        return crypto.createHash('sha256').update(payload).update(api.app.config.passwordSalt || '').digest('hex');
+        return crypto.createHash('sha256').update(payload).update(compound.app.get('passwordSalt') || '').digest('hex');
     }
 };
