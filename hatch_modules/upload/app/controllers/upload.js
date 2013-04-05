@@ -36,7 +36,16 @@ function UploadController(init) {
  */
 UploadController.prototype.upload = function (c) {
     c.compound.hatch.upload.upload(c.req, function (err, urls) {
+        
+        // needed for flash response
         c.res.contentType('text/html');
+
+        if (err) {
+            return c.send({
+                status: 'error',
+                message: err.message
+            });
+        }
 
         if (urls.length === 1) {
             c.send({
