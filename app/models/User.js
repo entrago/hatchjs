@@ -243,6 +243,29 @@ module.exports = function (compound, User) {
         this.events[event] = handler;
     };
 
+    User.authenticate = function authenticate(provider, data, c) {
+        User.findOrCreate({
+            provider: provider,
+            profile: data
+        }, function (err, user) {
+            if (user.errors) {
+                throw Error(JSON.stringify(user.errors));
+            }
+            if (user) {
+                c.req.session.userId = user.id;
+            }
+            if (user.email && user.password && user.type != 'temporary') {
+                c.redirect('//' + c.reg.group.url);
+            } else {
+                //set user type to temporary and complete the registration
+                user.type = 'temporary';
+                user.save(function() {
+                    c.redirect(c.specialPagePath('register') + '?redirect=' + escape(c.pathFor('user').join()));
+                });
+            }
+        });
+    };
+
     /**
      * finds a user if it already exists, otherwise create a new user
      * 
@@ -282,8 +305,9 @@ module.exports = function (compound, User) {
             User.emit(
                 'auth-' + data.provider,
                 data.profile,
-                function (query, info) {
-                    User.findOne({where: query}, function (err, user) {
+                function(query, info) {
+                    console.log('hag all', query, info);
+                    User.findOne({where: query}, function(err, user) {
                         if (user) {
                             if (!user.avatar && info.avatar) {
                                 user.avatar = info.avatar;
@@ -320,8 +344,8 @@ module.exports = function (compound, User) {
     };
 
     /**
-     * creates a user with a unique username - automatically appends 1,2,3,4,5,etc to the end of username 
-     * until it finds one which is free
+     * Create a user with a unique username - automatically appends 1,2,etc to
+     * the end of username until it finds one which is free
      * 
      * @param  {[json]}   data [user creation data]
      * @param  {Function} done [continuation function]
@@ -482,7 +506,7 @@ module.exports = function (compound, User) {
 
         // check for existing membership
         var membership = _.find(this.membership, function (membership) {
-            return membership.groupId == group.id;
+            return membership && membership.groupId == group.id;
         });
 
         // group:closed - do not join unless there is an invitation
