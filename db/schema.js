@@ -64,6 +64,7 @@ var Group = define('Group', function () {
 
 var Stylesheet = define('Stylesheet', function () {
     property('groupId', Number, { index: true });
+    property('name', String, { index: true });
     property('css', String);
     property('version', Number);
     property('lastUpdate', Date);
