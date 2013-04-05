@@ -15,31 +15,36 @@
 // 
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
+module.exports = LinkedinAuthController;
 
 var oauth = require('oauth');
 
-exports._initialize = function () {
-    this.before(consumer);
-};
-
-function consumer(c, next) {
-    c.callbackURL = 'http://' + c.req.headers.host + c.pathTo('callback');
-    c.consumer = function consumer() {
-        return new oauth.OAuth(
-            'https://api.linkedin.com/uas/oauth/requestToken',
-            'https://api.linkedin.com/uas/oauth/accessToken',
-            c.moduleInstance.contract.apiKey,
-            c.moduleInstance.contract.secret,
-            '1.0',
-            c.callbackURL,
-            'HMAC-SHA1'
-        );
-    };
-    next();
+function LinkedinAuthController(init) {
+    init.before(function initLinkedin(c) {
+        var gm = c.req.group.modules.find('auth-linkedin', 'name');
+        if (!gm) {
+            return c.next(new Error('The auth-linkedin module is not enable in this group'));
+        }
+        var contract = gm.contract;
+        var locals = this;
+        locals.callbackURL = 'http://' + c.req.headers.host + c.pathTo.callback;
+        locals.consumer = function consumer() {
+            return new oauth.OAuth(
+                'https://api.linkedin.com/uas/oauth/requestToken',
+                'https://api.linkedin.com/uas/oauth/accessToken',
+                contract.apiKey,
+                contract.secret,
+                '1.0',
+                locals.callbackURL,
+                'HMAC-SHA1'
+            );
+        };
+        c.next();
+    });
 }
 
-exports.auth = function linkedinAuth(c) {
-    c.consumer().getOAuthRequestToken({
+LinkedinAuthController.prototype.auth = function (c) {
+    this.consumer().getOAuthRequestToken({
             oauth_callback: c.callbackURL,
             scope: 'r_fullprofile r_emailaddress'
         },
@@ -54,7 +59,8 @@ exports.auth = function linkedinAuth(c) {
     );
 };
 
-exports.callback = function linkedinCallback(c) {
+LinkedinAuthController.prototype.callback = function (c) {
+    var consumer = this.consumer;
     var profile = [
         'id',
         'first-name',
@@ -66,7 +72,7 @@ exports.callback = function linkedinCallback(c) {
         'phone-numbers',
         'site-standard-profile-request:(url)',
     ];
-    c.consumer().getOAuthAccessToken(
+    consumer().getOAuthAccessToken(
         c.req.session.linkedinOauthRequestToken,
         c.req.session.linkedinOauthRequestTokenSecret,
         c.req.query.oauth_verifier,
@@ -76,7 +82,7 @@ exports.callback = function linkedinCallback(c) {
             }
             c.req.session.linkedinAccess = token;
             c.req.session.linkedinSecret = secret;
-            c.consumer().get(
+            consumer().get(
                 'http://api.linkedin.com/v1/people/~:(' + profile + ')?format=json',
                 token,
                 secret,
@@ -84,13 +90,9 @@ exports.callback = function linkedinCallback(c) {
                     if (err) {
                         return c.next(err);
                     }
-                    c.event('user-authenticated', {
-                        provider: 'linkedin',
-                        data: data
-                    });
+                    c.User.authenticate('linkedin', JSON.parse(data), c);
                 }
             );
         }
     );
 };
-
