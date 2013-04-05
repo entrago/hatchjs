@@ -1,0 +1,77 @@
+account:
+  title: Edit account
+  desctiption: Allows users to edit account details
+  icon: icon-cog
+profile:
+  title: User profile
+  desctiption: User profile information
+  icon: icon-user
+login:
+  title: Sign up form
+  desctiption: Sign up form for this group
+  icon: icon-lock
+resetpassword:
+  title: Reset password
+  desctiption: Reset password widget
+  icon: icon-lock
+userlist:
+  title: User list
+  desctiption: Lists users
+  icon: icon-group
+  settings:
+    fields:
+      displayMode:
+        type: select
+        title: 'What to display'
+        options:
+          - 'members:Members'
+          - 'following:Following'
+          - 'followers:Followers'
+        default: 'members'
+      displayType:
+        type: select
+        title: 'Display as'
+        options:
+          - 'simple-list:Simple list'
+          - 'full-details:Full details'
+          - 'thumbnails:Thumbnails'
+        default: 'thumbnails'
+      pageSize:
+        type: select
+        title: 'Users per page'
+        default: 10
+        options:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+          - 7
+          - 8
+          - 9
+          - 10
+          - 11
+          - 12
+          - 13
+          - 14
+          - 15
+          - 16
+          - 17
+          - 18
+          - 19
+          - 20
+          - 30
+          - 50
+          - 100
+      paging:
+        type: select
+        title: 'Paging controls'
+        default: 'show'
+        options:
+          - 'show:Show'
+          - 'hide:Hide'
+      alphabeticalIndex:
+        type: checkbox
+        title: 'A-Z index'
+        default: false

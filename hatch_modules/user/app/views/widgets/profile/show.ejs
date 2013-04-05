@@ -1,0 +1,80 @@
+<div class="remote-panel">
+
+    <% if(!widget.settings || widget.settings.title == null || widget.settings.title.length > 0) { %>
+        <h2><%- widget.settings && widget.settings.title %></h2>
+    <% } %>
+
+    <div class="row profile-row">
+        <div class="span2 span3-1">
+            <img src="<%- user.avatar %>" class="img-rounded" />
+        </div>
+
+        <div class="offset2 nofloat span3-2 span2-2 span3-offset0 span2-offset0">
+            <h4><%- user.displayName %></h4>
+            <p>
+                <%- user.oneLiner %>
+            </p>
+        </div>
+    </div>
+    <div class="row profile-stats profile-row">
+        <hr/>
+        <div class="">
+            <h3><%- numberOfPosts %></h3>
+            <p><%- __('posts') %></p>
+        </div>
+        <div class="">
+            <h3><%- numberOfFollowers %></h3>
+            <p><%- __('followers') %></p>
+        </div>
+        <div class="">
+            <h3><%- numberOfFriends %></h3>
+            <p><%- __('following') %></p>
+        </div>
+    </div>
+    <% if(req.user) { %>
+        <div class="row profile-row">
+            <hr/>
+            <div class="wide span2-2">
+                <% if(req.user.id != user.id) { %>
+                    <% if(user.isFollowed) { %>
+                        <%- linkTo(icon('remove') + ' <span class="text">' + __('Unfollow') + ' ' + user.displayName + '</span>', pathTo.unfollow(user.id), { remote: true, class: 'btn btn-primary wide', 'data-target-id': 'nothing', rel: 'follow' }) %>
+                    <% } else { %>
+                        <%- linkTo(icon('star') + ' <span class="text">' + __('Follow') + ' ' + user.displayName + '</span>', pathTo.follow(user.id), { remote: true, class: 'btn btn-primary wide', 'data-target-id': 'nothing', rel: 'follow' }) %>
+                    <% } %>
+                <% } else { %>
+                <%- linkTo(icon('cogs') + ' ' + __('Edit your profile'), specialPagePath('account'), {class: 'btn btn-primary wide' }) %>
+                <% } %>
+            </div>
+        </div>
+    <% } %>
+    <% if(profileFields.length > 0 && user.otherFields) { %>
+        <div class="row profile-row">
+            <hr/>
+            <div class="wide">
+                <dl class="dl-nospace">
+                    <% profileFields.forEach(function(field) { %>
+                        <% if(!user.otherFields || !user.otherFields[field.name]) return; %>
+                        <dt><%- field.title %></dt>
+                        <dd><%- (user.otherFields || [])[field.name] %></dd>
+                    <% }) %>
+                </dl>
+            </div>
+        </div>
+    <% } %>
+
+</div>
+
+<script type="text/javascript">
+    $('.module[data-id=<%- widget.id %>] a[rel=follow]').die().live('ajax:success', function(e, data) {
+        $.noty({
+            type: data.status,
+            text: '<i class="icon-' + (data.icon || 'ok') + '"></i> ' + data.message
+        });
+
+        //refresh the page
+        setTimeout(function() {
+            window.location = window.location;
+        }, 500);
+
+    });
+</script>

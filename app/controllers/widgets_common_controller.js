@@ -1,7 +1,10 @@
 layout('widgets');
 
+var _ = require('underscore');
+
 before('init env', function (c) {
     var locals = this;
+    locals._ = _;
     locals.group = req.group;
     locals.user = req.user;
     locals.data = body.data && JSON.parse(body.data).data;
