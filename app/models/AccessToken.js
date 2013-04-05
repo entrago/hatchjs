@@ -19,7 +19,7 @@
 'use strict';
 var crypto = require('crypto');
 
-module.exports = function (compound, Token) {
+module.exports = function (compound, AccessToken) {
     var api = compound.hatch.api;
     var User = compound.models.User;
 
@@ -30,7 +30,7 @@ module.exports = function (compound, Token) {
      * @param  {HttpRequest}   req      - current request
      * @param  {Function}      callback - callback function
      */
-    Token.loadFromRequest = function (req, callback) {
+    AccessToken.loadFromRequest = function (req, callback) {
         var token = req.headers.token || req.body.token || req.query.token;
 
         // if there is no token present, just continue
@@ -38,15 +38,15 @@ module.exports = function (compound, Token) {
             return callback();
         }
 
-        Token.findOne({ where: { token: token }}, function (err, token) {
+        AccessToken.findOne({ where: { token: token }}, function (err, token) {
             if (token) {
                 User.find(token.userId, function (err, user) {
                     // validate the token
                     if (!user) {
-                        return callback(new Error('User in token not found'));
+                        return callback(new Error('User in access token not found'));
                     }
                     if (!token.isValid()) {
-                        return callback(new Error('Token is invalid'));
+                        return callback(new Error('Access token is invalid'));
                     }
 
                     req.user = user;
@@ -65,7 +65,7 @@ module.exports = function (compound, Token) {
      * 
      * @return {Boolean}
      */
-    Token.prototype.isValid = function () {
+    AccessToken.prototype.isValid = function () {
         return !this.expiryDate || this.expiryDate > new Date();
     };
 
@@ -78,7 +78,7 @@ module.exports = function (compound, Token) {
      * @param  {Date}     expiryDate    - expiry date for this token (optional)
      * @param  {Function} callback      - callback function
      */
-    Token.generate = function (userId, applicationId, expiryDate, callback) {
+    AccessToken.generate = function (userId, applicationId, expiryDate, callback) {
         var token = new Token();
         
         token.userId = userId;

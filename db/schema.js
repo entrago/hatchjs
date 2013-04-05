@@ -26,7 +26,7 @@ var User = define('User', function () {
 
 User.schema.adapter.defineFulltextIndex('User', 'fulltext');
 
-var Token = define('Token', function () {
+var AccessToken = define('AccessToken', function () {
     property('userId', Number, {index: true});
     property('applicationId', Number, {index: true});
     property('token', String, {index: true});
