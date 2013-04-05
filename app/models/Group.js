@@ -95,8 +95,8 @@ module.exports = function (compound, Group) {
 
     Group.prototype.definePage = function definePage(url, c, cb) {
         var group = this;
-        url = url.split('?')[0];
-        var page = this.matchPage(url);
+        var path = url.split('?')[0];
+        var page = this.matchPage(path);
 
         // special page out of this group (sp.defaultPage)
         if (page && page.type !== 'page' && !page.id) {

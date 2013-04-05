@@ -141,7 +141,7 @@ UsersController.prototype.join = function(c) {
 
     c.req.user.joinGroup(c.req.group, invitationCode, function () {
         //redirect
-        c.redirect(c.req.group.path);
+        c.redirect('//' + c.req.group.url);
     });
 }
 
