@@ -18,7 +18,7 @@
         <%- metaTag('groupId', req.group.id) %>
 
 
-        <link type="text/css" rel="stylesheet" href="<%- pathFor('stylesheet').css(req.group.cssVersion || 0) %>" id="main-stylesheet" />
+        <link type="text/css" rel="stylesheet" href="<%- group.cssUrl || pathFor('stylesheet').css(req.group.cssVersion || 0) %>" id="main-stylesheet" />
         <% if (isPrivileged()) { %>
         <link rel="stylesheet" href="/javascripts/redactor/redactor.css" />
         <% } %>

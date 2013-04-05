@@ -53,6 +53,7 @@ var Group = define('Group', function () {
     property('headerHtml', String);
     property('footerHtml', String);
     property('cssVersion', String);
+    property('cssUrl', String);
     property('googleAnalyticsId', String);
     property('customProfileFields', JSON);
     property('memberLists', JSON);

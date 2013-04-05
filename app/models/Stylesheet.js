@@ -34,6 +34,7 @@ module.exports = function (compound, Stylesheet) {
      */
     Stylesheet.prototype.compile = function (c, callback) {
         var stylesheet = this;
+        var Group = c.Group;
 
         var tree, css;
         var path = __dirname + '/../../public' + compound.app.get('cssDirectory') + "theme-template.less";
@@ -88,8 +89,22 @@ module.exports = function (compound, Stylesheet) {
                         stylesheet.version ++;
                         stylesheet.lastUpdate = new Date();
 
-                        //success - callback!
-                        callback(null);
+                        if(stylesheet.groupId) {
+                            Group.find(stylesheet.groupId, function (err, group) {
+                                var path = compound.app.get('upload path') + '/' + group.cssVersion + '.css';
+
+                                //save the file
+                                fs.writeFile(path, css, function (err) {
+                                    group.cssUrl = '/upload/' + group.cssVersion + '.css';
+                                    group.save(function (err) {
+                                        callback(null);
+                                    });
+                                });
+                            });
+                        } else {
+                            //success - callback!
+                            callback(null);
+                        }
                     }
                     catch (err) {
                         callback(err);
