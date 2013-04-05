@@ -15,14 +15,18 @@
 // 
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
+module.exports = FacebookAuthController;
 
 var oauth = require('oauth');
 
-module.exports = FacebookAuthController;
-
 function FacebookAuthController(init) {
     init.before(function initFacebook(c) {
-        var contract = c.req.group.modules.find('auth-facebook', 'name').contract;
+        var gm = c.req.group.modules.find('auth-facebook', 'name');
+        if (!gm) {
+            return c.next(new Error('The auth-facebook module is not enable in this group'));
+        }
+        var contract = gm.contract;
+        console.log(contract);
         this.consumer = function consumer() {
             return new oauth.OAuth2(
                 contract.apiKey,
@@ -48,24 +52,22 @@ FacebookAuthController.prototype.auth = function facebookAuth(c) {
 };
 
 FacebookAuthController.prototype.callback = function facebookCallback(c) {
+    var consumer = this.consumer;
     with (c) {
-        this.consumer().getOAuthAccessToken(req.query.code, {redirect_uri: redirectUri}, function (err, token) {
+        consumer().getOAuthAccessToken(req.query.code, {redirect_uri: this.redirectUri}, function (err, token) {
             if (err) {
                 return next(err);
             }
 
             req.session.facebookAccess = token;
-            this.consumer().getProtectedResource(
+            consumer().getProtectedResource(
                 'https://graph.facebook.com/me',
                 token,
                 function (err, data, response) {
                     if (err) {
                         next(err);
                     } else {
-                        event('user-authenticated', {
-                            provider: 'facebook',
-                            data: data
-                        });
+                        c.User.authenticate('facebook', JSON.parse(data), c);
                     }
                 }
             );

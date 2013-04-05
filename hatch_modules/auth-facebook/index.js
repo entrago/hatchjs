@@ -31,7 +31,7 @@ module.exports = function (c) {
             done({
                 email: profile.email
             }, {
-                username: profile.name,
+                username: profile.username,
                 displayName: profile.name,
                 email: profile.email,
                 facebookId: profile.id
