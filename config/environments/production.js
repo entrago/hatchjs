@@ -4,6 +4,7 @@ module.exports = function (compound) {
     app.configure('production', function () {
         app.enable('merge javascripts');
         app.enable('merge stylesheets');
+        app.enable('static css');
         app.disable('assets timestamps');
         app.use(require('express').errorHandler());
         app.settings.quiet = true;

@@ -16,13 +16,20 @@
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
 
-/**
- * Server module exports method which returns new instance of application
- * server
- *
- * @param {Compound} parent - railway/express parent webserver.
- * @returns CompoundJS powered express webserver
- */
-var app = module.exports = function getServerInstance(parent) { 
-    return require('compound').createServer({root: __dirname});
+var compound = require('compound');
+
+module.exports = function(c) {
+    //register the default themes
+    ['Amelia', 'Cerulean', 'Cosmo', 'Cyborg', 'Journal', 'Readable', 'Simplex', 'Slate', 'Spacelab', 'Spruce', 'Superhero', 'United'].forEach(function(name) {
+        c.hatch.themes.registerTheme({ title: name, name: name.toLowerCase() });
+    });
+
+    //set the default - for new groups with no theme defined
+    c.hatch.themes.registerDefaultTheme('cerulean');
+
+    process.nextTick(function() {
+        c.models.Stylesheet.lastUpdate = new Date();
+    });
+
+    return compound.createServer({root: __dirname});
 };

@@ -26,7 +26,7 @@ var User = define('User', function () {
 
 User.schema.adapter.defineFulltextIndex('User', 'fulltext');
 
-var Token = define('Token', function () {
+var AccessToken = define('AccessToken', function () {
     property('userId', Number, {index: true});
     property('applicationId', Number, {index: true});
     property('token', String, {index: true});
@@ -53,6 +53,7 @@ var Group = define('Group', function () {
     property('headerHtml', String);
     property('footerHtml', String);
     property('cssVersion', String);
+    property('cssUrl', String);
     property('googleAnalyticsId', String);
     property('customProfileFields', JSON);
     property('memberLists', JSON);
@@ -64,6 +65,7 @@ var Group = define('Group', function () {
 
 var Stylesheet = define('Stylesheet', function () {
     property('groupId', Number, { index: true });
+    property('name', String, { index: true });
     property('css', String);
     property('version', Number);
     property('lastUpdate', Date);

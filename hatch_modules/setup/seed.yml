@@ -99,12 +99,12 @@
     email: 'user102@hatchjs.com'
     avatar: '/img/default-profile-pic.png'
 
-- Token:
+- AccessToken:
     id: 1
     userId: 1
     token: test123
 
-- Token:
+- AccessToken:
     id: 2
     userId: 2
     token: test234

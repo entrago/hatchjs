@@ -26,8 +26,6 @@ var csso = require('csso');
 
 module.exports = function (compound, Stylesheet) {
 
-    var api = compound.hatch.api;
-
     /**
      * compiles the css from this less stylesheet
      *
@@ -36,18 +34,19 @@ module.exports = function (compound, Stylesheet) {
      */
     Stylesheet.prototype.compile = function (c, callback) {
         var stylesheet = this;
+        var Group = c.Group;
 
         var tree, css;
-        var path = api.app.config.paths.stylesheets + "/theme-template.less";
-        var module = c && c.req && c.req.group && c.req.group.getModule('stylesheet');
+        var path = __dirname + '/../../public' + compound.app.get('cssDirectory') + "theme-template.less";
 
         fs.readFile(path, 'utf-8', function (err, str) {
             if (err) { return callback(err) }
 
             var moduleCss = '';
 
+            /*
             //get the module and widget stylesheets
-            api.module.getModuleInstancesList().forEach(function(instance) {
+            compound.hatch.module.getModuleInstancesList().forEach(function(instance) {
                 var path = instance.module.root;
 
                 //search for stylesheets
@@ -58,6 +57,7 @@ module.exports = function (compound, Stylesheet) {
                     moduleCss += css + '\n';
                 });
             });
+            */
 
             //replace the variables, bootswatch and the module Css
             str = str.replace("@import \"theme-template-variables.less\";", stylesheet.less.variables);
@@ -66,6 +66,8 @@ module.exports = function (compound, Stylesheet) {
 
             //add the custom less onto the end
             str += '\n' + stylesheet.less.custom;
+
+            console.log(str);
 
             new(less.Parser)({
                 paths: [require('path').dirname(path)],
@@ -82,23 +84,27 @@ module.exports = function (compound, Stylesheet) {
                         //css should be a string
                         if(typeof css == "object") css = css[0];
 
-                        //should we optimise?
-                        if(module && module.contract && module.contract.csso == 'true') {
-                            console.log('Before CSSO = ' + css.length);
-
-                            //now optimise with csso
-                            css = csso.justDoIt(css);
-
-                            console.log('After CSSO = ' + css.length);
-                        }
-
                         //store in the stylesheet
                         stylesheet.css = css;
                         stylesheet.version ++;
                         stylesheet.lastUpdate = new Date();
 
-                        //success - callback!
-                        callback(null);
+                        if(stylesheet.groupId) {
+                            Group.find(stylesheet.groupId, function (err, group) {
+                                var path = compound.app.get('upload path') + '/' + group.cssVersion + '.css';
+
+                                //save the file
+                                fs.writeFile(path, css, function (err) {
+                                    group.cssUrl = '/upload/' + group.cssVersion + '.css';
+                                    group.save(function (err) {
+                                        callback(null);
+                                    });
+                                });
+                            });
+                        } else {
+                            //success - callback!
+                            callback(null);
+                        }
                     }
                     catch (err) {
                         callback(err);
@@ -149,8 +155,8 @@ module.exports = function (compound, Stylesheet) {
         //get the cached version
         if (!Stylesheet.cache[name]) {
             //load the template
-            var path = api.app.config.paths.stylesheets + "/theme-template.less";
-            var theme = api.themes.getTheme(name);
+            var path = __dirname + '/../../public' + compound.app.get('cssDirectory') + "theme-template.less";
+            var theme = compound.hatch.themes.getTheme(name);
 
             //if no theme found, use the default theme settings
             if (!theme) {
@@ -223,5 +229,4 @@ module.exports = function (compound, Stylesheet) {
             });
         }
     }
-
 };
