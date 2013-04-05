@@ -4,6 +4,12 @@ module.exports = function (compound) {
     var app = compound.app;
     var hatch = require(app.root + '/lib/hatch');
 
+    var RedisStore = require('connect-redis')(express);
+    var isTest = app.set('env') === 'test';
+    var sessionStore = isTest ?
+        new MemoryStore :
+        new RedisStore({ttl: 86400 * 365});
+
     app.configure(function(){
         app.set('jsDirectory', '/javascripts/');
         app.set('cssDirectory', '/stylesheets/');
@@ -19,7 +25,12 @@ module.exports = function (compound) {
         app.use(express.static(app.root + '/public', { maxAge: 86400000 }));
         app.use(express.bodyParser());
         app.use(express.cookieParser('secret'));
-        app.use(express.session({secret: 'secret'}));
+        app.use(express.session({
+            secret: '~:hatch1#6Platform0*2%',
+            store: sessionStore,
+            key: 'hatch.sid',
+            cookie: { maxAge: 86400000 * 365 }
+        }));
         app.use(express.methodOverride());
         app.use(hatch.rewrite(compound));
         app.use('/do', hatch.modules(compound));

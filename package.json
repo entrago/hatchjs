@@ -28,7 +28,8 @@
     "unzip": "~0.1.5",
     "stream-buffers": "~0.2.4",
     "http-post": "latest",
-    "co-mailer": "0.0.2-1"
+    "co-mailer": "0.0.2-1",
+    "connect-redis": "~1.4.5"
   },
   "devDependencies": {
     "mocha": "1.8.1",
