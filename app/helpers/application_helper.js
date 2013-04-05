@@ -69,4 +69,8 @@ exports.pageTitle = function () {
     return req.title || page.metaTitle || page.title + " - " + req.group.name;
 };
 
+exports.getStylesheetPath = function () {
+    var req = this.req, group = req.group;
+    return this.res.app.enabled('static css') && group.cssUrl || this.pathFor('stylesheet').css(group.cssVersion || 0)
+};
 
