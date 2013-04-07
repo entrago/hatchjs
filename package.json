@@ -31,7 +31,8 @@
     "stream-buffers": "~0.2.4",
     "http-post": "latest",
     "co-mailer": "0.0.2-1",
-    "connect-redis": "~1.4.5"
+    "connect-redis": "~1.4.5",
+    "supertest": "latest"
   },
   "devDependencies": {
     "mocha": "1.8.1",

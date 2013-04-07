@@ -55,6 +55,7 @@ OAuthController.prototype.authorize = function (c) {
  * @param  {HttpContext} c - http context
  */
 OAuthController.prototype.grant = function (c) {
+    var User = c.User;
     var key = c.req.body.key;
     var redirectUri = c.req.body.redirectUri;
     var state = c.req.body.state;
@@ -62,17 +63,47 @@ OAuthController.prototype.grant = function (c) {
     var user = c.req.user;
     var expiryDate = null;
 
-    c.OAuthCode.generate(key, user.id, redirectUri, scope, expiryDate, state, function (err, code) {
-        if (err) {
-            return c.send({
-                status: 'error',
-                message: err.message
-            });
-        }
+    // user login - for username/password apps (e.g. iOS) and testing
+    if (!c.req.user) {
+        var username = c.req.body.username;
+        var password = c.req.body.password;
 
-        // redirect to the redirectUri with the newly generated token and state (if needed)
-        c.redirect(code.redirectUri + '?code=' + code.code + '&state=' + code.state);
-    });
+        User.findByUsername(username, function (err, u) {
+            if (!u || !User.verifyPassword(password, u.password)) {
+                return c.send({
+                    status: 'error',
+                    message: 'User not found or incorrect password'
+                });
+            }
+
+            user = u;
+            generate();
+        });
+    } else {
+        generate();
+    }
+
+    function generate() {
+        c.OAuthCode.generate(key, user.id, redirectUri, scope, expiryDate, state, function (err, code) {
+            if (err) {
+                return c.send({
+                    status: 'error',
+                    message: err.message
+                });
+            }
+
+            // redirect to the redirectUri with the newly generated token and state (if needed)
+            if (redirectUri) {
+                c.redirect(code.redirectUri + '?code=' + code.code + '&state=' + code.state);    
+            } else {
+                c.send({
+                    status: 'success',
+                    message: 'Authentication code granted',
+                    code: code.code
+                });
+            }
+        });
+    }
 };
 
 /**
@@ -81,9 +112,9 @@ OAuthController.prototype.grant = function (c) {
  * @param  {HttpContext} c - http context
  */
 OAuthController.prototype.exchange = function (c) {
-    var code = c.req.query.code;
-    var key = c.req.query.apiKey || c.req.query.key;
-    var secret = c.req.query.apiSecret || c.req.query.secret;
+    var code = c.req.query.code || c.req.body.code;
+    var key = c.req.query.apiKey || c.req.query.key || c.req.body.apiKey || c.req.body.key;
+    var secret = c.req.query.apiSecret || c.req.query.secret || c.req.body.apiSecret || c.req.body.secret;
 
     c.OAuthCode.findByCode(code, function (err, code) {
         if (!code) {

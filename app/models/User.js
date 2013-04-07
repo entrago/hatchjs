@@ -103,6 +103,21 @@ module.exports = function (compound, User) {
     };
 
     /**
+     * Find a user by their username/email address.
+     * 
+     * @param  {String}   username - username or email address
+     * @param  {Function} callback - callback function
+     */
+    User.findByUsername = function (username, callback) {
+        var cond = {};
+
+        if(username.indexOf('@') > -1) cond.email = username;
+        else cond.username = username;
+
+        User.findOne({ where: cond }, callback);
+    };
+
+    /**
      * notifies this user by either email, top bar notification or both
      * 
      * @param  {[String]}   type   [the name of the notification to send]

@@ -4,6 +4,7 @@ module.exports = function (compound) {
     var app = compound.app;
     var hatch = require(app.root + '/lib/hatch');
 
+    var MemoryStore = express.session.MemoryStore;
     var RedisStore = require('connect-redis')(express);
     var isTest = app.set('env') === 'test';
     var sessionStore = isTest ?
