@@ -626,8 +626,9 @@ module.exports = function (compound, User) {
      */
     User.prototype.hasPermission = function(group, permission) {
         var user = this;
-        var membership = _.find(this.membership || [], function(membership) {
-            return membership && membership.groupId == group.id;
+
+        var membership = _.find(this.membership.items, function (membership) {
+            return membership.groupId == group.id;
         });
 
         if(!membership) return false;
