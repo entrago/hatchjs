@@ -17,10 +17,8 @@
 //
 
 'use strict';
-var crypto = require('crypto');
 
 module.exports = function (compound, AccessToken) {
-    var api = compound.hatch.api;
     var User = compound.models.User;
 
     /**
@@ -45,7 +43,7 @@ module.exports = function (compound, AccessToken) {
                     if (!user) {
                         return callback(new Error('User in access token not found'));
                     }
-                    if (!token.isValid()) {
+                    if (!token.isTokenValid()) {
                         return callback(new Error('Access token is invalid'));
                     }
 
@@ -65,43 +63,29 @@ module.exports = function (compound, AccessToken) {
      * 
      * @return {Boolean}
      */
-    AccessToken.prototype.isValid = function () {
+    AccessToken.prototype.isTokenValid = function () {
         return !this.expiryDate || this.expiryDate > new Date();
     };
 
     /**
-     * Generate a new token for the specified user/application and save to the 
+     * Generate a new token for the specified user/client and save to the 
      * database and return via callback.
      * 
      * @param  {Number}   userId        - Id of the user
-     * @param  {Number}   applicationId - Id of the application
+     * @param  {Number}   clientId      - Id of the client application
+     * @param  {Object}   scope         - scope of access
      * @param  {Date}     expiryDate    - expiry date for this token (optional)
      * @param  {Function} callback      - callback function
      */
-    AccessToken.generate = function (userId, applicationId, expiryDate, callback) {
-        var token = new Token();
+    AccessToken.generateToken = function (userId, clientId, scope, expiryDate, callback) {
+        var token = new AccessToken();
         
         token.userId = userId;
-        token.applicationId = applicationId;
+        token.clientId = clientId;
+        token.score = JSON.parse(scope || '{}');
         token.expiryDate = expiryDate;
-        token.token = calcSha('token-' + userId + '-' + new Date().getTime());
+        token.token = compound.hatch.crypto.generateRandomString(256);
 
         token.save(callback);
     };
-
-    /**
-     * Calculate the sha1 of the specified string.
-     * 
-     * @param  {String} payload - string to hash
-     * @return {String}         
-     */
-    function calcSha(payload) {
-        if (!payload) {
-            return '';
-        }
-        if (payload.length === 64) {
-            return payload;
-        }
-        return crypto.createHash('sha256').update(payload).update(api.app.config.passwordSalt || '').digest('hex');
-    }
 };

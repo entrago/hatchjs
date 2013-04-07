@@ -75,7 +75,7 @@ function findObject(c) {
  * @param  {context} c - http context
  */
 UriController.prototype.get = function get(c) {
-    c.send((this.obj.toPublicObject && this.obj.toPublicObject()) || this.obj);
+    return c.send((this.obj.toPublicObject && this.obj.toPublicObject()) || this.obj);
 };
 
 /**
@@ -99,7 +99,7 @@ UriController.prototype.perform = function perform(c) {
             });
         }
 
-        c.send({
+        return c.send({
             status: 'success',
             message: c.req.params.action + ' executed',
             result: result,

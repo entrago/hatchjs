@@ -1,0 +1,21 @@
+<% if(user) { %>
+    <p>
+        Are you sure you wish to authorize with <strong><%- client.name %></strong>
+    </p>
+
+    <%- formTagBegin({action:pathTo.grant(), method: 'post', class: 'form-horizontal' }) %>
+        <input type="hidden" name="key" value="<%- key %>" />
+        <input type="hidden" name="state" value="<%- state %>" />
+        <input type="hidden" name="scope" value="<%- scope %>" />
+        <input type="hidden" name="redirectUri" value="<%- redirectUri %>" />
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Grant access</button>
+            <a href="//<%- req.group.homepage.url %>" class="btn">Cancel</a>
+        </div>
+    <%- formTagEnd() %>
+<% } else { %>
+    <p>
+        Please login or register to authorize your account with <strong><%- client.name %></strong>
+    </p>
+<% } %>

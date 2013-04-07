@@ -28,9 +28,30 @@ User.schema.adapter.defineFulltextIndex('User', 'fulltext');
 
 var AccessToken = define('AccessToken', function () {
     property('userId', Number, {index: true});
-    property('applicationId', Number, {index: true});
+    property('clientId', Number, {index: true});
     property('token', String, {index: true});
+    property('scope', JSON);
     property('expiryDate', Date);
+
+    set('ignoreNullValues', true);
+});
+
+var OAuthCode = define('OAuthCode', function () {
+    property('clientId', Number, {index: true});
+    property('userId', Number, {index: true});
+    property('code', String, {index: true});
+    property('scope', JSON);
+    property('expiryDate', Date);
+    property('state', String);
+
+    set('ignoreNullValues', true);
+});
+
+var OAuthClient = define('OAuthClient', function () {
+    property('name', String);
+    property('apiKey', String, {index: true});
+    property('apiSecret', String);
+    property('redirectUri', String);
 
     set('ignoreNullValues', true);
 });

@@ -20,6 +20,7 @@ var async = require('async');
 var ejs = require('ejs');
 var path = require('path');
 var request = require('request');
+var qs = require('querystring');
 
 module.exports = function (compound, Page) {
     var api = compound.hatch.api;
@@ -357,10 +358,17 @@ module.exports = function (compound, Page) {
         if (!widget.type) {
             return cb(new Error('Widget has no type specified'));
         }
+
+        var querystring = qs.stringify(req.query);
+        if(querystring) querystring = '?' + querystring;
+
         var apiDomain = this.url.match(/^[^\/]+/)[0];
         apiDomain = 'localhost:3000';
         var url = 'http://' + apiDomain + '/do/' +
-            widget.type.replace('/', '/widgets/') + '/' + action;
+            widget.type.replace('/', '/widgets/') + '/' + action +
+            querystring;
+
+        console.log(url);
 
         var data = {
             userId: 1,

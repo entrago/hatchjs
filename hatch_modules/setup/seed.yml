@@ -99,12 +99,9 @@
     email: 'user102@hatchjs.com'
     avatar: '/img/default-profile-pic.png'
 
-- AccessToken:
+- OAuthClient:
     id: 1
-    userId: 1
-    token: test123
-
-- AccessToken:
-    id: 2
-    userId: 2
-    token: test234
+    name: demo client
+    apiKey: key
+    apiSecret: secret
+    redirectUri: http://localhost:3000
