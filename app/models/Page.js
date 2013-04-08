@@ -368,8 +368,6 @@ module.exports = function (compound, Page) {
             widget.type.replace('/', '/widgets/') + '/' + action +
             querystring;
 
-        console.log(url);
-
         var data = {
             userId: 1,
             data: params,

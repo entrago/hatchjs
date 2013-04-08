@@ -22,6 +22,7 @@ var User = define('User', function () {
 
     set('ignoreNullValues', true);
     set('safe', true);
+    set('defaultSort', 'username');
 });
 
 User.schema.adapter.defineFulltextIndex('User', 'fulltext');
@@ -82,6 +83,7 @@ var Group = define('Group', function () {
     property('importStreams', JSON);
 
     set('ignoreNullValues', true);
+    set('defaultSort', 'name');
 });
 
 var Stylesheet = define('Stylesheet', function () {
@@ -117,6 +119,7 @@ var Page = define('Page', function () {
     property('tags', [], {index: true});
 
     set('ignoreNullValues', true);
+    set('defaultSort', 'order');
 });
 
 var Content = define('Content', function () {
@@ -151,6 +154,7 @@ var Content = define('Content', function () {
     property('tags', [], {index: true});
 
     set('ignoreNullValues', true);
+    set('defaultSort', 'createdAt DESC');
 });
 
 Content.schema.adapter.defineFulltextIndex('Content', 'fulltext');
@@ -161,6 +165,7 @@ var ContentFeedItem = define('ContentFeedItem', function () {
     property('createdAt', Date, {index: true} );
 
     set('ignoreNullValues', true);
+    set('defaultSort', 'createdAt DESC');
 });
 
 var Media = define('Media', function () {
@@ -170,6 +175,7 @@ var Media = define('Media', function () {
     property('url', String);
 
     set('ignoreNullValues', true);
+    set('defaultSort', 'createdAt DESC');
 });
 
 var Notification = define('Notification', function () {
@@ -181,6 +187,7 @@ var Notification = define('Notification', function () {
     property('html', String);
 
     set('ignoreNullValues', true);
+    set('defaultSort', 'count DESC');
 });
 
 var ImportStream = define('ImportStream', function () {
@@ -196,11 +203,13 @@ var ImportStream = define('ImportStream', function () {
     property('lastRun', Date);
 
     set('ignoreNullValues', true);
+    set('defaultSort', 'title');
 });
 
 var Tag = define('Tag', function () {
     property('groupId', Number, {index: true});
     property('userId', Number, {index: true});
+    property('published', Boolean, {index: true});
     property('type', String, {index: true});
     property('category', String, {index: true});
     property('name', String, {index: true});
@@ -211,6 +220,8 @@ var Tag = define('Tag', function () {
     property('updatedAt', Number);
     property('filter', String);
     property('subscribers', []);
+    property('permissions', []);
 
     set('ignoreNullValues', true);
+    set('defaultSort', 'count DESC');
 });

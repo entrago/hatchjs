@@ -19,6 +19,7 @@ exports.routes = function (map) {
             items.del('destroyAll', {as: 'destroySelectedContent'});
         });
     });
+    map.get(':section/tag/list', 'tag#index');
     map.resources('tags', function (tag) {
         tag.get('count');
     });

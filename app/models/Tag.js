@@ -23,9 +23,32 @@ var _ = require('underscore');
 module.exports = function (compound, Tag) {
     'use strict';
     var api = compound.hatch.api;
+    var TagPermissions = compound.models.TagPermissions;
 
     Tag.validatesPresenceOf('title', {message: 'Please enter a title'});
     Tag.validatesUniquenessOf('name', {message: 'This tag name is taken'});
+
+    /**
+     * Before this tag is destroyed, make sure all objects referencing it are
+     * de-refernced (removed) from it's collection.
+     * 
+     * @param  {Function} next - continuation function
+     */
+    Tag.beforeDestroy = function (next) {
+        var tag = this;
+        var model = compound.models[tag.type];
+
+        tag.getResults({}, function (err, results) {
+            results.forEach(function (obj) {
+                tag.remove(obj, function (err, obj) {
+                    obj.save();
+                });
+            });
+        });
+
+        // no need to wait for this to complete
+        next();
+    };
 
     /**
      * Find a tag by it's name.
@@ -50,8 +73,12 @@ module.exports = function (compound, Tag) {
         var model = compound.models[tag.type];
 
         var offset = params.offset || 0;
-        var limit = params.limit || 10;
+        var limit = params.limit;
         var cond = { tags: tag.name };
+
+        if (typeof limit === undefined || limit === null) {
+            limit = 10;
+        }
 
         var query = {
             offset: offset,
@@ -346,5 +373,47 @@ module.exports = function (compound, Tag) {
 
             callback(err, obj);
         });
+    };
+
+    /**
+     * Add an object to this tag collection.
+     * 
+     * @param {Object}   obj      - db entity object
+     * @param {Function} callback - callback function
+     */
+    Tag.prototype.add = function (obj, callback) {
+        var self = this;
+
+        if (!obj.tags) {
+            return callback(new Error('does not support tags'));
+        }
+
+        if (!obj.tags.find(self.name)) {
+            obj.tags.push(self.name);
+            callback(null, obj);
+        } else {
+            callback(null, obj);
+        }
+    };
+
+    /**
+     * Remove an object from this tag collection.
+     * 
+     * @param  {Object}   obj      - db entity object
+     * @param  {Function} callback - callback function
+     */
+    Tag.prototype.remove = function (obj, callback) {
+        var self = this;
+
+        if (!obj.tags) {
+            return callback(new Error('does not support tags'));
+        }
+
+        if (obj.tags.find(self.name)) {
+            obj.tags.remove(self.name);
+            callback(null, obj);
+        } else {
+            callback(null, obj);
+        }
     };
 };
