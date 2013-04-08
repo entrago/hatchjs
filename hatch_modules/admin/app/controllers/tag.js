@@ -24,14 +24,16 @@ module.exports = TagController;
 function TagController(init) {
     Application.call(this, init);
     init.before(loadTags);
-    init.before(findTag, {only: 'edit,save,delete,add,remove'});
+    init.before(findTag, {only: 'new,edit,save,delete,add,remove'});
 }
 
 function loadTags(c) {
     this.type = this.sectionName = c.params.section;
+    this.modelName = c.compound.model(this.type, false).modelName;
+
     this.pageName = c.actionName + '-tags';
 
-    c.Tag.all({ where: { type: this.type }}, function (err, tags) {
+    c.Tag.all({ where: { type: this.modelName }}, function (err, tags) {
         c.locals.tags = tags;
         c.next();
     });
@@ -39,7 +41,7 @@ function loadTags(c) {
 
 function findTag (c) {
     var self = this;
-    var id = c.req.get('id');
+    var id = c.req.params.id || c.req.query.id || c.req.body.id;
 
     if (id) {
         c.Tag.find(id, function (err, tag) {
@@ -62,11 +64,11 @@ TagController.prototype.index = function (c) {
 };
 
 /**
- * Show the edit form for the specified tag.
+ * Show the new/edit form for the specified tag.
  * 
  * @param  {HttpContext} c - http context
  */
-TagController.prototype.edit = function (c) {
+TagController.prototype.edit = TagController.prototype.new = function (c) {
     this.defaultFilter = 'filter = function(content) {\n\treturn false; ' +
         '//add your filter criteria here\n};';
     c.render();
@@ -79,6 +81,9 @@ TagController.prototype.edit = function (c) {
  */
 TagController.prototype.save = function (c) {
     var self = this;
+
+    c.body.groupId = c.req.group.id;
+    c.body.type = this.modelName;
 
     if (self.tag && self.tag.id) {
         self.tag.updateAttributes(c.req.body, done);

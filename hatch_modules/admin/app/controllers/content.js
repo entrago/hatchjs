@@ -28,6 +28,14 @@ module.exports = ContentController;
 
 function ContentController(init) {
     Application.call(this, init);
+    init.before(loadTags);
+}
+
+function loadTags(c) {
+    c.Tag.all({ where: { type: 'Content' }}, function (err, tags) {
+        c.locals.tags = tags;
+        c.next();
+    });
 }
 
 require('util').inherits(ContentController, Application);

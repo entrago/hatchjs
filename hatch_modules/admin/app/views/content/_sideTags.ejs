@@ -9,7 +9,7 @@
 <% tags.forEach(function(tag) { %>
     <% if (tag) { %>
         <%- li('content-' + tag.id) %>
-            <%- linkTo(icon('tag') + tag.name +
+            <%- linkTo(icon('tag') + tag.title +
                 '<span class="badge pull-right">' +
                 formatNumber(tag.contentCount),
                 pathTo.filteredContent(tag.id.toString())) %>

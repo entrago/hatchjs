@@ -7,57 +7,55 @@
             <div class="content">
 
                 <h3>Manage tags</h3>
-
                 <hr/>
 
                 <table class="table table-striped" id="member-lists-table">
                     <thead>
-                    <tr>
-                        <th colspan="2" width="">
-                            Tag name
-                        </th>
-                        <th width="10%">
-                            Filter
-                        </th>
-                        <th width="10%">
-                            Posts
-                        </th>
-                        <th width="7%">
-                            Action
-                        </th>
-                    </tr>
+                        <tr>
+                            <th colspan="2" width="">
+                                Tag name
+                            </th>
+                            <th width="10%">
+                                Filter
+                            </th>
+                            <th width="10%">
+                                Posts
+                            </th>
+                            <th width="7%">
+                                Action
+                            </th>
+                        </tr>
                     </thead>
                     <tbody>
                     <% if(tags.length == 0) { %>
-                    <tr>
-                        <td colspan="5">No tags have been defined</td>
-                    </tr>
+                        <tr>
+                            <td colspan="5">No tags have been defined</td>
+                        </tr>
                     <% } %>
                     <% tags.forEach(function(tag) { %>
-                        <% if(!tag) return; %>
-                    <tr>
-                        <td width="2%">
-                            <i class="icon-tag"></i>
-                        </td>
-                        <td>
-                            <%- linkTo(tag.name, pathTo.content(tag.id.toString())) %>
-                        </td>
-                        <td>
-                            <% if(tag.filter) { %>
-                                <i class="icon-ok"></i>
-                            <% } else { %>
-                                -
-                            <% } %>
-                        </td>
-                        <td>
-                            <%- formatNumber(tag.contentCount) %>
-                        </td>
-                        <td>
-                            <%- linkTo(Edit, pathTo.editTag(tag.id.toString())) %>
-                            &nbsp;
-                            <%- linkToRemote('<i class="icon-remove"></i>', pathTo.deleteTag(tag.id.toString()), { "data-confirm": "Are you sure you wish to delete this tag?" }) %>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td width="2%">
+                                <i class="icon-tag"></i>
+                            </td>
+                            <td>
+                                <%- linkTo(tag.title, '../filter/' + tag.id) %>
+                            </td>
+                            <td>
+                                <% if(tag.filter) { %>
+                                    <i class="icon-ok"></i>
+                                <% } else { %>
+                                    -
+                                <% } %>
+                            </td>
+                            <td>
+                                <%- formatNumber(tag.count) %>
+                            </td>
+                            <td>
+                                <%- linkTo('Edit', pathTo.editTag(type, tag.id.toString())) %>
+                                &nbsp;
+                                <%- linkTo('<i class="icon-remove"></i>', pathTo.deleteTag(type, tag.id.toString()), { remote: true, method: 'POST', "data-confirm": "Are you sure you wish to delete this tag?" }) %>
+                            </td>
+                        </tr>
                     <% }) %>
                     </tbody>
                 </table>

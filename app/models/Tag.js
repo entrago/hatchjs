@@ -22,12 +22,26 @@ var _ = require('underscore');
 
 module.exports = function (compound, Tag) {
     'use strict';
-    
+
     var api = compound.hatch.api;
     var TagPermissions = compound.models.TagPermissions;
 
     Tag.validatesPresenceOf('title', {message: 'Please enter a title'});
     Tag.validatesUniquenessOf('name', {message: 'This tag name is taken'});
+
+    /**
+     * Before this tag is created, make sure it has a name value - this is auto-
+     * calculated from groupId + title.
+     * 
+     * @param  {Function} next - continuation function
+     */
+    Tag.beforeCreate = function (next) {
+        if (!this.name) {
+            this.name = (this.groupId ? (this.groupId + '-') : '') + slugify(this.title);
+        }
+
+        next();
+    };
 
     /**
      * Before this tag is destroyed, make sure all objects referencing it are
@@ -417,4 +431,13 @@ module.exports = function (compound, Tag) {
             callback(null, obj);
         }
     };
+
+
+    function slugify(text) {
+        text = text.toLowerCase();
+        text = text.replace(/[^-a-zA-Z0-9\s]+/ig, '');
+        text = text.replace(/-/gi, "_");
+        text = text.replace(/\s/gi, "-");
+        return text;
+    }
 };

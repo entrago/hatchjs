@@ -9,6 +9,7 @@
                 <hr />
 
                 <%- formTagBegin({action: pathTo.saveTag(type), remote: true, method: 'PUT', id: 'tag-form' }) %>
+                    <input type="hidden" name="id" value="<%- tag.id %>" />
 
                     <% include _form %>
 

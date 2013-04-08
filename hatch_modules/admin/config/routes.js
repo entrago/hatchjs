@@ -1,5 +1,5 @@
 exports.routes = function (map) {
-    
+
     map.camelCaseHelperNames = true;
     map.root('pages#index');
     
@@ -23,10 +23,10 @@ exports.routes = function (map) {
 
     map.namespace(':section/tag', function (section) {
         section.get('list', 'tag#index', {as: 'listTags'});
-        section.get('edit', 'tag#edit', {as: 'editTag'});
-        section.get('new', 'tag#edit', {as: 'newTag'});
+        section.get(':id/edit', 'tag#edit', {as: 'editTag'});
+        section.get('new', 'tag#new', {as: 'newTag'});
         section.put('save', 'tag#save', {as: 'saveTag'});
-        section.post('delete', 'tags#delete', {as: 'deleteTag'});
+        section.post(':id/delete', 'tag#delete', {as: 'deleteTag'});
         section.post('add', 'tag#add', {as: 'addToTag'});
         section.post('remove', 'tag#remove', {as: 'removeFromTag'});
     });

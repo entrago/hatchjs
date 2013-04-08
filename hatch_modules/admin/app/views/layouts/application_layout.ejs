@@ -27,8 +27,6 @@
     <% } %>
 </head>
 <body class="navbar-fixed">
-
-    <div id="meny"></div>
     
     <div id="all">
     <% } else { %>
@@ -75,9 +73,8 @@
         </div>
     </div>
 
-    <div class="container" id="main">
-
-        <div id="row-content">
+    <div id="header-content">
+        <div class="container">
             <% tabs = _.sortBy(tabs, 'rank'); %>
 
             <header class="jumbotron subhead" id="overview" xmlns="http://www.w3.org/1999/html">
@@ -98,7 +95,11 @@
                     </ul>
                 </div>
             </header>
+        </div>
+    </div>
 
+    <div class="container">
+        <div id="row-content">
             <%- body %>
         </div>
 

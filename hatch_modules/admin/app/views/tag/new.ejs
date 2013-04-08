@@ -1,6 +1,6 @@
 <div class="row">
 
-    <% include ../content/_sidebar %>
+    <% include _sidebar %>
 
     <div class="span10">
         <div class="module">
@@ -8,7 +8,7 @@
                 <h3><%= t('tag.add') %></h3>
                 <hr/>
 
-                <%- formTagBegin({action: pathTo.tags, remote: true, id: 'tag-form' }) %>
+                <%- formTagBegin({action: pathTo.saveTag(type), remote: true, method: 'PUT', id: 'tag-form' }) %>
                     <input type="hidden" name="id" value="<%- tag && tag.id %>" />
 
                     <% include _form %>
