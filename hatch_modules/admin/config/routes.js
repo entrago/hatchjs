@@ -1,6 +1,6 @@
 exports.routes = function (map) {
+    
     map.camelCaseHelperNames = true;
-
     map.root('pages#index');
     
     map.resources('groups');
@@ -13,20 +13,30 @@ exports.routes = function (map) {
         module.get('disable');
         module.get('enable');
     });
+
     map.resources('content', {as: 'content', suffix: 'entry'}, function (item) {
         item.collection(function (items) {
             items.get('filter/:filter.:format?', '#index', {as: 'filteredContent' });
             items.del('destroyAll', {as: 'destroySelectedContent'});
         });
     });
-    map.get(':section/tag/list', 'tag#index');
-    map.resources('tags', function (tag) {
-        tag.get('count');
+
+    map.namespace(':section/tag', function (section) {
+        section.get('list', 'tag#index', {as: 'listTags'});
+        section.get('edit', 'tag#edit', {as: 'editTag'});
+        section.get('new', 'tag#edit', {as: 'newTag'});
+        section.put('save', 'tag#save', {as: 'saveTag'});
+        section.post('delete', 'tags#delete', {as: 'deleteTag'});
+        section.post('add', 'tag#add', {as: 'addToTag'});
+        section.post('remove', 'tag#remove', {as: 'removeFromTag'});
     });
+
     map.resources('streams', function (stream) {
         stream.get('toggle');
     });
+
     map.resources('users', {as: 'community', suffix: 'member'});
+
     map.resources('pages', function (page) {
         page.collection(function (pages) {
             pages.get('new-special', '#newSpecial', {as: 'newSpecial'});
@@ -36,30 +46,13 @@ exports.routes = function (map) {
             pages.get('edit/:id', '#edit', {as: 'editPage'});
         });
         page.put('reorder.:format?', 'pages#updateOrder');
-        
     });
 
     map.post('/page/columns', 'page#updateColumns');
 
-    map.resources('widgets', {path: 'widget'});
     map.get('/:controller/:action');
 
+    map.resources('widgets', {path: 'widget'});
     map.post('/widget', 'widgets#create');
     map.all('/widget/:pageId/:widgetId/:action', 'widgets');
-
-
-    function middleware (req, res, next) {
-        console.log('middleware');
-
-        if(req.query.pageId) {
-            compound.Page.find(c.req.query.pageId, function (err, page) {
-                console.log('loaded page ' + page.url);
-                compound.page = page;
-                next();
-            });
-        } 
-        else {
-            next();
-        }
-    };
 };

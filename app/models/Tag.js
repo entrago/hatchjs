@@ -22,6 +22,7 @@ var _ = require('underscore');
 
 module.exports = function (compound, Tag) {
     'use strict';
+    
     var api = compound.hatch.api;
     var TagPermissions = compound.models.TagPermissions;
 

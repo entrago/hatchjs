@@ -1,9 +1,9 @@
 
 <li class="nav-header"><%= t('content.header.tags') %></li>
 
-<%- li('manage-tags') %>
+<%- li('index-tags') %>
     <%- linkTo(icon('tags') + t('content.manageTags'),
-        pathTo.tags) %>
+        pathTo.listTags('content')) %>
 <%- liEnd %>
 
 <% tags.forEach(function(tag) { %>
@@ -17,7 +17,7 @@
     <% } %>
 <% }) %>
 
-<%- li('new-tag') %>
+<%- li('new-tags') %>
     <%- linkTo(icon('plus') + t('tag.new'),
-        pathTo.newTag) %>
+        pathTo.newTag('content')) %>
 <%- liEnd %>

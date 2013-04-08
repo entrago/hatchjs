@@ -23,17 +23,18 @@ module.exports = TagController;
 
 function TagController(init) {
     Application.call(this, init);
-    init.before(function setup(c) {
-        this.type = this.sectionName = c.params.section;
-        this.pageName = c.actionName;
+    init.before(loadTags);
+    init.before(findTag, {only: 'edit,save,delete,add,remove'});
+}
 
-        c.Tag.all({ where: { type: this.type }}, function (err, tags) {
-            c.locals.tags = tags;
-        });
+function loadTags(c) {
+    this.type = this.sectionName = c.params.section;
+    this.pageName = c.actionName + '-tags';
 
+    c.Tag.all({ where: { type: this.type }}, function (err, tags) {
+        c.locals.tags = tags;
         c.next();
     });
-    init.before(findTag, {only: 'edit,save,delete,add,remove'});
 }
 
 function findTag (c) {
@@ -46,6 +47,7 @@ function findTag (c) {
             c.next();
         });
     } else {
+        self.tag = c.locals.tag = {};
         c.next();
     }
 }
@@ -65,6 +67,8 @@ TagController.prototype.index = function (c) {
  * @param  {HttpContext} c - http context
  */
 TagController.prototype.edit = function (c) {
+    this.defaultFilter = 'filter = function(content) {\n\treturn false; ' +
+        '//add your filter criteria here\n};';
     c.render();
 };
 
@@ -76,10 +80,10 @@ TagController.prototype.edit = function (c) {
 TagController.prototype.save = function (c) {
     var self = this;
 
-    if (self.tag) {
+    if (self.tag && self.tag.id) {
         self.tag.updateAttributes(c.req.body, done);
     } else {
-        c.models.Tag.create(c.req.body, done);
+        c.Tag.create(c.req.body, done);
     }
 
     function done (err) {

@@ -1,0 +1,151 @@
+
+
+                    <div class="control-group">
+                        <label class="control-label" for="name"><%= __('Tag name') %></label>
+                        <div class="controls">
+                            <input type="text" class="input-xlarge" id="name" name="name" value="<%- tag && tag.name %>">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="description"><%= __('Description') %></label>
+                        <div class="controls">
+                            <textarea id="description" name="description" class="input-xlarge span6 richtext" rows="5"><%- tag && tag.description %></textarea>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="checkbox">
+                            <input type="checkbox" class="checkbox" name="filterEnabled" id="filterEnabled" <%- tag && tag.filter ? 'checked="checked"':'' %> />
+                            <%= __('Enable automatic filter') %>
+                        </label>
+
+                        <input type="hidden" name="filter" id="filterValue" value="<%- tag && escape(tag.filter) %>" />
+
+                        <div class="filter <%- tag && tag.filter ? 'enabled':'' %>" id="filter-holder">
+                            <div class="editor">
+                                <div id="filter" rows="10"><%- tag && tag.filter || defaultFilter %></div>
+                            </div>
+                            <div class="filter-cover"></div>
+
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox" name="filterExisting" id="filterExisting" />
+                                <%= __('Apply the new filter to content') %>
+                            </label>
+
+                            <div id="filter-count" style="display : none;">
+                                <span><%= __('Number of matches') %>: <strong id="filter-results-count">0</strong></span>
+                                <a href="#" id="refresh-filter"><i class="icon-refresh"></i></a>
+                            </div>
+                        </div>
+
+                        <div class="clearfix"></div>
+
+                        <style>
+                            #filter
+                            {
+                                position : relative;
+                                width : auto;
+                                height: 100px;
+                                font-family : 'Courier New', Courier, fixed-width;
+                                padding: 0px;
+                            }
+
+                            .filter-cover
+                            {
+                                background: #ddd url(/img/stripes.png);
+                                height: 120px;
+                                margin: -121px 1px 0;
+                                opacity: .85;
+                            }
+
+                            .filter
+                            {
+                                display : none;
+                            }
+
+                            .filter.enabled
+                            {
+                                display: block;
+                            }
+
+                            .filter.enabled .filter-cover
+                            {
+                                display : none;
+                            }
+
+                            .editor
+                            {
+                                padding: 10px;
+                                border: solid 1px #ddd;
+                                overflow: hidden;
+                                opacity : .99;
+                                margin-bottom: 10px;
+                            }
+
+                            .filter.enabled .editor
+                            {
+                                opacity : 1;
+                            }
+                        </style>
+
+                        <script src="/javascripts/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+                        <script src="/javascripts/ace/mode-javascript.js" type="text/javascript" charset="utf-8"></script>
+
+                        <script type="text/javascript">
+                            var editor = ace.edit("filter");
+                            var JavaScriptMode = require("ace/mode/javascript").Mode;
+                            editor.getSession().setMode(new JavaScriptMode());
+                            editor.renderer.setShowGutter(false);
+                            editor.renderer.setPrintMarginColumn(-1);
+
+                            editor.getSession().on('change', function(){
+                                document.getElementById("filterValue").value = editor.getSession().getValue();
+                            });
+
+                            $("#filterEnabled").bind("click", function() {
+                                if(this.checked) $("#filter-holder").addClass("enabled");
+                                else $("#filter-holder").removeClass("enabled");
+                            });
+
+                            function refreshFilterResults() {
+                                var url = '<%- pathTo.groupTag %>';
+                                $('#filter-results-count').load(url, {
+                                    type: 'POST',
+                                    filter: $('#filterValue').val()
+                                });
+
+                                return false;
+                            }
+
+                            $('#refresh-filter').bind('click', refreshFilterResults);
+
+                            $('#filterExisting').bind('click', function() {
+                                if(this.checked) {
+                                    $('#filter-count').show();
+                                    refreshFilterResults();
+                                }
+                                else $('#filter-count').hide();
+                            });
+                        </script>
+
+                    </div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        //convert richtexts
+        setupRichtextEditors();
+
+        //bind the form ajax
+        $('#tag-form').bind('ajax:success', function(e, data) {
+            $.noty({text: '<i class="icon-' + data.icon + '"></i> ' + data.message, type: data.status});
+
+            if (data.status === "success") {
+                // refresh the page
+                setTimeout(function() {
+                    window.location = '<%- pathTo.tags %>';
+                }, 1000);
+            }
+        });
+    });
+</script>
