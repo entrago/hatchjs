@@ -27,7 +27,7 @@ describe('OAuth', function() {
         request(app)
             .get('/do/oauth/authorize?key=testWrong')
             .end(function (err, res) {
-                eval(res.body).message.should.equal('Invalid API Key');
+                res.body.message.should.equal('Invalid API Key');
                 done();
             });
     });
@@ -43,8 +43,8 @@ describe('OAuth', function() {
             })
             .end(function (err, res) {
                 res.statusCode.should.equal(200);
-                code = eval(res.body).code;
-                code.length.should.equal(256);
+                code = res.body.code;
+                code.should.have.lengthOf(256);
                 done();
             });
     });
@@ -58,8 +58,8 @@ describe('OAuth', function() {
                 code: code
             })
             .end(function (err, res) {
-                var token = eval(res.body).token;
-                token.length.should.equal(256);
+                var token = res.body.token;
+                token.should.have.lengthOf(256);
                 done();
             });
     });
