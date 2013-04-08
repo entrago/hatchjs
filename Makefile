@@ -2,7 +2,7 @@
 
 TESTER = ./node_modules/.bin/mocha
 OPTS = --require ./test/init.js --ignore-leaks -t 5000
-TESTS = test/*.test.js
+TESTS = test/*.test.js hatch_modules/*/test/*.test.js
 
 test:
 	$(TESTER) $(OPTS) $(TESTS)

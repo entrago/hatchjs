@@ -112,9 +112,9 @@ OAuthController.prototype.grant = function (c) {
  * @param  {HttpContext} c - http context
  */
 OAuthController.prototype.exchange = function (c) {
-    var code = c.req.query.code || c.req.body.code;
-    var key = c.req.query.apiKey || c.req.query.key || c.req.body.apiKey || c.req.body.key;
-    var secret = c.req.query.apiSecret || c.req.query.secret || c.req.body.apiSecret || c.req.body.secret;
+    var code = c.req.param('code');
+    var key = c.req.param('apiKey') || c.req.param('key');
+    var secret = c.req.param('apiSecret') || c.req.param('secret');
 
     c.OAuthCode.findByCode(code, function (err, code) {
         if (!code) {

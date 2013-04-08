@@ -18,15 +18,15 @@ describe('Group', function() {
     });
 
     it('should create clone', function(done) {
-        Group.findOne({where:{url: '127.0.0.1:3456'}}, function(e, g) {
+        Group.findOne({where:{url: 'example.com'}}, function(e, g) {
             g.clone({
-                url: '127.0.0.1:3456/1602',
+                url: 'example.com/1602',
                 name: 'Example 1602'
             }, function(e, clone) {
                 should.not.exist(e);
                 should.exist(clone);
-                clone.url.should.equal('127.0.0.1:3456/1602');
-                clone.homepage.url.should.equal('127.0.0.1:3456/1602');
+                clone.url.should.equal('example.com/1602');
+                clone.homepage.url.should.equal('example.com/1602');
                 g.subgroups.map(function(x) {
                     return x.path;
                 }).should.include(clone.path);

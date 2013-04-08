@@ -1,6 +1,6 @@
 Group.seed ->
     id: 1
-    url: '127.0.0.1:3456'
+    url: 'example.com'
     path: ''
     name: 'Dev Group'
     subgroups: [{"path":"/extranet","id":2}]
@@ -12,7 +12,7 @@ Group.seed ->
 
 Group.seed ->
     id: 2
-    url: '127.0.0.1:3456/extranet'
+    url: 'example.com/extranet'
     path: '/extranet'
     name: 'Extranet'
     subgroups: null

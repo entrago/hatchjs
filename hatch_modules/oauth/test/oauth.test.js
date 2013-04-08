@@ -7,10 +7,10 @@ describe('OAuth', function() {
     var code;
 
     before(function (done) {
-        app = require('../')();
+        app = require('../../../')();
         compound = app.compound;
         compound.on('ready', function () {
-            compound.seed(done);
+            compound.seed(__dirname + '/seed', done);
         });
     });
 
@@ -58,8 +58,6 @@ describe('OAuth', function() {
                 code: code
             })
             .end(function (err, res) {
-                console.log(code);
-                console.log(res.body);
                 var token = eval(res.body).token;
                 token.length.should.equal(256);
                 done();
