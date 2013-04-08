@@ -1,4 +1,5 @@
 require('should');
+var semicov = require('semicov');
 
 process.env.NODE_ENV = 'test';
 
@@ -7,11 +8,11 @@ var express = require('express');
 if (!process.env.TRAVIS) {
     if (typeof __cov === 'undefined') {
         process.on('exit', function () {
-            require('semicov').report();
+            semicov.report();
         });
     }
 
-    require('semicov').init('lib');
+    semicov.init('hatch_modules', 'Hatch.js modules');
 }
 
 global.getApp = function() {
