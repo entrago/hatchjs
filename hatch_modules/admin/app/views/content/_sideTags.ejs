@@ -10,8 +10,8 @@
     <% if (tag) { %>
         <%- li('content-' + tag.id) %>
             <%- linkTo(icon('tag') + tag.title +
-                '<span class="badge pull-right">' +
-                formatNumber(tag.contentCount),
+                '<span class="badge pull-right" id="tagCount-' + tag.id + '">' +
+                formatNumber(tag.count) + '</span>',
                 pathTo.filteredContent(tag.id.toString())) %>
         <%- liEnd %>
     <% } %>

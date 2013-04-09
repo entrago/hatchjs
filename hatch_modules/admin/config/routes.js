@@ -17,8 +17,9 @@ exports.routes = function (map) {
     map.namespace(':section', function (section) {
         section.collection(function (tag) {
             tag.resources('tags', function (tag) {
-                tag.post('add', 'tag#add', {as: 'addToTag'});
-                tag.post('remove', 'tag#remove', {as: 'removeFromTag'});
+                tag.post(':id/add', 'tags#add', {as: 'addToTag'});
+                tag.post(':id/remove', 'tags#remove', {as: 'removeFromTag'});
+                tag.get('counts', '#tagCounts');
             });
         });
     });

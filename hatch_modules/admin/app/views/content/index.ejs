@@ -19,16 +19,16 @@
                         </ul>
                     </div>
 
-                    <% if ((group.tags || []).length > 0) { %>
+                    <% if (tags.length > 0) { %>
                         <div class="btn-group pull-left">
                             <%- buttonTag(t('content.actions.addTag') + caret, {
                                 class: 'btn dropdown-toggle',
                                 'data-toggle': 'dropdown'}) %>
                             <ul class="dropdown-menu">
-                                <% (group.tags || []).forEach(function(tag) { %>
+                                <% tags.forEach(function(tag) { %>
                                     <% if(!tag) return; %>
-                                    <li><%- linkTo(icon('tag') + tag.name,
-                                        pathTo.tags({tagId: tag.id}),
+                                    <li><%- linkTo(icon('tag') + tag.title,
+                                        pathTo.addToTag('content', tag.id),
                                         {rel: 'multiAjaxLink'}) %></li>
                                 <% }) %>
                             </ul>
@@ -39,13 +39,11 @@
                                 class: 'btn dropdown-toggle',
                                 'data-toggle': 'dropdown'}) %>
                             <ul class="dropdown-menu">
-                                <% (group.tags || []).forEach(function(tag) { %>
+                                <% tags.forEach(function(tag) { %>
                                     <% if (!tag) return; %>
-                                    <li><%- linkTo(icon('tag') + tag.name,
-                                        pathTo.tag(tag), {
-                                            'data-method': 'DELETE',
-                                            rel: 'multiAjaxLink'
-                                        }) %></li>
+                                    <li><%- linkTo(icon('tag') + tag.title,
+                                        pathTo.removeFromTag('content', tag.id), 
+                                        {rel: 'multiAjaxLink'}) %></li>
                                 <% }) %>
                             </ul>
                         </div>
@@ -101,6 +99,7 @@
                     type: 'POST',
                     data: {
                         _method: method,
+                        ids: window.selectedContent,
                         selectedContent: window.selectedContent,
                         unselectedContent: window.unselectedContent,
                         filter: '<%- filter %>',
@@ -116,6 +115,17 @@
 
                             // redraw table
                             window.table.fnDraw(false);
+
+                            setTimeout(function () {
+                                // update tag counts
+                                $.ajax('<%- pathTo.tagsCounts('content') %>', {
+                                    success: function (data) {
+                                        data.tags.forEach(function (tag) {
+                                            $('#tagCount-' + tag.id).text(tag.count);
+                                        });
+                                    }
+                                });
+                            }, 500);
                         }
                     }
                 });
@@ -209,7 +219,7 @@
                         var html = '<ul class="tags">';
 
                         $(val).each(function(i, tag) {
-                            html += '<li><a href="<%- pathTo.content %>/filter/' + tag.tagId + '">' + tag.name + '</a></li>';
+                            html += '<li><a href="<%- pathTo.content %>/filter/' + tag.tagId + '">' + tag.title + '</a></li>';
                         });
 
                         html += '</ul>';

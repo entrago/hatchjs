@@ -32,7 +32,7 @@ function ContentController(init) {
 }
 
 function loadTags(c) {
-    c.Tag.all({ where: { type: 'Content' }}, function (err, tags) {
+    c.Tag.all({ where: { type: 'Content', groupId: c.req.group.id }}, function (err, tags) {
         c.locals.tags = tags;
         c.next();
     });
@@ -114,8 +114,6 @@ ContentController.prototype.create = function create(c) {
     c.Content.create(data, function(err, content) {
         c.respondTo(function(format) {
             format.json(function () {
-                console.log(err);
-                console.log(content.errors);
                 if (err) {
                     var HelperSet = c.compound.helpers.HelperSet;
                     var helpers = new HelperSet(c);
@@ -193,8 +191,7 @@ ContentController.prototype.update = function update(c) {
                 });
             } else {
                 group.recalculateTagContentCounts(c);
-                console.log('dadsada');
-
+                
                 c.send({
                     code: 200,
                     html: c.t('post.saved')
@@ -286,8 +283,7 @@ function loadContent(c, cb) {
         } else if (typeof filter === 'string' && filter.indexOf("[native code]") === -1) {
             // filter by tag
             if (!isNaN(parseInt(filter, 10))) {
-                // TODO: rewrite without using nested indexes
-                // cond['tags:tagId'] = filter;
+                cond['tags'] = filter;
             }
             // filter by content type
             else {

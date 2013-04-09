@@ -16,7 +16,6 @@
       <div class="navbar-inner">
         <div class="container">
             <a class="brand" href="#">
-                <i class="icon-cogs"></i>
                 Application setup
             </a>
         </div>
@@ -107,7 +106,7 @@
                     <div class="control-group">
                         <label class="control-label" for="name">Restore data</label>
                         <div class="controls">
-                            <a href="#" id="upload-link" class="btn"><i class="icon-upload"></i> Upload data file</a>
+                            <a href="#" id="upload-link" class="btn">Upload data file</a>
                         </div>
                     </div>
 
@@ -146,7 +145,7 @@
                     allowedExtensions: ['zip', 'json'],
                     onComplete: function(id, filename, data) {
                         $('#dataFilename').val(data.url);
-                        $.noty({ text: '<i class="icon-ok"></i> Data uploaded successfully', type: 'success' });
+                        $.noty({ text: 'Data uploaded successfully', type: 'success' });
                     }
                 });
 

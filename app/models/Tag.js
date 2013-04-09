@@ -230,7 +230,7 @@ module.exports = function (compound, Tag) {
     Tag.prototype.updateCount = function (callback) {
         var tag = this;
 
-        compound.models[this.type].count({ tags: tag.name }, function (err, count) {
+        compound.model(this.type, false).count({ tags: tag.id }, function (err, count) {
             tag.count = count;
             tag.updatedAt = new Date();
 
@@ -403,8 +403,15 @@ module.exports = function (compound, Tag) {
             return callback(new Error('does not support tags'));
         }
 
-        if (!obj.tags.find(self)) {
-            obj.tags.push(self);
+        setTimeout(function () { 
+            self.updateCount();
+        }, 500);
+
+        if (!obj.tags.find(self.id, 'id')) {
+            obj.tags.push({
+                id: self.id,
+                title: self.title
+            });
             callback(null, obj);
         } else {
             callback(null, obj);
@@ -424,7 +431,11 @@ module.exports = function (compound, Tag) {
             return callback(new Error('does not support tags'));
         }
 
-        if (obj.tags.find(self)) {
+        setTimeout(function () { 
+            self.updateCount();
+        }, 500);
+
+        if (obj.tags.find(self.id, 'id')) {
             obj.tags.remove(self);
             callback(null, obj);
         } else {

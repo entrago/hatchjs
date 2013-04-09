@@ -64,6 +64,17 @@ TagController.prototype.index = function (c) {
 };
 
 /**
+ * Render the tag counts for this section.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+TagController.prototype.tagCounts = function (c) {
+    c.send({
+        tags: c.locals.tags
+    });
+};
+
+/**
  * Show the new/edit form for the specified tag.
  * 
  * @param  {HttpContext} c - http context
@@ -84,6 +95,7 @@ TagController.prototype.update = TagController.prototype.create = function (c) {
 
     c.body.groupId = c.req.group.id;
     c.body.type = this.modelName;
+    c.body.filter = c.body.filterEnabled && c.body.filter;
 
     if (self.tag && self.tag.id) {
         self.tag.updateAttributes(c.req.body, done);
@@ -91,7 +103,7 @@ TagController.prototype.update = TagController.prototype.create = function (c) {
         c.Tag.create(c.req.body, done);
     }
 
-    function done (err) {
+    function done (err, tag) {
         if (err) {
             return c.send({
                 status: 'error',
@@ -100,8 +112,13 @@ TagController.prototype.update = TagController.prototype.create = function (c) {
             });
         }
 
+        if (c.body.filterExisting) {
+
+        }
+
         c.send({
-            status: 'success'
+            status: 'success',
+            message: 'Tag saved'
         });
     }
 };
@@ -114,7 +131,8 @@ TagController.prototype.update = TagController.prototype.create = function (c) {
 TagController.prototype.destroy = function (c) {
     this.tag.destroy(function (err) {
         c.send({
-            status: 'success'
+            status: 'success',
+            redirect: c.pathTo.tags(c.locals.type)
         });
     });
 };
@@ -126,18 +144,20 @@ TagController.prototype.destroy = function (c) {
  */
 TagController.prototype.add = function (c) {
     var self = this;
-    var model = c.models[this.type];
+    var model = c[this.modelName];
 
     c.req.body.ids.forEach(function (id) {
         model.find(id, function (err, obj) {
-            self.tag.add(obj, function (err, obj) {
+            self.tag.add(obj, function (err) {
+                console.log(obj)
                 obj.save();
             });
         });
     });
 
     c.send({
-        status: 'success'
+        status: 'success',
+        message: 'Tag added'
     });
 };
 
@@ -148,17 +168,18 @@ TagController.prototype.add = function (c) {
  */
 TagController.prototype.remove = function (c) {
     var self = this;
-    var model = c.models[this.type];
+    var model = c[this.modelName];
 
     c.req.body.ids.forEach(function (id) {
         model.find(id, function (err, obj) {
-            self.tag.remove(obj, function (err, obj) {
+            self.tag.remove(obj, function (err) {
                 obj.save();
             });
         });
     });
 
     c.send({
-        status: 'success'
+        status: 'success',
+        message: 'Tag removed'
     });
 };

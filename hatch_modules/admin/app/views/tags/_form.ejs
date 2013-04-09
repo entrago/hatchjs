@@ -138,7 +138,7 @@
 
         //bind the form ajax
         $('#tag-form').bind('ajax:success', function(e, data) {
-            $.noty({text: '<i class="icon-' + data.icon + '"></i> ' + data.message, type: data.status});
+            $.noty({text: '<i class="icon-' + (data.icon || 'ok') + '"></i> ' + data.message, type: data.status});
 
             if (data.status === "success") {
                 // refresh the page
