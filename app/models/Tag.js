@@ -403,8 +403,8 @@ module.exports = function (compound, Tag) {
             return callback(new Error('does not support tags'));
         }
 
-        if (!obj.tags.find(self.name)) {
-            obj.tags.push(self.name);
+        if (!obj.tags.find(self)) {
+            obj.tags.push(self);
             callback(null, obj);
         } else {
             callback(null, obj);
@@ -424,8 +424,8 @@ module.exports = function (compound, Tag) {
             return callback(new Error('does not support tags'));
         }
 
-        if (obj.tags.find(self.name)) {
-            obj.tags.remove(self.name);
+        if (obj.tags.find(self)) {
+            obj.tags.remove(self);
             callback(null, obj);
         } else {
             callback(null, obj);

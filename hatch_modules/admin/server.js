@@ -17,12 +17,14 @@ var app = module.exports = function getServerInstance(parent) {
         { name: 'modules',   url: 'modules',   rank: 50 }
     ];
 
-    parent.hatch.themes.registerTheme({ 
-        title: 'Admin', 
-        name: 'admin',
-        variables: 'http://localhost:3000/stylesheets/admin/variables.less',
-        bootswatch: 'http://localhost:3000/stylesheets/admin/bootswatch.less'
-    });
+    if (parent) {
+        parent.hatch.themes.registerTheme({ 
+            title: 'Admin', 
+            name: 'admin',
+            variables: 'http://localhost:3000/stylesheets/admin/variables.less',
+            bootswatch: 'http://localhost:3000/stylesheets/admin/bootswatch.less'
+        });
+    }
 
     return app;
 };

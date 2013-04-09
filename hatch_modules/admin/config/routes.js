@@ -14,21 +14,20 @@ exports.routes = function (map) {
         module.get('enable');
     });
 
+    map.namespace(':section', function (section) {
+        section.collection(function (tag) {
+            tag.resources('tags', function (tag) {
+                tag.post('add', 'tag#add', {as: 'addToTag'});
+                tag.post('remove', 'tag#remove', {as: 'removeFromTag'});
+            });
+        });
+    });
+
     map.resources('content', {as: 'content', suffix: 'entry'}, function (item) {
         item.collection(function (items) {
             items.get('filter/:filter.:format?', '#index', {as: 'filteredContent' });
             items.del('destroyAll', {as: 'destroySelectedContent'});
         });
-    });
-
-    map.namespace(':section/tag', function (section) {
-        section.get('list', 'tag#index', {as: 'listTags'});
-        section.get(':id/edit', 'tag#edit', {as: 'editTag'});
-        section.get('new', 'tag#new', {as: 'newTag'});
-        section.put('save', 'tag#save', {as: 'saveTag'});
-        section.post(':id/delete', 'tag#delete', {as: 'deleteTag'});
-        section.post('add', 'tag#add', {as: 'addToTag'});
-        section.post('remove', 'tag#remove', {as: 'removeFromTag'});
     });
 
     map.resources('streams', function (stream) {

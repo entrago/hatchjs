@@ -8,14 +8,14 @@
                 <h3><%= t('tag.edit') %></h3>
                 <hr />
 
-                <%- formTagBegin({action: pathTo.saveTag(type), remote: true, method: 'PUT', id: 'tag-form' }) %>
+                <%- formTagBegin({action: pathTo.tag(type), remote: true, method: 'PUT', id: 'tag-form' }) %>
                     <input type="hidden" name="id" value="<%- tag.id %>" />
 
                     <% include _form %>
 
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary"><%= t('tag.save') %></button>
-                        <a href="<%- pathTo.listTags(type) %>" class="btn"><%= t('common.cancel') %></a>
+                        <a href="<%- pathTo.tags(type) %>" class="btn"><%= t('common.cancel') %></a>
                     </div>
                 <%- formTagEnd() %>
             </div>
