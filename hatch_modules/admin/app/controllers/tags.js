@@ -24,7 +24,7 @@ module.exports = TagController;
 function TagController(init) {
     Application.call(this, init);
     init.before(loadTags);
-    init.before(findTag, {only: 'new,edit,save,delete,add,remove'});
+    init.before(findTag, {only: 'new,edit,update,destroy,add,remove'});
 }
 
 function loadTags(c) {
@@ -79,7 +79,7 @@ TagController.prototype.edit = TagController.prototype.new = function (c) {
  * 
  * @param  {HttpContext} c - http context
  */
-TagController.prototype.save = function (c) {
+TagController.prototype.update = TagController.prototype.create = function (c) {
     var self = this;
 
     c.body.groupId = c.req.group.id;
@@ -111,7 +111,7 @@ TagController.prototype.save = function (c) {
  * 
  * @param  {HttpContext} c - http context
  */
-TagController.prototype.delete = function (c) {
+TagController.prototype.destroy = function (c) {
     this.tag.destroy(function (err) {
         c.send({
             status: 'success'

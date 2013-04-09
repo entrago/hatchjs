@@ -143,7 +143,7 @@
             if (data.status === "success") {
                 // refresh the page
                 setTimeout(function() {
-                    window.location = '<%- pathTo.tags %>';
+                    window.location = '<%- pathTo.tags(type) %>';
                 }, 1000);
             }
         });
