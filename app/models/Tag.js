@@ -53,16 +53,15 @@ module.exports = function (compound, Tag) {
         var tag = this;
         var model = compound.models[tag.type];
 
+        // remove this tag from all of it's results
         tag.getResults({}, function (err, results) {
-            results.forEach(function (obj) {
-                tag.remove(obj, function (err, obj) {
-                    obj.save();
-                });
+            async.forEach(results, function (obj, done) {
+                obj.tags.remove(tag);
+                obj.save(done);
+            }, function () {
+                next();
             });
         });
-
-        // no need to wait for this to complete
-        next();
     };
 
     /**
@@ -89,7 +88,7 @@ module.exports = function (compound, Tag) {
 
         var offset = params.offset || 0;
         var limit = params.limit;
-        var cond = { tags: tag.name };
+        var cond = { tags: tag.id };
 
         if (typeof limit === undefined || limit === null) {
             limit = 10;
