@@ -54,6 +54,26 @@ function findTag (c) {
     }
 }
 
+function getSortOrders (type) {
+    switch(type) {
+        case 'content':
+            return [
+                { name: 'Date', value: 'createdAt DESC' },
+                { name: 'Popularity', value: 'score DESC' },
+                { name: 'Comments', value: 'commentsTotal DESC' },
+                { name: 'Likes', value: 'likesTotal DESC' }
+            ];
+        
+        case 'user':
+            return [
+                { name: 'Username', value: 'username ASC' },
+                { name: 'Last name', value: 'lastname ASC' },
+                { name: 'First name', value: 'firstname ASC' },
+                { name: 'Date registered', value: 'createdAt DESC' }
+            ];
+    }
+}
+
 /**
  * Show the full list of tags within this section.
  * 
@@ -82,6 +102,8 @@ TagController.prototype.tagCounts = function (c) {
 TagController.prototype.edit = TagController.prototype.new = function (c) {
     this.defaultFilter = 'filter = function(content) {\n\treturn false; ' +
         '//add your filter criteria here\n};';
+
+    c.locals.sortOrders = getSortOrders(this.type);
     c.render();
 };
 

@@ -108,6 +108,12 @@ module.exports = function (compound, Content) {
     Content.beforeCreate = Content.beforeSave = function (done) {
         var content = this;
 
+        if (!this.createdAt) {
+            this.createdAt = new Date();
+        }
+
+        this.updatedAt = new Date();
+
         //get the group and check all tag filters
         Group.find(content.groupId, function(err, group) {
             if(!group) return done();

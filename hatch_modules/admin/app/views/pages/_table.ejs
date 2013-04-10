@@ -8,7 +8,7 @@
         <td> <%- __('Public') %> </td>
         <td> <%- /true/.test(page.hideFromNavigation) ? 'Hidden' : 'Visible' %> </td>
         <td>
-            <%- linkTo(__('Edit'), pathTo.editPage(req.group, page), {class: '' }) %>
+            <%- linkTo('Edit', pathTo.editPage(req.group.id, page.id), {class: '' }) %>
             &nbsp;
             <%- linkTo('<i class="icon-remove"></i>', pathTo.page(page), {remote: true, method: 'delete', rel: 'tooltip', 'data-original-title': __('Delete this page'), rel: 'delete-page'}) %>
         </td>

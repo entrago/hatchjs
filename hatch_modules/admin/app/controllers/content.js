@@ -41,8 +41,9 @@ function loadTags(c) {
 require('util').inherits(ContentController, Application);
 
 /**
- * GET /group/:group_id/content.format
- * respond to JSON, HTML
+ * Show the content list for this group.
+ * 
+ * @param  {HttpContext} c - http context
  */
 ContentController.prototype.index = function index(c) {
     c.req.session.adminSection = 'content';
@@ -71,12 +72,21 @@ ContentController.prototype.index = function index(c) {
     });
 };
 
+/**
+ * Show the new content input form.
+ * 
+ * @param  {HttpContext} c - http context
+ */
 ContentController.prototype.new = function(c) {
     this.post = new c.Content;
     c.render();
 };
 
-// Show the edit blog post form
+/**
+ * Show the edit content input form.
+ * 
+ * @param  {HttpContext} c - http context
+ */
 ContentController.prototype.edit = function edit(c) {
     this.pageName = 'content';
     var post = {};
@@ -102,9 +112,6 @@ ContentController.prototype.edit = function edit(c) {
 ContentController.prototype.create = function create(c) {
     var group = this.group;
     var data = c.body.Content;
-
-    // TODO: move to model hook (beforeSave)
-    data.updatedAt = new Date();
 
     // set the groupId and authorId for the new post
     data.groupId = group.id;
@@ -212,8 +219,7 @@ ContentController.prototype.destroy = function(c) {
     c.Content.find(c.params.id, function(err, content) {
         content.destroy(function(err) {
             // finally, update the group tag counts
-            group.recalculateTagContentCounts(c);
-
+            c.Tag.updateCountsForObject(content);
             c.send('ok');
         });
     });

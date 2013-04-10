@@ -1,9 +1,22 @@
 
 
                     <div class="control-group">
-                        <label class="control-label" for="name"><%= __('Tag name') %></label>
+                        <label class="control-label" for="title"><%= __('Tag name') %></label>
                         <div class="controls">
                             <input type="text" class="input-xlarge" id="title" name="title" value="<%- tag && tag.title %>">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="sortOrder"><%= __('Sort order') %></label>
+                        <div class="controls">
+                            <select id="sortOrder" name="sortOrder">
+                                <% sortOrders.forEach(function (order) { %>
+                                    <option value="<%- order.value %>" <%- order.value === tag.sortOrder ? 'selected="selected"':'' %>>
+                                        <%- order.name %>
+                                    </option>
+                                <% }) %>
+                            </select>
                         </div>
                     </div>
 

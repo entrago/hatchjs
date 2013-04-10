@@ -138,8 +138,8 @@ module.exports = function (compound, Tag) {
             settings.customSort = {};
         }
 
-        if (!settings.customSort['tags.' + tag.name]) {
-            settings.customSort['tags.' + tag.name] = tag.sortOrder;
+        if (!settings.customSort['tags.' + tag.id]) {
+            settings.customSort['tags.' + tag.id] = tag.sortOrder;
         }
     };
 
@@ -237,6 +237,22 @@ module.exports = function (compound, Tag) {
                 tag.save(callback);
             });
         });
+    };
+
+    /**
+     * Update the tag count for the specified db entity object. This is often 
+     * useful when the object is deleted from the database, to decrement all of
+     * the referenced tag counts.
+     * 
+     * @param  {Object}   obj      - db entity object
+     * @param  {Function} callback - callback function
+     */
+    Tag.updateCountsForObject = function (obj, callback) {
+        asnyc.forEach(obj.tags, function (tag, done) {
+            Tag.find(tag.id, function (err, tag) {
+                tag.updateCount(done);
+            });
+        }, callback);
     };
 
     /**
@@ -402,6 +418,9 @@ module.exports = function (compound, Tag) {
             return callback(new Error('does not support tags'));
         }
 
+        this.updateModel();
+
+        // wait to update count because this needs to happen *after* save
         setTimeout(function () { 
             self.updateCount();
         }, 500);
@@ -430,6 +449,9 @@ module.exports = function (compound, Tag) {
             return callback(new Error('does not support tags'));
         }
 
+        this.updateModel();
+
+        // wait to update count because this needs to happen *after* save
         setTimeout(function () { 
             self.updateCount();
         }, 500);
