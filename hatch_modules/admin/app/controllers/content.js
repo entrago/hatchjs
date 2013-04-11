@@ -32,7 +32,7 @@ function ContentController(init) {
 }
 
 function loadTags(c) {
-    c.Tag.all({ where: { type: 'Content', groupId: c.req.group.id }}, function (err, tags) {
+    c.Tag.all({ where: { groupIdByType: c.req.group.id + '-Content' }}, function (err, tags) {
         delete tags.countBeforeLimit;
         c.locals.tags = tags;
         c.next();

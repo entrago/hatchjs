@@ -33,7 +33,7 @@ function loadTags(c) {
 
     this.pageName = c.actionName + '-tags';
 
-    c.Tag.all({ where: { type: this.modelName }}, function (err, tags) {
+    c.Tag.all({ where: { groupIdByType: c.req.group.id + '-' + this.modelName }}, function (err, tags) {
         c.locals.tags = tags;
         c.next();
     });

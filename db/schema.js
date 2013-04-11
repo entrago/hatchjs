@@ -212,6 +212,7 @@ var Tag = define('Tag', function () {
     property('userId', Number, {index: true});
     property('published', Boolean, {index: true});
     property('type', String, {index: true});
+    property('groupIdByType', String, {index: true});
     property('category', String, {index: true});
     property('name', String, {index: true});
     property('title', String);

@@ -30,6 +30,15 @@ module.exports = function (compound, Tag) {
     Tag.validatesUniquenessOf('name', {message: 'This tag name is taken'});
 
     /**
+     * Get the 'groupId-type' shortcut index.
+     *  
+     * @return {String} groupId+type
+     */
+    Tag.getter.groupIdByType = function () {
+        return this.groupId + '-' + this.type;
+    };
+
+    /**
      * Before this tag is created, make sure it has a name value - this is auto-
      * calculated from groupId + title.
      * 
