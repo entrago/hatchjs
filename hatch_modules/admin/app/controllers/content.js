@@ -39,6 +39,7 @@ function loadTags(c) {
     });
 }
 
+// Render a content type input form which is defined in the contentType API
 function renderInputForm(c, next) {
     var type = c.locals.post.type;
     var contentType = c.compound.hatch.contentType.getContentType(type);
