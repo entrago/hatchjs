@@ -285,9 +285,7 @@ function loadContent(c, cb) {
 
         var filter = c.req.query.filter || c.req.body.filter;
 
-        if (filter === 'imported') {
-            cond.imported = true;
-        } else if (typeof filter === 'string' && filter.indexOf("[native code]") === -1) {
+        if (typeof filter === 'string' && filter.indexOf("[native code]") === -1) {
             // filter by tag
             if (!isNaN(parseInt(filter, 10))) {
                 cond['tags'] = filter;
@@ -305,11 +303,12 @@ function loadContent(c, cb) {
         var limit = parseInt(query.iDisplayLength || 0, 10);
         var offset = parseInt(query.iDisplayStart || 0, 10);
         var colNames = ['', 'title', 'tagString', 'createdAt', 'score', ''];
+        var search = query.sSearch || c.req.body.search;
         var orderBy = query.iSortCol_0 > 0 ?
             (colNames[query.iSortCol_0] + ' ' + query.sSortDir_0.toUpperCase()) :
             'createdAt DESC';
-        var search = query.sSearch || c.req.body.search;
-
+       
+        // count the total number of records so that we can show count before filter
         c.Content.count(cond, function(err, count) {
             if (err) {
                 return c.next(err);

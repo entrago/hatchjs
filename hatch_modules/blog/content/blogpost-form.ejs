@@ -19,7 +19,7 @@
                     </div>
                 </div>
 
-                <%- form.textarea('text', {rows: 28, class: 'richtext span6'}) %>
+                <%- form.textarea('text', {rows: 35, class: 'richtext span6'}) %>
             </div>
         </div>
     </div>
@@ -34,6 +34,7 @@
 
                 <div class="control-group">
                     <%- form.label('createdAt', t('post.createdAt')) %>
+                    <p class="instructions"><%= t('post.instructions.createdAt') %></p>
                     <div class="controls">
                         <div class="input-append date" id="createdAtDatePicker">
                             <%- form.input('createdAt', {class: 'input-large', 'data-format': datetimeformat.replace(/DD/ig, 'dd').replace(/YY/ig, 'yy').replace(/HH/, 'hh') })
@@ -95,9 +96,8 @@
                   id: 'previewImageImage',
                   style: post.previewImage ? '' : 'display: none'
                   }) %>
-              </div>
-          </div>
-      </div>
+            </div>
+        </div>
     </div>
 </div>
 

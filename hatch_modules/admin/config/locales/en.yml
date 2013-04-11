@@ -49,12 +49,13 @@ en:
       previewImage: Upload a preview image
       enterTags: Enter tags...
     instructions:
-      tags: 'Determines which pages and widgets this post will show up on'
-      excerpt: "Shows on the timeline or as a summary with a 'read more' link"
+      tags: Determines which pages and widgets this post will show up on
+      excerpt: "Shows on the timeline as a summary with a 'read more' link"
       previewImage: Shows up on the blog post summary
+      createdAt: Schedule this post for a future date
     saved: Post saved successfully
     createdAt: Publish date
-    title: Title
+    title: Blog post title
     tags: Tags
     excerpt: Excerpt
     previewImage: Preview image
