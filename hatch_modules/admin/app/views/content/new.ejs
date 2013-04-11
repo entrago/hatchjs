@@ -2,15 +2,8 @@
 
     <% include ../content/_sidebar %>
 
-    <% var form = formFor(post, {
-        remote: true,
-        action: pathTo.content({format: 'json'}),
-        id: 'content-form',
-        class: 'content-form'
-    }) %>
-
-    <%- form.begin() %>
-    <% include _form %>
-    <%- form.end() %>
+    <div class="span10">
+        <%- editForm %>
+    </div>
 
 </div>

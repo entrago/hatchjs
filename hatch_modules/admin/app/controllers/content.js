@@ -33,8 +33,24 @@ function ContentController(init) {
 
 function loadTags(c) {
     c.Tag.all({ where: { type: 'Content', groupId: c.req.group.id }}, function (err, tags) {
+        delete tags.countBeforeLimit;
         c.locals.tags = tags;
         c.next();
+    });
+}
+
+function renderInputForm(c, next) {
+    var type = c.locals.post.type;
+    var contentType = c.compound.hatch.contentType.getContentType(type);
+
+    c.prepareViewContext();
+    c.renderView('content/edit/' + contentType.name, function (err, html) {
+        if (err) {
+            html = err;
+        }
+
+        c.locals.editForm = html;
+        next();
     });
 }
 
@@ -57,10 +73,6 @@ ContentController.prototype.index = function index(c) {
         });
         format.json(function() {
             loadContent(c, function(posts) {
-                posts.forEach(function(post) {
-                    post.createdAt = moment(post.createdAt || new Date()).fromNow();
-                });
-
                 c.send({
                     sEcho: c.req.query.sEcho || 1,
                     iTotalRecords: posts.count,
@@ -79,7 +91,11 @@ ContentController.prototype.index = function index(c) {
  */
 ContentController.prototype.new = function(c) {
     this.post = new c.Content;
-    c.render();
+    this.post.type = c.req.params.type;
+
+    renderInputForm(c, function () {
+        c.render();
+    });
 };
 
 /**
@@ -91,11 +107,12 @@ ContentController.prototype.edit = function edit(c) {
     this.pageName = 'content';
     var post = {};
 
+    c.locals.datetimeformat = c.app.get('datetimeformat');
+
     if (c.req.params.id) {
         c.Content.find(c.params.id, function(err, content) {
             post = content;
-            post.createdAt = moment(post.createdAt ||
-                new Date().toString()).format("D-MMM-YYYY HH:mm:ss");
+            //post.createdAt = moment(post.createdAt || new Date().toString()).format(c.app.get('datetimeformat'));
             done();
         });
     } else {
@@ -105,7 +122,10 @@ ContentController.prototype.edit = function edit(c) {
     function done() {
         c.locals._ = _;
         c.locals.post = post;
-        c.render();
+        
+        renderInputForm(c, function () {
+            c.render();
+        });
     }
 };
 
@@ -138,7 +158,6 @@ ContentController.prototype.create = function create(c) {
                 }
             });
         });
-
     });
 };
 
@@ -149,61 +168,38 @@ ContentController.prototype.update = function update(c) {
     var post = null;
     var data = c.body.Content
 
-    data.createdAt = data.createdAt;
+    data.createdAt = moment(data.createdAt, c.app.get('datetimeformat')).toDate();
     data.updatedAt = new Date();
-
-    // build the tags json
-    var tags = data.tags || [];
-    data.tags = [];
-
-    tags.forEach(function(tag) {
-        data.tags.push({
-            tagId: group.getTag(tag).id,
-            name: tag,
-            createdAt: new Date(),
-            score: 0
-        });
-    });
-
-    // build the tag string
-    data.tagString = _.pluck(data.tags, 'name').join(', ');
 
     Content.find(id, function(err, content) {
         post = content;
 
-        // merge tag scores/createdAt from the existing post
-        tags.forEach(function(tag) {
-            var existing = content.tags.find(function(existingTag) {
-                return existingTag.name == tag.name
+        c.Tag.assignTagsForObject(post, c.req.body.Content_tags, function () {
+            delete data.tags;
+
+            // update the keys manually
+            Object.keys(data).forEach(function(key) {
+                content[key] = data[key];
             });
-            if (existing) {
-                tag.createdAt = existing.createdAt;
-                tag.score = existing.score;
-            }
-        });
 
-        // update the keys manually
-        Object.keys(data).forEach(function(key) {
-            content[key] = data[key];
-        });
-
-        content.save(function (err, content) {
-            if (err) {
-                var HelperSet = c.compound.helpers.HelperSet;
-                var helpers = new HelperSet(c);
-                c.send({
-                    code: 500,
-                    errors: content.errors || err,
-                    html: helpers.errorMessagesFor(content)
-                });
-            } else {
-                group.recalculateTagContentCounts(c);
-                
-                c.send({
-                    code: 200,
-                    html: c.t('post.saved')
-                });
-            }
+            content.save(function (err, content) {
+                if (err) {
+                    var HelperSet = c.compound.helpers.HelperSet;
+                    var helpers = new HelperSet(c);
+                    c.send({
+                        code: 500,
+                        errors: content.errors || err,
+                        html: helpers.errorMessagesFor(content)
+                    });
+                } else {
+                    group.recalculateTagContentCounts(c);
+                    
+                    c.send({
+                        code: 200,
+                        html: c.t('post.saved')
+                    });
+                }
+            });
         });
     });
 

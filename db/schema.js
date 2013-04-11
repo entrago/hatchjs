@@ -125,8 +125,8 @@ var Page = define('Page', function () {
 var Content = define('Content', function () {
     property('type', String, {index: true });
     property('imported', Boolean, {index: true });
-    property('title', String, {index: true });
-    property('text', String);
+    property('title', String, { sort: true });
+    property('text', String, { sort: true });
     property('excerpt', String);
     property('previewImage', String);
     property('attachment', JSON);
@@ -147,6 +147,7 @@ var Content = define('Content', function () {
     property('createdAt', Date, {index: true, sort: true });
     property('updatedAt', Date, {index: true });
     property('timestamp', Number, {index: true, sort: true });
+    property('timeSince', String);
     property('priority', Number, {index: true, sort: true });
     property('url', String, {index: true });
     property('fulltext', String);

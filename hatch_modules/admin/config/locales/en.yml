@@ -41,17 +41,23 @@ en:
     poll: Polls
     imported: Imported posts
     manageTags: Manage tags
-    new: New blog post
+    newblogpost: New blog post
   post:
     actions:
       publish: Publish post
       draft: Save draft
-      previewImage: Click to upload a preview image
+      previewImage: Upload a preview image
       enterTags: Enter tags...
     instructions:
       tags: 'Determines which pages and widgets this post will show up on'
       excerpt: "Shows on the timeline or as a summary with a 'read more' link"
+      previewImage: Shows up on the blog post summary
     saved: Post saved successfully
+    createdAt: Publish date
+    title: Title
+    tags: Tags
+    excerpt: Excerpt
+    previewImage: Preview image
   tag:
     new: New tag
     add: Add new tag

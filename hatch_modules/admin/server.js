@@ -24,6 +24,14 @@ var app = module.exports = function getServerInstance(parent) {
             variables: 'http://localhost:3000/stylesheets/admin/variables.less',
             bootswatch: 'http://localhost:3000/stylesheets/admin/bootswatch.less'
         });
+
+        app.compound.on('ready', function() {
+            Object.keys(parent.structure.views).forEach(function(key) {
+                if(key.indexOf('content/edit/') === 0) {
+                    app.compound.structure.views[key] = parent.structure.views[key];
+                }
+            });
+        });
     }
 
     return app;

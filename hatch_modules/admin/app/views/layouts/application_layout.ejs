@@ -19,7 +19,7 @@
     <script type="text/javascript">
         canEdit = <%- (req.member && req.user.canEdit) ? "true":"false" %>;
     </script>
-    <%- javascriptIncludeTag.call({controller: {app: req.app.parent.parent}}, 'jquery', 'bootstrap', 'bootstrap-typeahead', 'jquery-easyticker', 'jquery-hoverintent', 'jquery-blink', 'jquery-valadd', 'jquery-textarea-autogrow', 'jquery-noty', 'jquery-cookie', 'jquery-pjax', 'jquery-hovercard', 'jquery-highlight', 'uploader', 'rails', 'hatch-search', 'hatch', 'hatch-io', 'jquery-zoom', 'application') %>
+    <%- javascriptIncludeTag.call({controller: {app: req.app.parent.parent}}, 'jquery', 'bootstrap', 'bootstrap-typeahead', 'jquery-easyticker', 'jquery-hoverintent', 'jquery-blink', 'jquery-valadd', 'jquery-textarea-autogrow', 'jquery-noty', 'jquery-cookie', 'jquery-pjax', 'jquery-hovercard', 'jquery-highlight', 'uploader', 'rails', 'hatch-search', 'hatch', 'hatch-io', 'jquery-zoom', 'bootstrap-datetimepicker', 'application') %>
     <% if (req.member && req.user.canEdit) { %>
     <%- javascriptIncludeTag.call({controller: {app: req.app.parent.parent}}, 'jquery-ui.min', 'chosen.jquery', 'jquery-rule', 'jquery-datatables', 'jquery-selectrange', 'jquery-blockui', 'jquery-spectrum', 'jquery-colorscheme', 'hatch-dragdrop', 'hatch-css-properties', 'hatch-styleeditor', 'hatch-inline-edit', 'hatch-management') %>
         <script src="/javascripts/redactor/redactor.js"></script>

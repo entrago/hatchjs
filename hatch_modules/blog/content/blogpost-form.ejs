@@ -1,0 +1,160 @@
+<% var form = formFor(post, {
+    remote: true,
+    action: (post.id ? pathTo.contentEntry(post.id) : pathTo.content) + '.json',
+    id: 'content-form',
+    class: 'content-form'
+}) %>
+
+<%- form.begin() %>
+<%- form.input('type', {type: 'hidden'}) %>
+
+<div class="row">
+    <div class="span7">
+        <div class="module">
+            <div class="content">
+                <div class="control-group">
+                    <%- form.label('title', t('post.title'), {class: 'control-label'}) %>
+                    <div class="controls">
+                        <%- form.input('title', {class: 'span7'}) %>
+                    </div>
+                </div>
+
+                <%- form.textarea('text', {rows: 28, class: 'richtext span6'}) %>
+            </div>
+        </div>
+    </div>
+
+    <div class="span3">
+        <div class="module">
+            <div class="content">
+                <div class="form-actions">
+                    <%- form.submit(t('post.actions.publish'), {class: 'btn btn-primary'}) %>
+                    <%- form.button(t('post.actions.draft'), {class: 'btn'}) %>
+                </div>
+
+                <div class="control-group">
+                    <%- form.label('createdAt', t('post.createdAt')) %>
+                    <div class="controls">
+                        <div class="input-append date" id="createdAtDatePicker">
+                            <%- form.input('createdAt', {class: 'input-large', 'data-format': datetimeformat.replace(/DD/ig, 'dd').replace(/YY/ig, 'yy').replace(/HH/, 'hh') })
+                            %><span class="add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="clearfix"></div>
+
+                <div class="control-group">
+                    <%- form.label('tags', t('post.tags')) %>
+                    <p class="instructions"><%= t('post.instructions.tags') %></p>
+                    <div class="controls">
+                        <!--
+                        <%- form.select('tags', tags, {
+                            fieldname: 'title',
+                            fieldvalue: 'id',
+                            matcher: function (tag, postTag) {
+                                console.log('tag = ' + tag)
+                                console.log('postTag = ' + postTag)
+                                return tag == postTag.id;
+                            },
+                            name: 'tags[]',
+                            multiple: 'multiple',
+                            class: 'span3 chzn-select-create',
+                            'data-placeholder': t('post.actions.enterTags')
+                        }) %>
+                        -->
+
+                        <select id="tags" name="Content_tags" multiple="multiple" class="span3 chzn-select-create" data-placeholder="<%- t('post.actions.enterTags') %>">
+                            <% tags.forEach(function (tag) { %>
+                                <option value="<%- tag.id %>"<%- post.tags.find(tag.id, 'id') ? ' selected="selected"':'' %>><%- tag.title %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <%- form.label('excerpt', t('post.excerpt')) %>
+                    <p class="instructions"><%= t('post.instructions.excerpt') %></p>
+                    <div class="controls">
+                        <%- form.textarea('excerpt', {rows: 3, class: 'input-large'}) %>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <%- form.label('previewImage', t('post.previewImage')) %>
+                    <p class="instructions"><%= t('post.instructions.previewImage') %></p>
+                    <div class="controls">
+                        <%- linkTo(icon('picture') + t('post.actions.previewImage'), '#', {id: 'previewImageUploadButton', class: 'btn'}) %>
+                        &nbsp;
+                        <%- linkTo(icon('remove'), '#', {id: 'removePreviewImage'}) %>
+                        <%- form.input('previewImage', {type: 'hidden'}) %>
+                    </div>
+                </div>
+
+                <%- imageTag(post.previewImage, {
+                  id: 'previewImageImage',
+                  style: post.previewImage ? '' : 'display: none'
+                  }) %>
+              </div>
+          </div>
+      </div>
+    </div>
+</div>
+
+<%- form.end() %>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $(".content .chzn-select").chosen();
+
+        setupRichtextEditors();
+
+        $('#Content_createdAt').val('');
+        var picker = $('#createdAtDatePicker').datetimepicker({
+            orientation: 'left',
+            pick12HourFormat: false
+        }).data('datetimepicker');
+        picker.setDate(new Date('<%- post.createdAt %>').getTime() - new Date().getTimezoneOffset() * 60000);
+
+        //bind form success
+        $('#content-form').bind('ajax:success', function(e, res) {
+            var type, icon;
+            if (res.code === 200) {
+                type = 'success';
+                icon = '<%- icon("ok") %>';
+                setTimeout(function() {
+                    window.location = '<%- pathTo.content %>';
+                }, 1000);
+            } else {
+                type = 'error';
+                icon = '<%- icon("warning-sign") %>';
+            }
+
+            $.noty({
+                text: icon + res.html,
+                type: type
+            });
+
+        });
+
+        var uploader = new qq.FileUploader({
+            params: { _csrf: $('meta[name=csrf-token]').attr('content') },
+            element: $('#previewImageUploadButton').get(0),
+            action: '<%- pathFor('upload').add -%>',
+            uploadButtonText: $('#previewImageUploadButton').html(),
+            encoding: 'multipart',
+            onComplete: function(id, filename, data) {
+                $('#previewImage').val(data.url);
+                $('#previewImageImage').show().attr('src', data.url);
+
+                $.noty({ text: '<i class="icon-ok"></i> Preview image uploaded', type: 'success' });
+            }
+        });
+
+        $('#removePreviewImage').bind("click", function() {
+            $('#previewImage').val('');
+            $('#previewImageImage').hide();
+            return false;
+        })
+    });
+</script>

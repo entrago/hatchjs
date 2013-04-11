@@ -1,9 +1,11 @@
 <li class="nav-header"><%= t('content.header.actions') %></li>
 
-<%- li('new') %>
-    <%- linkTo(icon('pencil') + t('content.new'),
-        pathTo.newContentEntry) %>
-<%- liEnd %>
+<% editableContentTypes.forEach(function (type) { %>
+    <%- li('new') %>
+        <%- linkTo(icon(type.icon) + t('content.new' + type.name),
+            pathTo.newContentForm(type.name)) %>
+    <%- liEnd %>
+<% }) %>
 
 <li class="nav-header"><%= t('content.header.filter') %></li>
 
@@ -12,18 +14,10 @@
         pathTo.content) %>
 <%- liEnd %>
 
-<% var iconFor = {
-    blogpost: 'align-left',
-    discussion: 'comments',
-    statusupdate: 'user',
-    poll: 'bar-chart',
-    imported: 'cloud'
-} %>
-<% 'blogpost discussion statusupdate poll imported'.split(' ')
-    .forEach(function (f) { %>
-    <%- li('content-' + f) %>
+<% contentTypes.forEach(function (type) { %>
+    <%- li('content-' + type.name) %>
         <%- linkTo(
-            icon(iconFor[f]) + t('content.' + f),
-            pathTo.filteredContent(f)) %>
+            icon(type.icon) + t('content.' + type.name),
+            pathTo.filteredContent(type.name)) %>
     <%- liEnd %>
 <% }) %>

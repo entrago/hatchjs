@@ -17,6 +17,11 @@ module.exports = function (compound) {
         app.set('cssEngine', 'stylus');
         app.set('upload path', app.root + '/public/upload');
 
+        // date and time formats
+        app.set('dateformat', 'DD/MM/YYYY');
+        app.set('timeformat', 'HH:mm:ss');
+        app.set('datetimeformat', app.get('dateformat') + ' ' + app.get('timeformat'));
+
         // TODO move render speed hook to proper place
         compound.injectMiddlewareAt(2, function timeLogger(req, res, next) {
             req.startedAt = Date.now();

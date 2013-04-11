@@ -28,6 +28,7 @@ exports.routes = function (map) {
         item.collection(function (items) {
             items.get('filter/:filter.:format?', '#index', {as: 'filteredContent' });
             items.del('destroyAll', {as: 'destroySelectedContent'});
+            items.get('new/:type', '#new', {as: 'newContentForm'});
         });
     });
 

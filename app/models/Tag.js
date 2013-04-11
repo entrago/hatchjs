@@ -65,6 +65,66 @@ module.exports = function (compound, Tag) {
     };
 
     /**
+     * Assign tags to an object from req.body data containing an array of tag 
+     * ids. This function will automatically recalculate the tag counts for all
+     * tags involved in this transaction - both those being removed and added to
+     * the object tags list.
+     * 
+     * @param  {Object}   obj      - db entity to assign tags for
+     * @param  {Object}   data     - req.body.tags containing tag ids
+     * @param  {Function} callback - callback function
+     */
+    Tag.assignTagsForObject = function (obj, data, callback) {
+        var updateTags = [];
+
+        if (!data) {
+            data = [];
+        }
+        if (typeof data !== 'object') {
+            data = [data];
+        }
+
+        obj.tags.forEach(function (tag) {
+            updateTags.push(tag.id);
+        });
+
+        while (obj.tags.length > 0) {
+            obj.tags.remove(obj.tags.items[0]);
+        }
+
+        // assign the tags from the body data
+        async.forEach(data, function (tagId, done) {
+            Tag.find(tagId, function (err, tag) {
+                obj.tags.push({
+                    id: tag.id,
+                    title: tag.title
+                });
+
+                if (!_.find(updateTags, function (tagId) { 
+                    return tagId === tag.id
+                })) {
+                    updateTags.push(tag.id);
+                }
+
+                done();
+            });
+        }, function (err) {
+            callback(err, obj);
+
+            // update the counts for all tags (if there are any)
+            setTimeout(function () {
+                if (updateTags.length > 0) {
+                    updateTags.forEach(function (tagId) {
+                        Tag.find(tagId, function (err, tag) {
+                            tag.updateCount();
+                        });
+                    });
+                }
+            }, 500);
+        });
+    };
+
+    /**
      * Find a tag by it's name.
      * 
      * @param  {string}   name     - name of the tag
@@ -228,7 +288,7 @@ module.exports = function (compound, Tag) {
      */
     Tag.prototype.updateCount = function (callback) {
         var tag = this;
-
+    
         compound.model(this.type, false).count({ tags: tag.id }, function (err, count) {
             tag.count = count;
             tag.updatedAt = new Date();
@@ -248,7 +308,7 @@ module.exports = function (compound, Tag) {
      * @param  {Function} callback - callback function
      */
     Tag.updateCountsForObject = function (obj, callback) {
-        asnyc.forEach(obj.tags, function (tag, done) {
+        async.forEach(obj.tags, function (tag, done) {
             Tag.find(tag.id, function (err, tag) {
                 tag.updateCount(done);
             });

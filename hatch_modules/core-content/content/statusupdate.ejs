@@ -1,0 +1,25 @@
+<%- remotePanelFor(content, { class: 'status-update-wrapper content-item', id: content.id }) %>
+    <%
+    if (typeof req.query.comments === 'undefined') req.query.comments = false;
+    %>
+
+    <div class="pull-left span1">
+        <%- linkTo(img(content.author.avatar, {class: 'img-rounded'}, 'span1'), specialPagePath('profile', { username: content.author.username })) %>
+    </div>
+    <div class="offset1">
+        <%- linkTo(content.author.displayName, specialPagePath('profile', { username: content.author.username }), { rel: 'hovercard', 'data-url': pathFor('user').hovercard(content.author.id) }) %>
+    </div>
+    <div class="offset1">
+        <% if(content.text) { %>
+            <p><%- markdown(content.text) %></p>
+        <% } %>
+        <%- partial('attachments') %>
+    </div>
+    <div class="offset1 content-metadata">
+        <%- partial('links-and-likes') %>
+        <%- partial('discuss') %>
+    </div>
+
+    <%- partial('tags') %>
+    <div class="content-footer"></div>
+<%- end() %>

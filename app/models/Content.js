@@ -43,6 +43,15 @@ module.exports = function (compound, Content) {
         return Math.min(Math.floor(((this.likes || []).length + (this.comments || []).length) / 2), 5);
     };
 
+    /**
+     * gets the time since this post was published
+     * 
+     * @return {String}
+     */
+    Content.getter.timeSince = function() {
+        return moment(this.createdAt || new Date()).fromNow();
+    };
+
     Content.setter.createdAt = function(value) {
         value = value || '';
         if (value && value.toString().match(/now|immediately/i)) {
@@ -88,16 +97,6 @@ module.exports = function (compound, Content) {
      */
     Content.getter.likesTotal = function() {
         return (this.likes || []).length - (this.dislikes || []).length;
-    };
-
-    /**
-     * gets the nicely formatted time for this post
-     * 
-     * @return {[String]} 
-     */
-    Content.prototype.timeSince = function() {
-        var d = moment(this.createdAt);
-        return d && d.fromNow() || 'invalid date';
     };
 
     /**

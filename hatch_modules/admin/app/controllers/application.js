@@ -44,4 +44,12 @@ var Application = module.exports = function Application(init) {
             c.next();
         }
     });
+
+    init.before(loadContentTypes);
 };
+
+function loadContentTypes(c) {
+    c.locals.contentTypes = c.compound.hatch.contentType.getAll();
+    c.locals.editableContentTypes = c.compound.hatch.contentType.getEditable();
+    c.next();
+}
