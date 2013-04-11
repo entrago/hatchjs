@@ -114,28 +114,30 @@ module.exports = function (compound, Tag) {
                 done();
             });
         }, function (err) {
+            // wrap the save function for this object to intercept the callback
+            // and insert the command to update the tag counts
             var save = obj.save;
             obj.save = function (options, callback) {
-                save.call(obj, options, function (err, obj) {
-                    update();
-                    if (callback) {
-                        callback(err, obj);
-                    }
-                })
-            }
-
-            callback(err, obj);
-
-            // update the counts for all tags (if there are any)
-            function update() {
-                if (updateTags.length > 0) {
+                if (typeof options == 'function') {
+                    callback = options;
+                    options = {};
+                }
+                var oldCallback = callback;
+                callback = function (err, obj) {
                     updateTags.forEach(function (tagId) {
                         Tag.find(tagId, function (err, tag) {
                             tag.updateCount();
                         });
                     });
+                    
+                    if(oldCallback) {
+                        oldCallback(err, obj);
+                    }
                 }
+                save.call(obj, options, callback);
             }
+
+            callback(err, obj);
         });
     };
 
