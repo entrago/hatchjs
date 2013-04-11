@@ -113,18 +113,38 @@ module.exports = function (compound, Tag) {
         // assign the tags from the body data
         async.forEach(data, function (tagId, done) {
             Tag.find(tagId, function (err, tag) {
-                obj.tags.push({
-                    id: tag.id,
-                    title: tag.title
-                });
+                // if the tag was not found, create it
+                if (!tag && typeof tagId === 'string') {
+                    var tag = {
+                        title: tagId,
+                        groupId: obj.groupId,
+                        type: obj.constructor.modelName,
+                        sortOrder: 'id DESC'
+                    };
 
-                if (!_.find(updateTags, function (tagId) { 
-                    return tagId === tag.id
-                })) {
-                    updateTags.push(tag.id);
+                    Tag.create(tag, function (err, tag) {
+                        pushTag(tag);
+                    });
+                } else if(tag) {
+                    pushTag(tag);
+                } else {
+                    done();
                 }
 
-                done();
+                function pushTag(tag) {
+                    obj.tags.push({
+                        id: tag.id,
+                        title: tag.title
+                    });
+
+                    if (!_.find(updateTags, function (tagId) { 
+                        return tagId === tag.id
+                    })) {
+                        updateTags.push(tag.id);
+                    }
+
+                    done();
+                }
             });
         }, function (err) {
             // wrap the save function for this object to intercept the callback

@@ -30,9 +30,9 @@
     </label>
     <div class="controls">
         <select id="tags" name="tags[]" multiple="multiple" class="span3 chzn-select-create" data-placeholder="<%= __('Enter tags...') %>">
-            <% (req.group.tags || []).forEach(function(tag) { %>
+            <% (tags || []).forEach(function(tag) { %>
             <% if(!tag) return; %>
-            <option<%- _.find(stream.tags && stream.tags.items || [], function(t) { return t.tagId == tag.id }) ? ' selected="selected"':'' %>><%- tag.name %></option>
+            <option<%- _.find(stream.tags && stream.tags.items || [], function(t) { return t.tagId == tag.id }) ? ' selected="selected"':'' %>><%- tag.title %></option>
             <% }) %>
         </select>
     </div>
@@ -53,7 +53,7 @@
 
 <div class="form-actions">
     <button type="submit" class="btn btn-primary"><%= __('Save changes') %></button>
-    <a href="<%- pathTo.groupStreams(group) %>" class="btn"><%= __('Cancel') %></a>
+    <a href="<%- pathTo.streams() %>" class="btn"><%= __('Cancel') %></a>
 </div>
 
 <script type="text/javascript">
@@ -66,7 +66,7 @@
 
             if(data.status == "success") {
                 //refresh the page
-                setTimeout(function() { window.location = '<%- pathTo.groupStreams(group) %>'; }, 1000);
+                setTimeout(function() { window.location = '<%- pathTo.streams() %>'; }, 1000);
             }
         });
     });

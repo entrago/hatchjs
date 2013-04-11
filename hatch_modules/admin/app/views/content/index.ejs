@@ -118,13 +118,7 @@
 
                             setTimeout(function () {
                                 // update tag counts
-                                $.ajax('<%- pathTo.tagsCounts('content') %>', {
-                                    success: function (data) {
-                                        data.tags.forEach(function (tag) {
-                                            $('#tagCount-' + tag.id).text(tag.count);
-                                        });
-                                    }
-                                });
+                                refreshTagCounts();
                             }, 500);
                         }
                     }
@@ -137,6 +131,16 @@
 
             return false;
         });
+
+        function refreshTagCounts() {
+            $.ajax('<%- pathTo.tagsCounts('content') %>', {
+                success: function (data) {
+                    data.tags.forEach(function (tag) {
+                        $('#tagCount-' + tag.id).text(tag.count);
+                    });
+                }
+            });
+        }
 
         // handle the selectAllContent checkbox events
         $("#selectAllContent").on("click", function() {
@@ -177,6 +181,8 @@
 
                     // redraw table
                     window.table.fnDraw(false);
+
+                    refreshTagCounts();
                 });
 
                 // click the checkboxes which are ticked

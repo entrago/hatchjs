@@ -66,6 +66,7 @@ function getSortOrders (type) {
     switch(type) {
         case 'content':
             return [
+                { name: 'ID', value: 'id DESC' },
                 { name: 'Date', value: 'createdAt DESC' },
                 { name: 'Popularity', value: 'score DESC' },
                 { name: 'Comments', value: 'commentsTotal DESC' },
@@ -74,6 +75,7 @@ function getSortOrders (type) {
         
         case 'user':
             return [
+                { name: 'ID', value: 'id DESC' },
                 { name: 'Username', value: 'username ASC' },
                 { name: 'Last name', value: 'lastname ASC' },
                 { name: 'First name', value: 'firstname ASC' },

@@ -124,6 +124,9 @@ ContentController.prototype.create = function create(c) {
     var group = this.group;
     var data = c.body.Content || c.req.body;
 
+    // set the constructor
+    data.constructor = c.Content;
+
     // set the groupId and authorId for the new post
     data.groupId = group.id;
     data.authorId = c.req.user.id;
@@ -143,7 +146,7 @@ ContentController.prototype.create = function create(c) {
             if (err) {
                 var HelperSet = c.compound.helpers.HelperSet;
                 var helpers = new HelperSet(c);
-                
+
                 c.send({
                     code: 500,
                     errors: content.errors,
@@ -181,10 +184,10 @@ ContentController.prototype.update = function update(c) {
 
             // update the keys manually
             Object.keys(data).forEach(function(key) {
-                content[key] = data[key];
+                post[key] = data[key];
             });
 
-            content.save(function (err, content) {
+            post.save(function (err, content) {
                 if (err) {
                     var HelperSet = c.compound.helpers.HelperSet;
                     var helpers = new HelperSet(c);

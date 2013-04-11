@@ -42,6 +42,15 @@ function StreamsController(init) {
             locals.stream = stream;
         });
     }, {only: ['edit', 'update', 'destroy', 'toggle']});
+    init.before(loadTags);
+}
+
+function loadTags(c) {
+    c.Tag.all({ where: { groupIdByType: c.req.group.id + '-Content' }}, function (err, tags) {
+        delete tags.countBeforeLimit;
+        c.locals.tags = tags;
+        c.next();
+    });
 }
 
 require('util').inherits(StreamsController, Application);
@@ -49,6 +58,7 @@ require('util').inherits(StreamsController, Application);
 // Show the import streams
 StreamsController.prototype.index = function(c) {
     var ImportStream = c.ImportStream;
+    this.pageName = 'manage-streams';
 
     ImportStream.all({ where: { groupId: c.req.group.id }}, function(err, streams) {
         this.streams = streams;
