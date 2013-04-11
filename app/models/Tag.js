@@ -77,17 +77,22 @@ module.exports = function (compound, Tag) {
     Tag.assignTagsForObject = function (obj, data, callback) {
         var updateTags = [];
 
+        // fix mising tag data - replace with empty array
         if (!data) {
             data = [];
         }
+
+        // fix single tagIds that are sometimes not an array
         if (typeof data !== 'object') {
             data = [data];
         }
 
+        // add the existing tags to the update collection
         obj.tags.forEach(function (tag) {
             updateTags.push(tag.id);
         });
 
+        // remove all of the existing tags from the object
         while (obj.tags.length > 0) {
             obj.tags.remove(obj.tags.items[0]);
         }
@@ -109,10 +114,20 @@ module.exports = function (compound, Tag) {
                 done();
             });
         }, function (err) {
+            var save = obj.save;
+            obj.save = function (options, callback) {
+                save.call(obj, options, function (err, obj) {
+                    update();
+                    if (callback) {
+                        callback(err, obj);
+                    }
+                })
+            }
+
             callback(err, obj);
 
             // update the counts for all tags (if there are any)
-            setTimeout(function () {
+            function update() {
                 if (updateTags.length > 0) {
                     updateTags.forEach(function (tagId) {
                         Tag.find(tagId, function (err, tag) {
@@ -120,7 +135,7 @@ module.exports = function (compound, Tag) {
                         });
                     });
                 }
-            }, 500);
+            }
         });
     };
 
