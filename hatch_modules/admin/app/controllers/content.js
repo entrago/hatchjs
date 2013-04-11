@@ -92,7 +92,7 @@ ContentController.prototype.index = function index(c) {
  * @param  {HttpContext} c - http context
  */
 ContentController.prototype.new = function(c) {
-    this.post = new c.Content;
+    this.post = new c.Content();
     this.post.type = c.req.params.type;
 
     renderInputForm(c, function () {
@@ -106,83 +106,76 @@ ContentController.prototype.new = function(c) {
  * @param  {HttpContext} c - http context
  */
 ContentController.prototype.edit = function edit(c) {
-    this.pageName = 'content';
-    var post = {};
-
-    if (c.req.params.id) {
-        c.Content.find(c.params.id, function(err, content) {
-            post = content;
-            //post.createdAt = moment(post.createdAt || new Date().toString()).format(c.app.get('datetimeformat'));
-            done();
-        });
-    } else {
-        done();
-    }
-
-    function done() {
-        c.locals._ = _;
+    c.Content.find(c.params.id, function(err, post) {
         c.locals.post = post;
         
         renderInputForm(c, function () {
             c.render();
         });
-    }
+    });
 };
 
+/**
+ * Create a new content record with the data from the form body.
+ * 
+ * @param  {HttpContext} c - http context
+ */
 ContentController.prototype.create = function create(c) {
     var group = this.group;
-    var data = c.body.Content;
+    var data = c.body.Content || c.req.body;
 
     // set the groupId and authorId for the new post
     data.groupId = group.id;
     data.authorId = c.req.user.id;
-    data.score = 0;
 
+    // if there is no date, set to now. otherwise parse with moment to fix format
     if (!data.createdAt) {
         data.createdAt = new Date();
     } else {
         data.createdAt = moment(data.createdAt, c.app.get('datetimeformat')).toDate();
     }
+
     data.updatedAt = new Date();
 
+    // assign tags to the new object and then save after that
     c.Tag.assignTagsForObject(data, c.req.body.Content_tags, function () {
         c.Content.create(data, function(err, content) {
-            c.respondTo(function(format) {
-                format.json(function () {
-                    if (err) {
-                        var HelperSet = c.compound.helpers.HelperSet;
-                        var helpers = new HelperSet(c);
-                        c.send({
-                            code: 500,
-                            errors: content.errors,
-                            html: helpers.errorMessagesFor(content)
-                        });
-                    } else {
-                        group.recalculateTagContentCounts(c);
-                        c.send({
-                            code: 200,
-                            html: c.t('models.Content.messages.saved')
-                        });
-                    }
+            if (err) {
+                var HelperSet = c.compound.helpers.HelperSet;
+                var helpers = new HelperSet(c);
+                
+                c.send({
+                    code: 500,
+                    errors: content.errors,
+                    html: helpers.errorMessagesFor(content)
                 });
-            });
+            } else {
+                group.recalculateTagContentCounts(c);
+                c.send({
+                    code: 200,
+                    html: c.t('models.Content.messages.saved')
+                });
+            }
         });
     });
 };
 
+/**
+ * Update an existing content record with the data from the form body.
+ * 
+ * @param  {HttpContext} c - http context
+ */
 ContentController.prototype.update = function update(c) {
     var Content = c.Content;
     var id = c.params.id;
     var group = c.req.group;
-    var post = null;
-    var data = c.body.Content
+    var data = c.body.Content;
 
+    // parse the date format with moment
     data.createdAt = moment(data.createdAt, c.app.get('datetimeformat')).toDate();
     data.updatedAt = new Date();
 
-    Content.find(id, function(err, content) {
-        post = content;
-
+    Content.find(id, function(err, post) {
         c.Tag.assignTagsForObject(post, c.req.body.Content_tags, function () {
             delete data.tags;
 
@@ -200,9 +193,7 @@ ContentController.prototype.update = function update(c) {
                         errors: content.errors || err,
                         html: helpers.errorMessagesFor(content)
                     });
-                } else {
-                    group.recalculateTagContentCounts(c);
-                    
+                } else {               
                     c.send({
                         code: 200,
                         html: c.t('post.saved')
@@ -211,13 +202,13 @@ ContentController.prototype.update = function update(c) {
             });
         });
     });
-
-    function done() {
-        // finally, update the group tag counts
-    }
 };
 
-// Delete a content record
+/**
+ * Delete a single content record.
+ * 
+ * @param  {HttpContext} c - http context
+ */
 ContentController.prototype.destroy = function(c) {
     var group = c.req.group;
 
@@ -230,8 +221,11 @@ ContentController.prototype.destroy = function(c) {
     });
 };
 
-// Delete multiple content records
-// TODO: rename to destroyAll
+/**
+ * Delete multiple content records.
+ * 
+ * @param  {HttpContext} c - http context
+ */
 ContentController.prototype.destroyAll = function(c) {
     var Content = c.Content;
     var group = c.req.group;
@@ -279,7 +273,6 @@ ContentController.prototype.destroyAll = function(c) {
 
 // Load content based on the current filter/critera
 function loadContent(c, cb) {
-
     return makeQuery(makeCond(c), cb);
 
     function makeCond(c) {
@@ -318,32 +311,17 @@ function loadContent(c, cb) {
             if (err) {
                 return c.next(err);
             }
-            // redis fulltext search
-            if (search) {
-                c.Content.all({
-                    where: cond,
-                    fulltext: search,
-                    order: orderBy,
-                    offset: offset,
-                    limit: limit
-                }, function(err, posts) {
-                    posts.count = count;
-                    cb(posts);
-                });
-            }
-            // no filter, standard query
-            else {
-                c.Content.all({
-                    where: cond,
-                    order: orderBy,
-                    offset: offset,
-                    limit: limit
-                }, function(err, posts) {
-                    posts.count = count;
-                    cb(posts);
-                });
-            }
-        });
 
+            c.Content.all({
+                where: cond,
+                order: orderBy,
+                offset: offset,
+                limit: limit,
+                fulltext: search
+            }, function(err, posts) {
+                posts.count = count;
+                cb(posts);
+            });
+        });
     }
 }

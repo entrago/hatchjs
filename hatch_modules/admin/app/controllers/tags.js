@@ -18,6 +18,7 @@
 
 var Application = require('./application');
 var async = require('async');
+var _ = require('underscore');
 
 module.exports = TagController;
 
@@ -34,6 +35,13 @@ function loadTags(c) {
     this.pageName = c.actionName + '-tags';
 
     c.Tag.all({ where: { groupIdByType: c.req.group.id + '-' + this.modelName }}, function (err, tags) {
+        tags.forEach(function (tag) {
+            tag.sortOrder = tag.sortOrder &&
+            _.find(getSortOrders(c.params.section), function (sortOrder) {
+                return sortOrder.value === tag.sortOrder;
+            }).name;
+        });
+
         c.locals.tags = tags;
         c.next();
     });
@@ -80,6 +88,7 @@ function getSortOrders (type) {
  * @param  {HttpContext} c - http context
  */
 TagController.prototype.index = function (c) {
+    c.locals.sortOrders = getSortOrders(this.type);
     c.render();
 };
 
