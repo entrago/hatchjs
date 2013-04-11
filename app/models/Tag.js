@@ -96,6 +96,10 @@ module.exports = function (compound, Tag) {
             data = [data];
         }
 
+        if (!obj.tags) {
+            obj.tags = [];
+        }
+
         // add the existing tags to the update collection
         obj.tags.forEach(function (tag) {
             updateTags.push(tag.id);
@@ -126,28 +130,40 @@ module.exports = function (compound, Tag) {
             // wrap the save function for this object to intercept the callback
             // and insert the command to update the tag counts
             var save = obj.save;
-            obj.save = function (options, callback) {
-                if (typeof options == 'function') {
-                    callback = options;
-                    options = {};
-                }
-                var oldCallback = callback;
-                callback = function (err, obj) {
-                    updateTags.forEach(function (tagId) {
-                        Tag.find(tagId, function (err, tag) {
-                            tag.updateCount();
-                        });
-                    });
-                    
-                    if(oldCallback) {
-                        oldCallback(err, obj);
+
+            if (save) {
+                obj.save = function (options, callback) {
+                    if (typeof options == 'function') {
+                        callback = options;
+                        options = {};
                     }
+                    var oldCallback = callback;
+                    callback = function (err, obj) {
+                        runTagUpdate();
+                        
+                        if(oldCallback) {
+                            oldCallback(err, obj);
+                        }
+                    }
+                    save.call(obj, options, callback);
                 }
-                save.call(obj, options, callback);
+            } else {
+                // we still need a timeout if the obj is not a db entity. this
+                // can happen if we are updating the data to be used to create
+                // a new db entity
+                setTimeout(runTagUpdate, 500);
             }
 
             callback(err, obj);
         });
+
+        function runTagUpdate() {
+            updateTags.forEach(function (tagId) {
+                Tag.find(tagId, function (err, tag) {
+                    tag.updateCount();
+                });
+            });
+        }
     };
 
     /**

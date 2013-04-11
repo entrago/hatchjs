@@ -43,6 +43,8 @@ function renderInputForm(c, next) {
     var type = c.locals.post.type;
     var contentType = c.compound.hatch.contentType.getContentType(type);
 
+    c.locals.datetimeformat = c.app.get('datetimeformat');
+
     c.prepareViewContext();
     c.renderView('content/edit/' + contentType.name, function (err, html) {
         if (err) {
@@ -107,8 +109,6 @@ ContentController.prototype.edit = function edit(c) {
     this.pageName = 'content';
     var post = {};
 
-    c.locals.datetimeformat = c.app.get('datetimeformat');
-
     if (c.req.params.id) {
         c.Content.find(c.params.id, function(err, content) {
             post = content;
@@ -138,24 +138,33 @@ ContentController.prototype.create = function create(c) {
     data.authorId = c.req.user.id;
     data.score = 0;
 
-    c.Content.create(data, function(err, content) {
-        c.respondTo(function(format) {
-            format.json(function () {
-                if (err) {
-                    var HelperSet = c.compound.helpers.HelperSet;
-                    var helpers = new HelperSet(c);
-                    c.send({
-                        code: 500,
-                        errors: content.errors,
-                        html: helpers.errorMessagesFor(content)
-                    });
-                } else {
-                    group.recalculateTagContentCounts(c);
-                    c.send({
-                        code: 200,
-                        html: c.t('models.Content.messages.saved')
-                    });
-                }
+    if (!data.createdAt) {
+        data.createdAt = new Date();
+    } else {
+        data.createdAt = moment(data.createdAt, c.app.get('datetimeformat')).toDate();
+    }
+    data.updatedAt = new Date();
+
+    c.Tag.assignTagsForObject(data, c.req.body.Content_tags, function () {
+        c.Content.create(data, function(err, content) {
+            c.respondTo(function(format) {
+                format.json(function () {
+                    if (err) {
+                        var HelperSet = c.compound.helpers.HelperSet;
+                        var helpers = new HelperSet(c);
+                        c.send({
+                            code: 500,
+                            errors: content.errors,
+                            html: helpers.errorMessagesFor(content)
+                        });
+                    } else {
+                        group.recalculateTagContentCounts(c);
+                        c.send({
+                            code: 200,
+                            html: c.t('models.Content.messages.saved')
+                        });
+                    }
+                });
             });
         });
     });
