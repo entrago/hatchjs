@@ -149,13 +149,15 @@
                 $("#content-table tbody input[type=checkbox]").attr("checked", true);
 
                 // reset the selected content array with only the "all" value
-                window.selectedContent = ["all"];
-                window.unselectedContent = [];
+                $.ajax('<%- pathTo.contentIds %>?filter=<%- filter %>&sSearch=' + $('#content-table_filter input').val(), {
+                    success: function (data) {
+                        window.selectedContent = data.ids;        
+                    }
+                });
             }
             else {
                 // unselect all content
                 window.selectedContent = [];
-                window.unselectedContent = [];
 
                 // uncheck all checkboxes
                 $("#content-table tbody input[type=checkbox]").attr("checked", null);

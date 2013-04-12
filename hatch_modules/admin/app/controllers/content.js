@@ -31,6 +31,8 @@ function ContentController(init) {
     init.before(loadTags);
 }
 
+require('util').inherits(ContentController, Application);
+
 function loadTags(c) {
     c.Tag.all({ where: { groupIdByType: c.req.group.id + '-Content' }}, function (err, tags) {
         delete tags.countBeforeLimit;
@@ -57,8 +59,6 @@ function renderInputForm(c, next) {
     });
 }
 
-require('util').inherits(ContentController, Application);
-
 /**
  * Show the content list for this group.
  * 
@@ -83,6 +83,28 @@ ContentController.prototype.index = function index(c) {
                     aaData: posts
                 });
             });
+        });
+    });
+};
+
+/**
+ * Return only the IDs for a search query. This is used when a user clicks the
+ * 'select all' checkbox so that we can get ALL of the ids of the content rather
+ * than just the ids of the content on the current page of results.
+ * 
+ * @param  {HttpContext} c - http contextlo
+ */
+ContentController.prototype.ids = function ids(c) {
+    this.filter = c.req.query.filter || c.req.params.filter;
+    var suffix = 'string' === typeof this.filter ? '-' + this.filter : '';
+    this.pageName = 'content' + suffix;
+
+    c.req.query.limit = 1000000;
+    c.req.query.offset = 0;
+
+    loadContent(c, function(posts) {
+        c.send({
+            ids: _.pluck(posts, 'id')
         });
     });
 };
@@ -234,21 +256,9 @@ ContentController.prototype.destroyAll = function(c) {
     var Content = c.Content;
     var group = c.req.group;
     var selectedContent = c.body.selectedContent || [];
-    var unselectedContent = c.body.unselectedContent || [];
     var count = 0;
 
-    if (selectedContent.indexOf('all') > -1) {
-        loadContent(c, function(posts) {
-            selectedContent = _.pluck(posts, 'id');
-            selectedContent = _.filter(selectedContent, function(id) {
-                return unselectedContent.indexOf(id) == -1;
-            });
-
-            deleteSelectedContent(selectedContent);
-        });
-    } else {
-        deleteSelectedContent(selectedContent);
-    }
+    deleteSelectedContent(selectedContent);
 
     function deleteSelectedContent(selectedContent) {
         async.forEach(selectedContent, function(id, next) {
@@ -264,7 +274,9 @@ ContentController.prototype.destroyAll = function(c) {
             });
         }, function() {
             // finally, update the group tag counts
-            group.recalculateTagContentCounts(c);
+            c.locals.tags.forEach(function (tag) {
+                tag.updateCount();
+            });
 
             c.send({
                 message: count + ' posts deleted',
@@ -301,8 +313,8 @@ function loadContent(c, cb) {
 
     function makeQuery(cond, cb) {
         var query = c.req.query;
-        var limit = parseInt(query.iDisplayLength || 0, 10);
-        var offset = parseInt(query.iDisplayStart || 0, 10);
+        var limit = parseInt(query.iDisplayLength || query.limit || 0, 10);
+        var offset = parseInt(query.iDisplayStart || query.offset || 0, 10);
         var colNames = ['', 'title', 'tagString', 'createdAt', 'score', ''];
         var search = query.sSearch || c.req.body.search;
         var orderBy = query.iSortCol_0 > 0 ?
