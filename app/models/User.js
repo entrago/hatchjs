@@ -22,7 +22,6 @@ var async = require('async');
 var _ = require('underscore');
 
 module.exports = function (compound, User) {
-    var api = compound.hatch.api;
 
     User.validatesPresenceOf('username', {message: 'Please enter a username'});
     User.validatesPresenceOf('email', {message: 'Please enter an email address'});
@@ -54,7 +53,7 @@ module.exports = function (compound, User) {
     };
 
     // Builds group index by membership status
-    function getMembershipIndex(user, status) {
+    function getMembershipIndex (user, status) {
         var index = [];
         user.memberships.forEach(function (membership) {
             if(!status || membership.status === status) {
@@ -68,7 +67,7 @@ module.exports = function (compound, User) {
      * Get an array of ids for all groups this user is a member of with any
      * status (member, pending, editor).
      * 
-     * @return {[]} - an array of group ids
+     * @return {Array} - an array of group ids
      */
     User.getter.membershipGroupId = function() {
         return getMembershipIndex(this);
@@ -78,7 +77,7 @@ module.exports = function (compound, User) {
      * Get an array of ids for all groups this user is a member of with status
      * of 'member'.
      * 
-     * @return {[]} - an array of group ids
+     * @return {Array} - an array of group ids
      */
     User.getter.memberGroupId = function() {
         return getMembershipIndex(this, 'member');
@@ -88,7 +87,7 @@ module.exports = function (compound, User) {
      * Get an array of ids for all groups this user is a member of with status
      * of 'pending'.
      * 
-     * @return {[]} - an array of group ids
+     * @return {Array} - an array of group ids
      */
     User.getter.pendingGroupId = function() {
         return getMembershipIndex(this, 'pending');
@@ -98,7 +97,7 @@ module.exports = function (compound, User) {
      * Get an array of ids for all groups this user is a member of with status
      * of 'editor'.
      * 
-     * @return {[]} - an array of group ids
+     * @return {Array} - an array of group ids
      */
     User.getter.editorGroupId = function() {
         return getMembershipIndex(this, 'editor');
@@ -165,7 +164,7 @@ module.exports = function (compound, User) {
      * @param  {Object}     params   - notification parameters
      * @param  {Function}   callback - continuation function
      */
-    User.prototype.notify = function notify(type, params, callback) {
+    User.prototype.notify = function (type, params, callback) {
         var user = this;
         params = params || {};
 
@@ -200,10 +199,10 @@ module.exports = function (compound, User) {
     /**
      * Follow the specified user.id
      * 
-     * @param  {[Number}  id       - id of user to follow
+     * @param  {Number}   id       - id of user to follow
      * @param  {Function} callback - continuation function
      */
-    User.prototype.followUser = function followUser(id, callback) {
+    User.prototype.followUser = function (id, callback) {
         var user = this;
         var hq = User.schema.adapter;
         var redis = User.schema.adapter.client;
@@ -224,7 +223,7 @@ module.exports = function (compound, User) {
      * @param  {Number}   id       - id of user to unfollow
      * @param  {Function} callback - continuation function
      */
-    User.prototype.unfollowUser = function unfollowUser(id, callback) {
+    User.prototype.unfollowUser = function (id, callback) {
         var user = this;
         var hq = User.schema.adapter;
         var redis = User.schema.adapter.client;
@@ -247,7 +246,7 @@ module.exports = function (compound, User) {
      * @param  {Number}     userId   - id of the user to get followers for
      * @param  {Function}   callback - continuation function
      */
-    User.getFollowersOf = function getFollowersOf(userId, callback) {
+    User.getFollowersOf = function (userId, callback) {
         var hq = User.schema.adapter;
         var redis = User.schema.adapter.client;
 
@@ -286,7 +285,7 @@ module.exports = function (compound, User) {
      * @param  {Object}      data     - data to auth/register with
      * @param  {HttpContext} c        - http context
      */
-    User.authenticate = function authenticate(provider, data, c) {
+    User.authenticate = function (provider, data, c) {
         User.findOrCreate(provider, data, function (err, user) {
             if (user.errors) {
                 throw Error(JSON.stringify(user.errors));
@@ -390,16 +389,15 @@ module.exports = function (compound, User) {
     };
 
     /**
-     * merges 2 users
+     * Merge 2 user accounts into 1.
      * 
-     * @param  {[json]}   data    [first user]
-     * @param  {[json]}   newUser [second user]
-     * @param  {Function} done    [continuation function]
+     * @param  {Object}   data     - first user
+     * @param  {Object}   newUser  - second user
+     * @param  {Function} callback - continuation function
      */
-    User.mergeAccounts = function (data, newUser, done) {
+    User.mergeAccounts = function (data, newUser, callback) {
         console.log('merging accounts');
-        User.findOne({where: {email: data.email}}, function (err, user) {
-            console.log(user ? 'user found' : 'user not found');
+        User.findOne({where: { email: data.email }}, function (err, user) {
             if (user && User.verifyPassword(data.password, user.password)) {
                 console.log('user to merge with', user);
                 Object.keys(newUser).forEach(function (field) {
@@ -412,29 +410,29 @@ module.exports = function (compound, User) {
                         console.log('removing new user');
                         newUser.destroy(done.bind(user, err, user));
                     } else {
-                        done(err, user);
+                        callback(err, user);
                     }
                 });
             } else {
                 if (user) {
                     newUser.errors = {
-                        email:['already taken']
+                        email: ['already taken']
                     };
-                    done(new Error('Email already taken'), newUser);
+                    callback(new Error('Email already taken'), newUser);
                 } else {
                     newUser.email = data.email;
-                    newUser.save(done);
+                    newUser.save(callback);
                 }
             }
         });
     };
 
     /**
-     * Verifies a user's password
+     * Verify a user's password.
      * 
-     * @param  {[String]}   password     [password to check]
-     * @param  {[String]}   userPassword [password to check against]
-     * @return {[Boolean]}  
+     * @param  {String}   password     - password to check
+     * @param  {String}   userPassword - password to check against
+     * @return {Boolean}  
      */
     User.verifyPassword = function (password, userPassword) {
         if (userPassword === null) return true;
@@ -450,10 +448,11 @@ module.exports = function (compound, User) {
     };
 
     /**
-     * validates a user has entered all of the mandatory profile fields for the specified group
+     * Validate that the user has entered all of the mandatory profile fields 
+     * for the specified group.
      * 
-     * @param  {[Group]}   group [group to check profile fields for]
-     * @return {[Boolean]}
+     * @param  {Group}   group - group to check profile fields for
+     * @return {Boolean}
      */
     User.prototype.validateGroupProfileFields = function(group) {
         var valid = true;
@@ -467,13 +466,14 @@ module.exports = function (compound, User) {
     };
 
     /**
-     * gets a user who matches the specified invitation code
+     * Get a user who matches the specified invitation code.
      * 
-     * @param  {[Number]}   groupId        [id of the group]
-     * @param  {[String]}   invitationCode [invitation code hash to load invitation for]
-     * @param  {Function}   callback       [continuation function]
+     * @param  {Number}   groupId        - id of the group
+     * @param  {String}   invitationCode - invitation code hash to load invitation for
+     * @param  {Function} callback       - continuation function
      */
     User.getByInvitationCode = function(groupId, invitationCode, callback) {
+        // TODO: refactor for non-nested-indexes
         var cond = {
             'membership:groupId': groupId,
             'membership:invitationCode': invitationCode
@@ -485,38 +485,37 @@ module.exports = function (compound, User) {
     };
 
     /**
-     * sends a reset password link to this user
+     * Send a reset password link to this user.
      * 
-     * @param  {[ActionContext]}   c  [context]
-     * @param  {Function}          cb [continuation function]
+     * @param  {HttpContext}   c        - http context
+     * @param  {Function}      callback - callback function
      */
-    User.prototype.resetPassword = function (c, cb) {
+    User.prototype.resetPassword = function (c, callback) {
+        var user = this;
         compound.models.ResetPassword.upgrade(this, function (err, rp) {
-            this.notify('resetpassword', _.extend({ token: rp.token }, c));
-            cb();
-        }.bind(this));
+            user.notify('resetpassword', _.extend({ token: rp.token }, c));
+            if (callback) {
+                callback();
+            }
+        });
     };
 
     /**
-     * Joins the group `group`
+     * Join the group `group`.
      *
-     * @param {Group} group - group to join
-     * @param {String} code - invitation code
-     * @param {Function} cb(err) - callback
-    **/
-    User.prototype.joinGroup = function joinGroup(group, code, cb) {
+     * @param {Group}    group    - group to join
+     * @param {String}   code     - invitation code
+     * @param {Function} callback - callback function
+     */
+    User.prototype.joinGroup = function(group, code, callback) {
 
         // default status
         var user = this;
         var state = 'pending';
         var requested = true;
 
-        if (!this.membership) {
-            this.membership = [];
-        }
-
         // check for existing membership
-        var membership = _.find(this.membership, function (membership) {
+        var membership = _.find(this.memberships, function (membership) {
             return membership && membership.groupId == group.id;
         });
 
@@ -526,7 +525,7 @@ module.exports = function (compound, User) {
             if (code) {
                 User.getByInvitationCode(group.id, code, function (err, u) {
                     if (err) {
-                        return cb(err);
+                        return callback(err);
                     }
                     if (u && u.id != user.id && u.type === 'temporary') {
                         // delete the temp user
@@ -541,7 +540,7 @@ module.exports = function (compound, User) {
 
             // if we weren't able to find an invitation, cancel out
             if (state !== 'approved' && group.joinPermissions === 'closed') {
-                return cb();
+                return callback();
             }
         }
 
@@ -560,7 +559,7 @@ module.exports = function (compound, User) {
                 } 
                 // if there is already a request to join - do nothing
                 else {
-                    return cb();
+                    return callback();
                 }
             }
 
@@ -576,34 +575,34 @@ module.exports = function (compound, User) {
                 joinedAt: new Date()
             };
 
-            this.membership.push(membership);
+            this.memberships.push(membership);
         }
 
         // save and continue
-        this.save(cb);
+        this.save(callback);
     };
 
     /**
-     * rejects an invitation to join a group
+     * Reject an invitation to join a group.
      * 
-     * @param  {[ActionContext]}   c  [context]
-     * @param  {Function}          cb [continuation function]
+     * @param  {Number}   groupId  - id of the group to reject
+     * @param  {Function} callback - continuation function
      */
-    User.prototype.rejectInvitation = function(c, cb) {
+    User.prototype.rejectInvitation = function(groupId, callback) {
         // check for existing membership
-        this.membership = _.reject(this.membership, function (membership) {
-            return membership.groupId == c.group().id;
+        this.memberships.items = _.reject(this.memberships.items, function (membership) {
+            return membership.groupId == groupId;
         });
 
         // save and continue
-        this.save(cb);
+        this.save(callback);
     };
 
     /**
-     * outputs the publicObject representation of this user - automatically removes sensitive information such
-     * as email address, password hash etc
+     * Output the publicObject representation of this user - automatically 
+     * removes sensitive information such as email address, password hash etc.
      * 
-     * @return {[JSON]} JSON representation of user
+     * @return {Object} - JSON representation of user
      */
     User.prototype.toPublicObject = function () {
         var obj = this.toObject();
@@ -621,6 +620,12 @@ module.exports = function (compound, User) {
         return obj;
     };
 
+    /**
+     * Get whether this user accepts the specified type of email notification.
+     * 
+     * @param  {String} type - type of notification
+     * @return {Boolean}
+     */
     User.prototype.canReceiveEmail = function(type) {
         var setting = (this.mailSettings || {})[type];
         
@@ -633,80 +638,66 @@ module.exports = function (compound, User) {
 
 
     /**
-     * checks whether this user has the specified permission
+     * Check whether this user has the specified permission.
+     *
+     * @param {Group}    group      - group to check within
+     * @param {String}   permission - name of the permission to check for
+     * @param {Function} callback   - callback function
      */
-    User.prototype.hasPermission = function(group, permission) {
+    User.prototype.hasPermission = function(group, permission, callback) {
         var user = this;
+        var redis = User.schema.adapter.client;
+
         var membership = _.find(this.memberships.items, function (membership) {
             return membership.groupId == group.id;
         });
 
-        if(!membership) return false;
+        if(!membership) {
+            return callback(null, false);
+        }
         // special case for 'view' permission - only need to be a member
-        else if(permission === 'view') return true;
+        else if(permission === 'view') {
+            return callback(null, true);
+        }
 
-        //owner and editor can do everything
-        if(membership.role === 'owner' || membership.role === 'editor') return true;  
+        // owner and editor can do everything
+        if(membership.role === 'owner' || membership.role === 'editor') {
+            return callback(null, true);
+        }
 
         var found = false;
-        var parent = (api.permissions.getParent(permission) || {}).name;
 
-        //loop through each custom user list in the group and check for the permission
-        _.forEach(group.memberLists || [], function(list) {
-            if(user.customListIds && user.customListIds.indexOf(group.id + '-' + list.id) > -1 &&
-                api.permissions.match(list.permissions, permission)) found = true;
-        });
-
-        return found;
-    };
-
-
-
-    /**
-     * gets the permission for this user within a group
-     * 
-     * @param  {[Group]} group [group to get permissions for]
-     * @return {[list]}        [list of permissions]
-     */
-    User.prototype.getPermissions = function(group, filter) {
-        var user = this;
-        var membership = _.find(this.memberships || [], function(membership) {
-            return membership.groupId == group.id;
-        });
-
-        if(!membership) return [];
-
-        //owner and editor can do everything
-        if(membership.role === 'owner' || membership.role === 'editor') return ['*'];  
-
-        var permissions = [];
-
-        //loop through each custom user list in the group and check for the permission
-        _.forEach(group.memberLists || [], function(list) {
-            if(user.customListIds && user.customListIds.indexOf(group.id + '-' + list.id) > -1) {
-                _.forEach(list.permissions, function(permission) {
-                    if(permissions.indexOf(permission) == -1) {
-                        if(!filter || new RegExp(filter).exec(permission)) {
-                            permissions.push(permission);
+        // check permissions within tags for the specified group
+        compound.models.Tag.all({ where: { groupIdByType: group.id + '-User' }}, function (err, tags) {
+            tags.forEach(function (tag) {
+                // look at permissions first to avoid needless calls
+                if(_.find(tag.permissions.items), function (tagPermission) {
+                    return new Regexp(permission).exec(tagPermission);
+                }) {
+                    redis.zrank('z:' + hq.modelName('Tag') + ':' + tag.id, user.id, function (err, rank) {
+                        if (rank) {
+                            found = true;
+                            return callback(null, found);
                         }
-                    }
-                });
-            }
+                    });
+                }
+            });
         });
 
-        return permissions;
+        if (!found) {
+            return callback(null, found);
+        }
     };
 
-
     /**
-     * encrypts a password
+     * Encrypt a password.
      * 
-     * @param  {[string]} payload [password to encrypyt]
-     * @return {[string]}         [encrypted password]
+     * @param  {String} payload - password to encrypyt
+     * @return {String}
      */
     User.calcSha = function(payload) {
         return calcSha(payload);
-    }
+    };
 
 
     /**
