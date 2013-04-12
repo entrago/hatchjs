@@ -24,20 +24,7 @@ var compound = require('compound');
 module.exports = function (c) {
     c.once('models', function(m) {
         var User = m.User;
-
         User.defineProperty('linkedinId', { type: String, index: true });
-
-        User.on('auth-linkedin', function (profile, done) {
-            var displayName = [profile.firstName, profile.lastName].join(' ');
-            done({
-                linkedinId: profile.id
-            }, {
-                username: displayName,
-                name: displayName,
-                avatar: profile.pictureUrl,
-                linkedinId: profile.id
-            });
-        });
     });
 
     c.on('render', function(viewContext) {

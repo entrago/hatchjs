@@ -15,6 +15,7 @@
 // 
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
+
 module.exports = LinkedinAuthController;
 
 var oauth = require('oauth');
@@ -86,11 +87,27 @@ LinkedinAuthController.prototype.callback = function (c) {
                 'http://api.linkedin.com/v1/people/~:(' + profile + ')?format=json',
                 token,
                 secret,
-                function (err, data) {
+                function (err, profile) {
                     if (err) {
                         return c.next(err);
                     }
-                    c.User.authenticate('linkedin', JSON.parse(data), c);
+
+                    profile = JSON.parse(profile);
+
+                    var displayName = [profile.firstName, profile.lastName].join(' ');
+                    var data = {
+                        username: displayName,
+                        name: displayName,
+                        avatar: profile.pictureUrl,
+                        linkedinId: profile.id
+                    };
+
+                    var provider = {
+                        name: 'linkedin',
+                        idFields: ['linkedinId']
+                    };
+
+                    c.User.authenticate(provider, data, c);
                 }
             );
         }

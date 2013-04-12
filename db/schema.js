@@ -12,13 +12,18 @@ var User = define('User', function () {
     property('lastnameLetter', String, {index: true});
     property('displayName', String, {sort: true});
     property('oneLiner', String);
-    property('membership', []);
-    property('customListIds', JSON, {index: true});
-    property('ifollow', JSON); // array of ids of user who followed by user
+    property('memberships', []);
+    property('following', [], {index: true}); // [] of user.ids followed by user
     property('otherFields', JSON);
     property('mailSettings', JSON);
     property('fulltext', String);
     property('tags', [], {index: true});
+
+    // group membership indexes
+    property('membershipGroupId', JSON, {index: true});
+    property('memberGroupId', JSON, {index: true});
+    property('pendingGroupId', JSON, {index: true});
+    property('editorGroupId', JSON, {index: true});
 
     set('ignoreNullValues', true);
     set('safe', true);

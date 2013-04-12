@@ -18,25 +18,14 @@
 // 
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
+
 var compound = require('compound');
 
 module.exports = function (c) {
     var module = this;
     c.on('models', function() {
         var User = c.model('user');
-
         User.defineProperty('twitterId',  { type: String, index: true });
-
-        User.on('auth-twitter', function twitterAuth(profile, done) {
-            done({
-                twitterId: profile.id
-            }, {
-                username: profile.screen_name,
-                name: profile.name || profile.screen_name,
-                avatar: profile.profile_image_url,
-                twitterId: profile.id
-            });
-        });
     });
 
     // module.api.content.registerContentType('twitter', __dirname + '/content/twitter');

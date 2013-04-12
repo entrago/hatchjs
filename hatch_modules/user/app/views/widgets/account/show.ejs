@@ -3,8 +3,7 @@
 <% } %>
 
 <% if(req.user) { %>
-
-    <%- formTag({action:pathTo.update(), remote: true, method: 'post', class: 'form-horizontal', id: 'accountForm' }) %>
+    <%- formTag({action:pathTo.update(), remote: true, method: 'post', class: 'form form-horizontal', id: 'accountForm' }) %>
         <% if(req.user.type != "temporary") { %>
             <div class="control-group">
                 <label class="control-label" for="username"><%- __('Username') %></label>

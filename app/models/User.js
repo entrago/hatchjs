@@ -33,27 +33,100 @@ module.exports = function (compound, User) {
     User.validatesUniquenessOf('email', {message: 'This email address is taken'});
     User.validatesUniquenessOf('username', {message: 'This username is taken'});
 
-    User.getter.lastnameLetter = function () { return (this.lastname && this.lastname[0] || '').toLowerCase(); };
-    User.getter.displayName = function() { return (this.firstname && this.lastname) ? (this.firstname + ' ' + this.lastname) : this.username; };
-
     /**
-     * gets the text for the fulltext index
+     * Get the first letter of the last name for this user.
      * 
-     * @return {[String]}
+     * @return {String} 
      */
-    User.getter.fulltext = function() {
-        return this.firstname + ' ' + this.lastname + ' ' + this.oneLiner;
+    User.getter.lastnameLetter = function () { 
+        return (this.lastname && this.lastname[0] || '').toLowerCase(); 
     };
 
     /**
-     * performs functions before a user is saved to the database
+     * Get the best display name for this user. Prefers firstname + lastname but
+     * falls back to username.
+     * 
+     * @return {String} 
+     */
+    User.getter.displayName = function() { 
+        return (this.firstname && this.lastname) ? 
+            (this.firstname + ' ' + this.lastname) : this.username; 
+    };
+
+    // Builds group index by membership status
+    function getMembershipIndex(user, status) {
+        var index = [];
+        user.memberships.forEach(function (membership) {
+            if(!status || membership.status === status) {
+                index.push(membership.groupId);
+            }
+        });
+        return index;
+    }
+
+    /**
+     * Get an array of ids for all groups this user is a member of with any
+     * status (member, pending, editor).
+     * 
+     * @return {[]} - an array of group ids
+     */
+    User.getter.membershipGroupId = function() {
+        return getMembershipIndex(this);
+    };
+
+    /**
+     * Get an array of ids for all groups this user is a member of with status
+     * of 'member'.
+     * 
+     * @return {[]} - an array of group ids
+     */
+    User.getter.memberGroupId = function() {
+        return getMembershipIndex(this, 'member');
+    };
+
+    /**
+     * Get an array of ids for all groups this user is a member of with status
+     * of 'pending'.
+     * 
+     * @return {[]} - an array of group ids
+     */
+    User.getter.pendingGroupId = function() {
+        return getMembershipIndex(this, 'pending');
+    };
+
+    /**
+     * Get an array of ids for all groups this user is a member of with status
+     * of 'editor'.
+     * 
+     * @return {[]} - an array of group ids
+     */
+    User.getter.editorGroupId = function() {
+        return getMembershipIndex(this, 'editor');
+    };
+
+    /**
+     * Get the text for the fulltext index for this user.
+     * 
+     * @return {String} - username+firstname+lastname+oneLiner
+     */
+    User.getter.fulltext = function() {
+        return 
+        [
+            this.username,
+            this.firstname,
+            this.lastname,
+            this.oneLiner
+        ].join(' ');
+    };
+
+    /**
+     * Performs functions before a user is saved to the database.
      * - fixes username and email
      * - set the default profile pic
-     * - automatically add user to custom user lists with filter set
      * 
-     * @param  {Function} done [continuation function]
+     * @param  {Function} next - continuation function
      */
-    User.beforeCreate = User.beforeSave = function (done) {
+    User.beforeCreate = User.beforeSave = function (next) {
         // lowercase username and email
         if (this.email) {
             this.email = this.email.toLowerCase();
@@ -67,39 +140,7 @@ module.exports = function (compound, User) {
             this.avatar = '/img/default-profile-pic.png';
         }
 
-        var user = this;
-        var Group = compound.models.Group;
-
-        async.forEach(user.membership || [], function(membership, next) {
-            // get the group and check all tag filters
-            Group.find(membership.groupId, function(err, group) {
-                //the group may have been deleted - so check first
-                if (!group) {
-                    return next();
-                }
-
-                var lists = group.getListsForUser(user);
-
-                // add the tags that are not already present
-                if (!membership.customListIds) {
-                    membership.customListIds = [];
-                }
-
-                lists.forEach(function(list) {
-                    if (membership.customListIds.indexOf(list.id) == -1) {
-                        membership.customListIds.push(list.id);
-                    }
-                });
-
-                if (lists.length > 0) {
-                    group.recalculateMemberListCounts();
-                }
-
-                next();
-            });
-        }, function() {
-            done();
-        });
+        next();
     };
 
     /**
@@ -118,13 +159,13 @@ module.exports = function (compound, User) {
     };
 
     /**
-     * notifies this user by either email, top bar notification or both
+     * Notify this user by either email, top bar notification or both.
      * 
-     * @param  {[String]}   type   [the name of the notification to send]
-     * @param  {[json]}     params [notification parameters]
-     * @param  {Function}   cb     [continuation function]
+     * @param  {String}     type     - the name of the notification to send
+     * @param  {Object}     params   - notification parameters
+     * @param  {Function}   callback - continuation function
      */
-    User.prototype.notify = function notify(type, params, cb) {
+    User.prototype.notify = function notify(type, params, callback) {
         var user = this;
         params = params || {};
 
@@ -145,83 +186,92 @@ module.exports = function (compound, User) {
             },
             function(done) {
                 if (compound.hatch.notification.isDefined(type)) {
-                    console.log('creating notification entity');
                     compound.hatch.notification.create(type, user, params || [], done);
                 }
                 else done();
             }
         ], function(err, results) {
-            if(cb) cb();
+            if(callback) {
+                callback();
+            }
         })
     };
 
     /**
-     * follows the specified user
+     * Follow the specified user.id
      * 
-     * @param  {[Number]}   id [id of user to follow]
-     * @param  {Function}   cb [continuation function]
+     * @param  {[Number}  id       - id of user to follow
+     * @param  {Function} callback - continuation function
      */
-    User.prototype.followUser = function followUser(id, cb) {
-        var u = this;
+    User.prototype.followUser = function followUser(id, callback) {
+        var user = this;
         var hq = User.schema.adapter;
         var redis = User.schema.adapter.client;
 
         redis.sadd('l:' + hq.modelName('Follow') + ':' + id, this.id, function (err) {
-            if (err) return cb(err);
-            u.ifollow = u.ifollow || [];
-            u.ifollow.push(id);
-            u.save(cb);
+            if (err) {
+                return callback(err);
+            }
+            user.following = user.following || [];
+            user.following.push(id);
+            user.save(callback);
         });
     };
 
     /**
-     * unfollows the specified user
+     * Unfollow the specified user.id
      * 
-     * @param  {[Number]}   id [id of user to unfollow]
-     * @param  {Function}   cb [continuation function]
+     * @param  {Number}   id       - id of user to unfollow
+     * @param  {Function} callback - continuation function
      */
-    User.prototype.unfollowUser = function followUser(id, cb) {
-        var u = this;
+    User.prototype.unfollowUser = function unfollowUser(id, callback) {
+        var user = this;
         var hq = User.schema.adapter;
         var redis = User.schema.adapter.client;
 
         redis.srem('l:' + hq.modelName('Follow') + ':' + id, this.id, function (err) {
-            if (err) return cb(err);
-            u.ifollow = u.ifollow || [];
-            u.ifollow = _.reject(u.ifollow, function(userId) { return userId == id; });
-            u.save(cb);
+            if (err) {
+                return callback(err);
+            }
+            user.following = user.following || [];
+            user.following = _.reject(user.following, function(userId) { 
+                return userId == id; 
+            });
+            user.save(callback);
         });
     };
 
     /**
-     * gets the follows of the specified user
+     * Get the followers of the specified user.
      * 
-     * @param  {[Number]}   userId [id of the user to get followers for]
-     * @param  {Function}   cb     [continuation function]
+     * @param  {Number}     userId   - id of the user to get followers for
+     * @param  {Function}   callback - continuation function
      */
-    User.getFollowersOf = function getFollowersOf(userId, cb) {
+    User.getFollowersOf = function getFollowersOf(userId, callback) {
         var hq = User.schema.adapter;
         var redis = User.schema.adapter.client;
 
-        redis.smembers('l:' + hq.modelName('Follow') + ':' + userId, cb);
+        redis.smembers('l:' + hq.modelName('Follow') + ':' + userId, callback);
     };
 
     /**
-     * gets the followers for this user
+     * Get the followers for this user.
      * 
-     * @param  {Function} cb [continuation function]
+     * @param  {Function} callback - continuation function
      */
-    User.prototype.followers = function (cb) {
+    User.prototype.followers = function (callback) {
         var hq = User.schema.adapter;
         var redis = User.schema.adapter.client;
 
         User.getFollowersOf(this.id, function (err, ids) {
-            if (err) return cb(err);
+            if (err) {
+                return callback(err);
+            }
             redis.multi(ids.map(function (id) {
                 return ['GET', hq.modelName('User') + ':' + id];
             })).exec(function (err, resp) {
-                if (err) return cb(err);
-                cb(err, resp.map(function (r) {
+                if (err) return callback(err);
+                callback(err, resp.map(function (r) {
                     return new User(JSON.parse(r));
                 }));
             });
@@ -229,40 +279,15 @@ module.exports = function (compound, User) {
     };
 
     /**
-     * emits an event which can be subscribed to
+     * Authenticate a user. This either registers a new user or logs them in if
+     * they already exist.
      * 
-     * @param  {[String]} event [event name]
-     * @param  {[type]} a     [description]
-     * @param  {[type]} b     [description]
-     * @param  {[type]} c     [description]
+     * @param  {String}      provider - facebook, twitter, linkedin etc
+     * @param  {Object}      data     - data to auth/register with
+     * @param  {HttpContext} c        - http context
      */
-    User.emit = function (event, a, b, c) {
-        console.log('emit', event, 'with', a);
-        if (this.events && this.events[event]) {
-            console.log('got handler', this.events[event].name);
-            this.events[event](a, b, c);
-        } else {
-            console.log('event', event, 'is not configured');
-            console.log(a, b, c);
-        }
-    };
-
-    /**
-     * sets an event handler for this user
-     * 
-     * @param  {[String]} event   [name of event to subscribe to]
-     * @param  {[type]}   handler [event handler function]
-     */
-    User.on = function (event, handler) {
-        if (!this.events) this.events = {};
-        this.events[event] = handler;
-    };
-
     User.authenticate = function authenticate(provider, data, c) {
-        User.findOrCreate({
-            provider: provider,
-            profile: data
-        }, function (err, user) {
+        User.findOrCreate(provider, data, function (err, user) {
             if (user.errors) {
                 throw Error(JSON.stringify(user.errors));
             }
@@ -282,85 +307,56 @@ module.exports = function (compound, User) {
     };
 
     /**
-     * finds a user if it already exists, otherwise create a new user
+     * Find a user if it already exists, otherwise create a new user with the 
+     * data.
      * 
-     * @param  {[json]}   data [user data]
-     * @param  {Function} done [continuation function]
+     * @param  {Object}   provider - provider of the data
+     * @param  {Object}   data     - user data
+     * @param  {Function} callback - continuation function
      */
-    User.findOrCreate = function (data, done) {
-        var createWith;
-
-        /* LOCAL */
-        if (data.provider === 'local') {
-            var emaname = data.email.toLowerCase();
-            User.findOne({
-                where: {
-                    email:emaname
-                }
-            }, function (err, user) {
-                if (user) return done(err, user);
-                User.findOne({
-                    where: {
-                        username:emaname
-                    }
-                }, function (err, user) {
-                    if (user) {
-                        return done(err, user);
-                    }
-                    createWith = {
-                        username: data.username,
-                        email: data.email,
-                        password: data.password,
-                        type: data.type
-                    };
-                    create();
-                });
-            });
-        } else {
-            User.emit(
-                'auth-' + data.provider,
-                data.profile,
-                function(query, info) {
-                    console.log('hag all', query, info);
-                    User.findOne({where: query}, function(err, user) {
-                        if (user) {
-                            if (!user.avatar && info.avatar) {
-                                user.avatar = info.avatar;
-                                user.save(done.bind(user, err, user));
-                            } else {
-                                return done(err, user);
-                            }
-                        } else {
-                            if (!info.email) {
-                                info.email = 'temp_' + new Date().getTime() + '@temp.com';
-                            }
-                            if (!info.password) {
-                                info.password = 'tempuser';
-                            }
-
-                            // register as a temporary user so they have to complete the rest of their profile
-                            info.type = 'temporary';
-
-                            createWith = info;
-                            create();
-                        }
-                    });
-                }
-            );
-
+    User.findOrCreate = function (provider, data, callback) {
+        if (typeof provider.idFields !== 'object') {
+            provider.idFields = [provider.idFields];
         }
+        var cond = {};
 
-        function create() {
-            if (createWith) {
-                console.log('create with name', createWith.username);
-                User.createWithUniqueUsername(createWith, done);
+        // build the query to check for an existing user
+        provider.idFields.forEach(function (field) {
+            cond[field] = data[field];
+        });
+
+        User.findOne({ where: cond }, function (err, user) {
+            if (user) {
+                // update user details and return
+                user.updateAttributes(data, callback);
+            } else {
+                // standard users (non-oauth)
+                if (provider.name === 'local') {
+                    User.create(data, callback);
+                } else {
+                    // fill in blank fields if not present
+                    if (!data.email) {
+                        data.email = 'temp_' + new Date().getTime() + '@temp.com';
+                    }
+                    if (!data.password) {
+                        data.password = 'tempuser';
+                    }
+
+                    // register as a temporary user so they have to complete the
+                    // rest of their profile
+                    data.type = 'temporary';
+
+                    // create the user with a unique username - this can add 1,2
+                    // etc to the end of their username if it is already taken
+                    User.createWithUniqueUsername(data, callback);
+                }
             }
-        }
+        });
     };
 
     /**
      * Create a user with a unique username - automatically appends 1,2,etc to
-     * the end of username until it finds one which is free
+     * the end of username until it finds one which is free.
      * 
      * @param  {[json]}   data [user creation data]
      * @param  {Function} done [continuation function]
@@ -641,8 +637,7 @@ module.exports = function (compound, User) {
      */
     User.prototype.hasPermission = function(group, permission) {
         var user = this;
-
-        var membership = _.find(this.membership.items, function (membership) {
+        var membership = _.find(this.memberships.items, function (membership) {
             return membership.groupId == group.id;
         });
 
@@ -675,7 +670,7 @@ module.exports = function (compound, User) {
      */
     User.prototype.getPermissions = function(group, filter) {
         var user = this;
-        var membership = _.find(this.membership || [], function(membership) {
+        var membership = _.find(this.memberships || [], function(membership) {
             return membership.groupId == group.id;
         });
 

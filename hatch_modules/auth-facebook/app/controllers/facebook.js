@@ -15,6 +15,7 @@
 // 
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
+
 module.exports = FacebookAuthController;
 
 var oauth = require('oauth');
@@ -26,7 +27,6 @@ function FacebookAuthController(init) {
             return c.next(new Error('The auth-facebook module is not enable in this group'));
         }
         var contract = gm.contract;
-        console.log(contract);
         this.consumer = function consumer() {
             return new oauth.OAuth2(
                 contract.apiKey,
@@ -63,11 +63,25 @@ FacebookAuthController.prototype.callback = function facebookCallback(c) {
             consumer().getProtectedResource(
                 'https://graph.facebook.com/me',
                 token,
-                function (err, data, response) {
+                function (err, profile, response) {
                     if (err) {
                         next(err);
                     } else {
-                        c.User.authenticate('facebook', JSON.parse(data), c);
+                        profile = JSON.parse(profile);
+                        
+                        var data = {
+                            username: profile.username,
+                            displayName: profile.name,
+                            email: profile.email,
+                            facebookId: profile.id
+                        };
+
+                        var provider = { 
+                            name: 'facebook', 
+                            idFields: 'facebookId' 
+                        };
+
+                        c.User.authenticate(provider, data, c);
                     }
                 }
             );

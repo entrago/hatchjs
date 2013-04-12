@@ -24,19 +24,7 @@ var compound = require('compound');
 module.exports = function (c) {
     c.once('models', function(m) {
         var User = m.User;
-
         User.defineProperty('facebookId', {type: String, index: true});
-
-        User.on('auth-facebook', function (profile, done) {
-            done({
-                email: profile.email
-            }, {
-                username: profile.username,
-                displayName: profile.name,
-                email: profile.email,
-                facebookId: profile.id
-            });
-        });
     });
 
     c.on('render', function(viewContext) {

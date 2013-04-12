@@ -85,7 +85,7 @@
     password: 'secr3t'
     email: 'user101@hatchplatform.com'
     avatar: '/img/default-profile-pic.png'
-    membership:
+    memberships:
       -
         groupId: 1
         role: owner

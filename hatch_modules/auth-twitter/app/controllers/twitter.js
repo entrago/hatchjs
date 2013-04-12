@@ -18,11 +18,14 @@
 
 var oauth = require('oauth');
 
-exports._initialize = function () {
-    this.before(consumer);
-};
+module.exports = TwitterAuthController;
 
-exports.auth = function twitterAuth(c) {
+
+function TwitterAuthController(init) {
+    init.before(consumer);
+}
+
+TwitterAuthController.prototype.auth = function twitterAuth(c) {
     c.consumer().getOAuthRequestToken(
         function (err, token, secret) {
             if (err) {
@@ -35,7 +38,7 @@ exports.auth = function twitterAuth(c) {
     );
 };
 
-exports.callback = function twitterCallback(c) {
+TwitterAuthController.prototype.callback = function twitterCallback(c) {
     if(c.req.query.denied) {
         return c.redirect('../../../');
     }
@@ -54,31 +57,47 @@ exports.callback = function twitterCallback(c) {
                 'http://api.twitter.com/1/account/verify_credentials.json',
                 token,
                 secret,
-                function (err, data, response) {
+                function (err, profile, response) {
                     if (err) {
                         return c.next(err);
                     }
-                    c.event('user-authenticated', {
-                        provider: 'twitter',
-                        data: data
-                    });
+
+                    var profile = JSON.parse(profile);
+                    var data = {
+                        username: profile.screen_name,
+                        name: profile.name || profile.screen_name,
+                        avatar: profile.profile_image_url,
+                        twitterId: profile.id
+                    };
+
+                    var provider = {
+                        name: 'twitter',
+                        idFields: ['twitterId']
+                    };
+
+                    c.User.authenticate(provider, data, c);
                 }
             );
         }
     );
 };
 
-function consumer(c, next) {
+function consumer(c) {
+    var gm = c.req.group.modules.find('auth-twitter', 'name');
+    if (!gm) {
+        return c.next(new Error('The auth-facebook module is not enable in this group'));
+    }
+    var contract = gm.contract;
     c.consumer = function consumer() {
         return new oauth.OAuth(
             'https://twitter.com/oauth/request_token',
             'https://twitter.com/oauth/access_token', 
-            c.moduleInstance.contract.apiKey,
-            c.moduleInstance.contract.secret,
+            contract.apiKey,
+            contract.secret,
             '1.0A',
-            'http://' + c.req.headers.host + c.pathTo('callback'),
+            'http://' + c.req.headers.host + c.pathTo.callback,
             'HMAC-SHA1'
         );
     };
-    next();
+    c.next();
 }
