@@ -46,10 +46,20 @@ var Application = module.exports = function Application(init) {
     });
 
     init.before(loadContentTypes);
+    init.before(loadMemberRoles);
 };
 
 function loadContentTypes(c) {
     c.locals.contentTypes = c.compound.hatch.contentType.getAll();
     c.locals.editableContentTypes = c.compound.hatch.contentType.getEditable();
+    c.next();
+}
+
+function loadMemberRoles(c) {
+    c.locals.memberRoles = [
+        { name: 'members', icon: 'user', filter: 'member' },
+        { name: 'editors', icon: 'star', filter: 'editor' },
+        { name: 'pending', icon: 'time', filter: 'pending' }
+    ];
     c.next();
 }

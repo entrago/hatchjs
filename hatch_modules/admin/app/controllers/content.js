@@ -93,7 +93,7 @@ ContentController.prototype.index = function index(c) {
  * 'select all' checkbox so that we can get ALL of the ids of the content rather
  * than just the ids of the content on the current page of results.
  * 
- * @param  {HttpContext} c - http contextlo
+ * @param  {HttpContext} c - http context
  */
 ContentController.prototype.ids = function ids(c) {
     this.filter = c.req.query.filter || c.req.params.filter;

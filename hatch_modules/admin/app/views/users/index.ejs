@@ -1,0 +1,247 @@
+<div class="row">
+
+  <% include _sidebar %>
+
+  <div class="span10">
+      <div class="module">
+          <div class="content community-table-content">
+              <div class="pull-left">
+                  <% var caret = ' <span class="caret"></span>'; %>
+
+                  <div class="btn-group pull-left" style="margin-right : 8px;">
+                      <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><%- __('Member actions') %> <span class="caret"></span></button>
+                      <ul class="dropdown-menu">
+                          <li><%- linkTo('<i class="icon-envelope"></i> ' + __('Send message'), pathTo.sendMessageTo(), { rel: 'multiAjaxLink' }) %></li>
+                          <li><%- linkTo('<i class="icon-remove"></i> ' + __('Remove members'), pathTo.removeMembers(), { rel: 'multiAjaxLink' }) %></li>
+                      </ul>
+                  </div>
+
+                  <% if (tags.length > 0) { %>
+                      <div class="btn-group pull-left">
+                          <%- buttonTag(t('users.actions.addTag') + caret, {
+                              class: 'btn dropdown-toggle',
+                              'data-toggle': 'dropdown'}) %>
+                          <ul class="dropdown-menu">
+                              <% tags.forEach(function(tag) { %>
+                                  <% if(!tag) return; %>
+                                  <li><%- linkTo(icon('tag') + tag.title,
+                                      pathTo.addToTag('users', tag.id),
+                                      {rel: 'multiAjaxLink'}) %></li>
+                              <% }) %>
+                          </ul>
+                      </div>
+
+                      <div class="btn-group pull-left">
+                          <%- buttonTag(t('users.actions.removeTag') + caret, {
+                              class: 'btn dropdown-toggle',
+                              'data-toggle': 'dropdown'}) %>
+                          <ul class="dropdown-menu">
+                              <% tags.forEach(function(tag) { %>
+                                  <% if (!tag) return; %>
+                                  <li><%- linkTo(icon('tag') + tag.title,
+                                      pathTo.removeFromTag('users', tag.id), 
+                                      {rel: 'multiAjaxLink'}) %></li>
+                              <% }) %>
+                          </ul>
+                      </div>
+                  <% } %>
+              </div>
+
+              <table class="table table-striped members-table" id="members-table">
+                  <thead>
+                      <tr>
+                          <th width="3%">
+                              <input type="checkbox" class="checkbox" value="all" id="selectAllUsers" rel="tooltip" title="Select all users" />
+                          </th>
+                          <th>
+                              <%- __('Username') %>
+                          </th>
+                          <th width="300">
+                              Tags
+                          </th>
+                          <th width="150">
+                              <%- __('Membership') %>
+                          </th>
+                          <th width="150">
+                              <%- __('Since') %>
+                          </th>
+                          <th width="60">
+                              <%- __('Actions') %>
+                          </th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr>
+                          <td colspan="6">
+                              <div class="loading-spacer"><%- __('loading members...') %></div>
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        //setup ajax links
+        $("a[rel=multiAjaxLink]").on("click", function() {
+            if(window.selectedUsers.length > 0) {
+                $.ajax(this.href, {
+                    type: 'POST',
+                    data: {
+                        ids: window.selectedUsers,
+                        filterBy: '<%- filterBy %>',
+                        search: $('#members-table_filter input').val()
+                    },
+                    success: function(data) {
+                        if(data.redirect) {
+                            window.location = data.redirect;
+                        }
+                        else {
+                            //show notification
+                            $.noty({ text: '<i class="icon-ok"></i> ' + data.message, type: 'success' });
+
+                            //redraw table
+                            window.table.fnDraw(false);
+                        }
+                    }
+                });
+            }
+            else alert("Please select some users!");
+
+            //hide the menu
+            $(this).parents(".btn-group").removeClass("open");
+
+            return false;
+        });
+
+        //handle the selectAllUsers checkbox events
+        $("#selectAllUsers").on("click", function() {
+            if(this.checked) {
+                //check all checkboxes
+                $("#members-table tbody input[type=checkbox]").attr("checked", true);
+
+                //reset the selected users array with only the "all" value
+                window.selectedUsers = ["all"];
+                window.unselectedUsers = [];
+            }
+            else {
+                //unselect all users
+                window.selectedUsers = [];
+                window.unselectedUsers = [];
+
+                //uncheck all checkboxes
+                $("#members-table tbody input[type=checkbox]").attr("checked", null);
+            }
+        });
+
+        //setup user arrays
+        window.selectedUsers = [];
+        window.unselectedUsers = [];
+
+        window.table = $('#members-table').dataTable( {
+            "bProcessing": true,
+            "bServerSide": true,
+            "sAjaxSource": "<%- pathTo.community %>.json?filterBy=<%- filterBy %>",
+            "fnDrawCallback": function() {
+                //setup tooltips
+                $('#members-table *[rel=tooltip]').tooltip();
+
+                //setup ajax actions
+                $('#members-table a[data-remote]').on("ajax:success", function() {
+                    //show notification
+                    $.noty({ text: '<i class="icon-ok"></i> ' + $(this).attr("data-success"), type: 'success' });
+
+                    //redraw table
+                    window.table.fnDraw(false);
+                });
+
+                //click the checkboxes which are ticked
+                $("#members-table tbody input[type=checkbox]").each(function(i, checkbox) {
+                    if(window.selectedUsers.indexOf(checkbox.value) > -1 || (window.selectedUsers.indexOf("all") > -1 && window.unselectedUsers.indexOf(checkbox.value) == -1)) checkbox.checked = true;
+                });
+
+                //attach events to the checkboxes
+                $("#members-table tbody input[type=checkbox]").on("click", function() {
+                    if(this.checked) {
+                        window.selectedUsers.push(this.value);
+                        if(window.unselectedUsers.indexOf(this.value) > -1) window.unselectedUsers.splice(window.unselectedUsers.indexOf(this.value), 1);
+                    }
+                    else {
+                        if(window.selectedUsers.indexOf(this.value) > -1) window.selectedUsers.splice(window.selectedUsers.indexOf(this.value), 1);
+                        window.unselectedUsers.push(this.value);
+                    }
+                });
+            },
+            "aoColumns": [
+                { "mDataProp": null,
+                    "fnRender": function(obj, val) {
+                        var user = obj.aData;
+                        var checkbox = '<input type="checkbox" value="' + user.id + '" />';
+                        return checkbox;
+                    }
+                },
+                { "mDataProp": "displayName" },
+                { "mDataProp": "tags",
+                    "fnRender": function(obj, val) {
+                        var html = '<ul class="tags">';
+
+                        $(val).each(function(i, tag) {
+                            html += '<li><a href="<%- pathTo.community %>/filter/' + tag.id + '">' + tag.title + '</a></li>';
+                        });
+
+                        html += '</ul>';
+                        return html;
+                    }
+                },
+                { "mDataProp": "membership.role" },
+                { "mDataProp": "membership.timeSince" },
+                { "mDataProp": null,
+                    "fnRender" : function(obj, val) {
+                        var user = obj.aData;
+                        var html = '';
+
+                        //owner = no actions possible
+                        if(user.membership.role == 'owner') {
+                            return '-';
+                        }
+                        //requested = show approve
+                        else if(user.membership.state == 'pending' && user.membership.requested) {
+                            html += '<a href="<%- pathTo.community %>/' + user.id + '/accept" data-remote="true" rel="tooltip" title="<%= __('approve membership request') %>" data-success="<%= __('membership approved') %>"><i class="icon-ok"></i></a>';
+                        }
+                        //pending = show resent invite
+                        else if(user.membership.state == 'pending') {
+                            html += '<a href="<%- pathTo.community %>/' + user.id + '/resendinvite" data-remote="true" rel="tooltip" title="<%= __('resend invite email') %>" data-success="<%= __('invite re-sent') %>"><i class="icon-envelope-alt"></i></a>';
+                        }
+                        //member = show upgrade to editor
+                        else if(user.membership.role == 'member') {
+                            html += '<a href="<%- pathTo.community %>/' + user.id + '/upgrade" data-remote="true" rel="tooltip" title="<%= __('upgrade to editor') %>" data-success="<%= __('member upgraded to editor') %>"><i class="icon-thumbs-up"></i></a>';
+                        }
+                        //editor = show downgrade to member
+                        else if(user.membership.role == 'editor') {
+                            html += '<a href="<%- pathTo.community %>/' + user.id + '/downgrade" data-remote="true" rel="tooltip" title="<%= __('downgrade to member') %>" data-success="<%= __('editor downgraded to member') %>"><i class="icon-thumbs-down"></i></a>';
+                        }
+
+                        html += ' &nbsp; <a href="<%- pathTo.community %>/' + user.id + '/remove" data-remote="true" data-confirm="<%= __('Are you sure you wish to remove this member?') %>" rel="tooltip" title="<%= __('remove from community') %>" data-success="<%= __('user removed from community') %>"><i class="icon-remove"></i></a>';
+
+                        return html;
+                    }
+                }
+            ],
+            "sDom": "<''<'pull-right'f>r>t<''<'pull-left'l><'pull-left'i><'pull-right'p>>",
+            "sPaginationType": "bootstrap",
+            "oLanguage": {
+                "sLengthMenu": "_MENU_ <%= __('users per page') %>",
+                "oPaginate": {
+                    "sNext": "",
+                    "sPrevious": ""
+                }
+            },
+            "aoColumnDefs": [
+                { "bSortable": false, "aTargets": [ 0, 5 ] }
+            ]
+        });
+    });
+</script>

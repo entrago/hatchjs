@@ -1,0 +1,12 @@
+<% var li = matcher(pageName, '<li class="active">', '<li>'),
+    liEnd = '</li>'; %>
+
+<div class="span2">
+    <div class="module">
+        <ul class="nav nav-list">
+            <% include _sideUsers %>
+            <% include _sideTags %>
+            <% include _sideActions %>
+        </ul>
+    </div>
+</div>

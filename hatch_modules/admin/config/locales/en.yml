@@ -7,11 +7,27 @@ en:
     editAccont: Edit my account
     signOut: Sign out
   tabs:
-    community: Community
+    users: Community
     content: Content
     pages: Pages
     group: Settings
     modules: Modules
+  users:
+    header:
+      filter: Filter
+      tags: Tags
+      actions: Actions
+    all: All users
+    members: Members
+    editors: Editors
+    pending: Pending
+    actions:
+      addTag: Add tag
+      removeTag: Remove tag
+      invite: Invite users
+      sendMessage: Send message
+      profileFields: Profile fields
+      export: Export data
   content:
     actions:
       common: Actions

@@ -1,0 +1,14 @@
+<li class="nav-header"><%= t('users.header.filter') %></li>
+
+<%- li('users') %>
+    <%- linkTo(icon('home') + t('users.all'),
+        pathTo.community) %>
+<%- liEnd %>
+
+<% memberRoles.forEach(function (role) { %>
+    <%- li('users-' + role.filter) %>
+        <%- linkTo(
+            icon(role.icon) + t('users.' + role.name),
+            pathTo.filteredUsers(role.filter)) %>
+    <%- liEnd %>
+<% }) %>

@@ -37,7 +37,15 @@ exports.routes = function (map) {
         stream.get('toggle');
     });
 
-    map.resources('users', {as: 'community', suffix: 'member'});
+    map.resources('users', {as: 'community', suffix: 'member'}, function (user) {
+        user.collection(function (users) {
+            users.get('filter/:filterBy.:format?', '#index', {as: 'filteredUsers' });
+            users.get('sendmessageto', '#sendMessageTo', {as: 'sendMessageTo'});
+            users.get('sendmessage', '#sendMessageForm', {as: 'sendMessageForm'});
+            users.get('invite', '#inviteForm', {as: 'inviteUsers'});
+            users.post('removeMembers', '#removeMembers', {as: 'removeMembers'});
+        });
+    });
 
     map.resources('pages', function (page) {
         page.collection(function (pages) {

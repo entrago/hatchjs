@@ -16,12 +16,14 @@
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
 
-var crypto = require('crypto');
 var mailer = require('nodemailer');
 var async = require('async');
 var _ = require('underscore');
+var moment = require('moment');
 
 module.exports = function (compound, User) {
+
+    var crypto = compound.hatch.crypto;
 
     User.validatesPresenceOf('username', {message: 'Please enter a username'});
     User.validatesPresenceOf('email', {message: 'Please enter an email address'});
@@ -53,11 +55,14 @@ module.exports = function (compound, User) {
     };
 
     // Builds group index by membership status
-    function getMembershipIndex (user, status) {
+    function getMembershipIndex (user, status, identifier) {
+        if (!identifier) {
+            identifier = 'groupId';
+        }
         var index = [];
         user.memberships.forEach(function (membership) {
             if(!status || membership.status === status) {
-                index.push(membership.groupId);
+                index.push(membership[identifier]);
             }
         });
         return index;
@@ -101,6 +106,16 @@ module.exports = function (compound, User) {
      */
     User.getter.editorGroupId = function() {
         return getMembershipIndex(this, 'editor');
+    };
+
+    /**
+     * Get an array of invitation codes for all groups this user is a pending
+     * to become a member of.
+     * 
+     * @return {Array} - an array of invitation codes
+     */
+    User.getter.inviteGroupId = function() {
+        return getMembershipIndex(this, 'pending', 'invitationCode');
     };
 
     /**
@@ -357,9 +372,9 @@ module.exports = function (compound, User) {
      * Create a user with a unique username - automatically appends 1,2,etc to
      * the end of username until it finds one which is free.
      * 
-     * @param  {[json]}   data [user creation data]
-     * @param  {Function} done [continuation function]
-     * @param  {[type]}   num  [leave this blank]
+     * @param  {Object}   data - user creation data
+     * @param  {Function} done - continuation function
+     * @param  {Number}   num  - leave this blank
      */
     User.createWithUniqueUsername = function (data, done, num) {
         var username;
@@ -437,14 +452,19 @@ module.exports = function (compound, User) {
     User.verifyPassword = function (password, userPassword) {
         if (userPassword === null) return true;
 
-        if (password && calcSha(password) === userPassword || password === userPassword) {
+        if (password && crypto.calcSha(password) === userPassword || password === userPassword) {
             return true;
         }
         return false;
     };
 
+    /**
+     * Set the user's password hash to store in the database.
+     * 
+     * @param  {String} pwd - original password
+     */
     User.setter.password = function (pwd) {
-        this._password = calcSha(pwd);
+        this._password = crypto.calcSha(pwd);
     };
 
     /**
@@ -473,10 +493,9 @@ module.exports = function (compound, User) {
      * @param  {Function} callback       - continuation function
      */
     User.getByInvitationCode = function(groupId, invitationCode, callback) {
-        // TODO: refactor for non-nested-indexes
         var cond = {
-            'membership:groupId': groupId,
-            'membership:invitationCode': invitationCode
+            membershipGroupId: groupId,
+            inviteGroupId: invitationCode
         };
 
         User.all({where: cond}, function(err, users) {
@@ -583,18 +602,59 @@ module.exports = function (compound, User) {
     };
 
     /**
-     * Reject an invitation to join a group.
+     * Get the membership record for the specified group.
      * 
-     * @param  {Number}   groupId  - id of the group to reject
-     * @param  {Function} callback - continuation function
+     * @param  {Number} groupId - group.id
+     * @return {Object}         - membership record or null
      */
-    User.prototype.rejectInvitation = function(groupId, callback) {
-        // check for existing membership
-        this.memberships.items = _.reject(this.memberships.items, function (membership) {
+    User.prototype.getMembership = function (groupId) {
+        var membership = this.memberships.find(groupId, 'groupId');
+        if (membership) {
+            membership.timeSince = moment(membership.joinedAt).fromNow();
+        }
+        return membership;
+    };
+
+    /**
+     * Set a user's membership role within the specified group.
+     * 
+     * @param {Number}   groupId  - group.id
+     * @param {String}   role     - role to set
+     * @param {Function} callback - callback function
+     */
+    User.prototype.setMembershipRole = function (groupId, role, callback) {
+        var membership = this.memberships.find(groupId, 'groupId');
+        if (membership) {
+            membership.role = role;
+        }
+        this.save(callback);
+    };
+
+    /**
+     * Set a user's membership status within the specified group.
+     * 
+     * @param {Number}   groupId  - group.id
+     * @param {String}   status   - status to set
+     * @param {Function} callback - callback function
+     */
+    User.prototype.setMembershipStatus = function (groupId, status, callback) {
+        var membership = this.memberships.find(groupId, 'groupId');
+        if (membership) {
+            membership.status = status;
+        }
+        this.save(callback);
+    };
+
+    /**
+     * Remove a membership to the specified group.
+     * 
+     * @param  {Number}   groupId  - group.id
+     * @param  {Function} callback - callback function
+     */
+    User.prototype.rejectInvitation = User.prototype.removeMembership = function (groupId, callback) {
+        this.memberships.items = _.reject(this.memberships, function (membership) {
             return membership.groupId == groupId;
         });
-
-        // save and continue
         this.save(callback);
     };
 
@@ -609,9 +669,9 @@ module.exports = function (compound, User) {
 
         delete obj.password;
         delete obj.hasPassword;
-        delete obj.emailAddress;
-        delete obj.membership;
-        delete obj.ifollow;
+        delete obj.email;
+        delete obj.memberships;
+        delete obj.following;
         delete obj.customListIds;
         delete obj.mailSettings;
         delete obj.fulltext;
@@ -671,7 +731,7 @@ module.exports = function (compound, User) {
         compound.models.Tag.all({ where: { groupIdByType: group.id + '-User' }}, function (err, tags) {
             tags.forEach(function (tag) {
                 // look at permissions first to avoid needless calls
-                if(_.find(tag.permissions.items), function (tagPermission) {
+                if(!found && _.find(tag.permissions.items), function (tagPermission) {
                     return new Regexp(permission).exec(tagPermission);
                 }) {
                     redis.zrank('z:' + hq.modelName('Tag') + ':' + tag.id, user.id, function (err, rank) {
@@ -688,27 +748,4 @@ module.exports = function (compound, User) {
             return callback(null, found);
         }
     };
-
-    /**
-     * Encrypt a password.
-     * 
-     * @param  {String} payload - password to encrypyt
-     * @return {String}
-     */
-    User.calcSha = function(payload) {
-        return calcSha(payload);
-    };
-
-
-    /**
-     * calculates a sha1 of the specified string
-     * 
-     * @param  {[String]} payload
-     * @return {[String]}
-     */
-    function calcSha(payload) {
-        if (!payload) return '';
-        if (payload.length == 64) return payload;
-        return crypto.createHash('sha256').update(payload).update(compound.app.get('passwordSalt') || '').digest('hex');
-    }
 };

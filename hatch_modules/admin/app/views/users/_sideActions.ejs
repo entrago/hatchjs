@@ -1,0 +1,19 @@
+
+<li class="nav-header"><%= t('users.header.actions') %></li>
+
+<%- li('invite') %>
+    <%- linkTo(icon('plus-sign') + t('users.actions.invite'),
+        pathTo.inviteUsers) %>
+<%- liEnd %>
+<%- li('sendMessage') %>
+    <%- linkTo(icon('envelope') + t('users.actions.sendMessage'),
+        pathTo.sendMessageForm) %>
+<%- liEnd %>
+<%- li('profileFields') %>
+    <%- linkTo(icon('list-alt') + t('users.actions.profileFields'),
+        pathTo.userProfileFields) %>
+<%- liEnd %>
+<%- li('exportForm') %>
+    <%- linkTo(icon('download-alt') + t('users.actions.export'),
+        pathTo.userExportForm) %>
+<%- liEnd %>

@@ -1,3 +1,20 @@
+//
+// Hatch.js is a CMS and social website building framework built in Node.js 
+// Copyright (C) 2013 Inventures Software Ltd
+// 
+// This file is part of Hatch.js
+// 
+// Hatch.js is free software: you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation, version 3
+// 
+// Hatch.js is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// 
+// See the GNU General Public License for more details. You should have received a copy of the GNU
+// General Public License along with Hatch.js. If not, see <http://www.gnu.org/licenses/>.
+// 
+// Authors: Marcus Greenwood, Anatoliy Chakkaev and others
+//
 
 var Application = require('./application');
 
@@ -6,57 +23,56 @@ module.exports = UsersController;
 function UsersController(init) {
     Application.call(this, init);
     init.before(function setup(c) {
-        this.sectionName = 'community';
+        this.sectionName = 'users';
         c.next();
     });
     init.before(findMember, {only: 'edit, update, destroy'});
+    init.before(loadTags);
 }
 
 require('util').inherits(UsersController, Application);
 
-//finds a specific member and sets their membership to this group
-function findMember(c) {
-    var self = this;
-    var User = c.model('User');
-    User.find(c.req.params.id, function (err, user) {
-        self.member = user;
-        self.member.membership.forEach(function (m, index) {
-            if (m && m.groupId == c.req.group.id) {
-                self.membership = m;
-                c.membershipId = index;
-            }
-        });
+// Load the user tags for this group to display on the left navigation
+function loadTags(c) {
+    c.Tag.all({ where: { groupIdByType: c.req.group.id + '-User' }}, function (err, tags) {
+        delete tags.countBeforeLimit;
+        c.locals.tags = tags;
         c.next();
     });
 }
 
-//loads all/specified members based on the current context
+// finds a specific member and sets their membership to this group
+function findMember(c) {
+    var self = this;
+    c.User.find(c.req.params.id, function (err, user) {
+        self.member = user;
+        self.membership = user.getMembership(c.req.group.id);
+        c.next();
+    });
+}
+
+// loads all/specified members based on the current context
 function loadMembers(c, next) {
-    var User = c.model('User');
+    var cond = { };
 
-    var cond = {
-        'membership:groupId': c.req.group.id
-    };
-    c.locals.filter = c.req.params.filterby || c.req.query.filter || c.req.body.filter || 'all';
+    c.locals.filterBy = c.req.params.filterBy || c.req.query.filterBy || c.req.body.filterBy || 'all';
 
-    switch (c.locals.filter) {
+    switch (c.locals.filterBy) {
         case 'members':
-            cond['membership:state'] = 'approved';
-            cond['membership:role'] = 'member';
+            cond.memberGroupId = c.req.group.id;
             break;
         case 'editors':
-            cond['membership:state'] = 'approved';
-            cond['membership:role'] = 'editor';
+            cond.editorGroupId = c.req.group.id;
             break;
         case 'pending':
-            cond['membership:state'] = 'pending';
+            cond.pendingGroupId = c.req.group.id;
+            break;
+        case 'all':
+            cond.membershipGroupId = c.req.group.id;
             break;
         default:
-            var listId = parseInt(c.locals.filter);
-            c.locals.listId = listId;
-            if(!isNaN(listId)) {
-                cond['customListIds'] = c.req.group.id + '-' + listId;
-            }
+            cond.tags = c.locals.filterBy;
+            break;
     }
 
     var limit = parseInt(c.req.query.iDisplayLength || 0, 10);
@@ -64,87 +80,82 @@ function loadMembers(c, next) {
     var orderBy = c.req.query.iSortCol_0 > 0 ? (['', 'lastname', 'username', c.req.group.id + ':membership:role', c.req.group.id + ':membership:joinedAt', ''][c.req.query.iSortCol_0] + ' ' + c.req.query.sSortDir_0.toUpperCase()) : c.req.group.id + ':membership:joinedAt DESC';
     var search = c.req.query.sSearch || c.req.body.search;
 
-    User.count({'membership:groupId': c.req.group.id}, function (err, count) {
-        //redis full-text search
-        if(search) {
-            User.all({where: cond, fulltext: search, order: orderBy, offset: offset, limit: limit}, function (err, members) {
-                setMemberships(members);
+    var query = {
+        where: cond, 
+        fulltext: search, 
+        order: orderBy, 
+        offset: offset, 
+        limit: limit
+    };
 
-                c.locals.members = members;
-                c.locals.allMembersCount = count;
+    // first get the total count of all members and then run the
+    c.User.count({ membershipGroupId: c.req.group.id }, function (err, count) {
+        c.User.all(query, function (err, members) {
+            setMemberships(members);
 
-                next();
-            });
-        }
-        //no filter, standard query
-        else {
-            User.all({where: cond, order: orderBy, limit: limit, offset: offset}, function (err, members) {
-                setMemberships(members);
+            c.locals.members = members;
+            c.locals.allMembersCount = count;
 
-                c.locals.members = members;
-                c.locals.allMembersCount = count;
-
-                next();
-            });
-        }
+            next();
+        });
     });
 
-    //sets the memberships details
     function setMemberships(members) {
-        if (members) {
-            members.forEach(function (m) {
-                m.membership.forEach(function (ms) {
-                    if (ms && ms.groupId == c.req.group.id) {
-                        //nicely format the join date
-                        ms.joinedAt = moment(ms.joinedAt).fromNow();
-
-                        //set the applicable membership
-                        m.membership = ms;
-                    }
-                });
-
-                //a pending/requested member is only ever a member
-                if (m.membership.state === 'pending' || m.membership.state === 'requested') {
-                    if(m.membership.requested) m.membership.role = 'requested';
-                    else m.membership.role = 'pending';
-                }
-
-                //localise
-                m.membership.roleName = c.__(m.membership.role);
-            });
-        }
+        members.forEach (function (member) {
+            member.membership = member.getMembership(c.req.group.id);
+        });
     }
 };
 
 
 /**
- * Display the main user list.
+ * Display the main user list or loads the main user list in JSON format.
  * 
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.index = function (c) {
     this.req.session.adminSection = 'community';
-    var c = this;
-    var q = c.req.query;
+    var suffix = 'string' === typeof c.req.params.filterBy ? '-' + c.req.params.filterBy : '';
+    this.pageName = 'users' + suffix;
 
-    if (c.req.params.format === 'json') {
-        //load all members and display
-        loadMembers(c, function() {
-            //json response
-            c.send({
-                sEcho: c.req.query.sEcho || 1,
-                iTotalRecords: c.locals.allMembersCount,
-                iTotalDisplayRecords: c.locals.members.countBeforeLimit || 0,
-                aaData: c.locals.members
-            });
+    c.respondTo(function(format) {
+        format.html(function() {
+            c.locals.filterBy = c.req.params.filterBy || c.req.query.filterBy || c.req.body.filterBy || 'all';
+            c.render();
         });
-    }
-    //standard response - does not need to load the users. They are loaded after page-load with AJAX/JSON
-    else {
-        c.locals.filter = c.req.params.filterby || c.req.query.filter || c.req.body.filter || 'all';
-        c.locals.listId = isNaN(c.locals.filter) ? null : c.locals.filter;
-        c.render('community/index');
-    }
+        format.json(function() {
+            //load all members and display
+            loadMembers(c, function() {
+                //json response
+                c.send({
+                    sEcho: c.req.query.sEcho || 1,
+                    iTotalRecords: c.locals.allMembersCount,
+                    iTotalDisplayRecords: c.locals.members.countBeforeLimit || 0,
+                    aaData: c.locals.members
+                });
+            });
+        }); 
+    });
+};
+
+/**
+ * Return only the IDs for a search query. This is used when a user clicks the
+ * 'select all' checkbox so that we can get ALL of the ids of the users rather
+ * than just the ids of the users on the current page of results.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+UsersController.prototype.ids = function ids(c) {
+    this.filterBy = c.req.query.filterBy || c.req.params.filterBy;
+
+    c.req.query.limit = 1000000;
+    c.req.query.offset = 0;
+
+    loadUsers(c, function(users) {
+        c.send({
+            ids: _.pluck(users, 'id')
+        });
+    });
 };
 
 
@@ -154,430 +165,117 @@ UsersController.prototype.index = function (c) {
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.remove = function(c) {
-    var User = c.model('User');
-    User.find(c.params.id, function (err, user) {
-        //remove this user's membership for this group
-        if(c.params.listId) {
-            user.customListIds = _.reject(user.customListIds, function(id) {
-                return id == c.req.group.id + '-' + c.params.listId;
-            });
-        }
-        else {
-            user.membership = _.reject(user.membership, function(membership) {
-                return membership.groupId == c.req.group.id;
-            });
-        }
-
-        //save the user to the database
-        user.save(function() {
-            recalcMemberLists(c);
-
-            c.send({ action: "remove", id: user.id });
-        });
+    this.user.removeMembership(c.req.group.id, function (err, user) {
+        c.send('ok');
     });
 };
 
-//removes multiple members from the community
-exports.removeMembers = function(c) {
-    var User = c.model('User');
-
+/**
+ * Remove multiple selected members from the community.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+UsersController.prototype.removeMembers = function(c) {
     var selectedUsers = c.req.body.selectedUsers || [];
-    var unselectedUsers = c.req.body.unselectedUsers || [];
-    var listId = c.req.body.filter || c.params.listId;
 
-    //generate the list of users to remove
-    if(selectedUsers.indexOf("all") > -1) {
-        //inverse the list
-        selectedUsers = [];
-
-        //load all of the selected users based on the filter
-        var filter = c.req.body.filter;
-
-        //load all of the users based on the filter
-        loadMembers(c, function() {
-            //add all of the users that are NOT in the unselectedUsers list to the selectedUsers list
-            c.locals.members.forEach(function(user) {
-                if(unselectedUsers.indexOf(user.id.toString()) == -1) selectedUsers.push(user.id);
-            });
-
-            //now we have our final list, remove the users
-            removeUsers();
-        });
-    }
-    //just remove the selected users
-    else removeUsers();
-
-    //function to remove an array of users from the community
-    function removeUsers() {
-        var count = 0;
-
-        //remove each of the members
-        async.forEach(selectedUsers, function(userId, callback) {
-
-            //load each user
-            User.find(userId, function (err, user) {
-                if(listId != null) {
-                    user.customListIds = _.reject(user.customListIds, function(id) {
-                        return id == c.req.group.id + '-' + listId;
-                    });
-
-                    count++;
-                }
-                else {
-                    //remove this user's membership for this group
-                    user.membership = _.reject(user.membership, function(membership) {
-                        if(membership.groupId == c.req.group.id) {
-                            //if this user in the owner, skip over
-                            if(membership.role == 'owner' && isNaN(listId)) return false;
-                            else {
-                                count ++;
-                                return true;
-                            }
-                        }
-                    });
-                }
-
-                //save the user to the database
-                user.save(function() {
-                    callback();
-                });
-            });
-        }, function() {
-            recalcMemberLists(c);
-
-            c.send({
-                message: count + ' user' + (count != 1 ? 's':'') + ' removed from ' + (isNaN(listId) ? 'community':'list'),
-                status: 'success',
-                icon: 'ok'
-            });
-        });
-    }
-}
-
-//upgrades a member to an editor
-exports.upgrade = function(c) {
-    var User = c.model('User');
-    User.find(c.params.id, function (err, user) {
-        //find this user's membership for this group
-        var membership = _.find(user.membership, function(membership) {
-            return membership.groupId == c.req.group.id;
-        });
-
-        membership.role = "editor";
-
-        //save the user to the database
-        user.save(function() {
-            //TODO: send an email notification to the newly appointed editor
-
-            c.send({ action: "upgrade", id: user.id });
-        });
-    });
-};
-
-//upgrades a member to an editor
-exports.downgrade = function(c) {
-    var User = c.model('User');
-    User.find(c.params.id, function (err, user) {
-        //find this user's membership for this group
-        var membership = _.find(user.membership, function(membership) {
-            return membership.groupId == c.req.group.id;
-        });
-
-        membership.role = "member";
-
-        //save the user to the database
-        user.save(function() {
-            c.send({ action: "upgrade", id: user.id });
-        });
-    });
-};
-
-
-//accepts a requested user
-exports.accept = function(c) {
-    var User = c.model('User');
-    User.find(c.params.id, function (err, user) {
-        //find this user's membership for this group
-        var membership = _.find(user.membership, function(membership) {
-            return membership.groupId == c.req.group.id;
-        });
-
-        membership.state = "approved";
-
-        //save the user to the database
-        user.save(function() {
-            c.send({ action: "approved", id: user.id });
-        });
-    });
-};
-
-//accepts a requested user
-exports.resendInvite = function(c) {
-    var User = c.model('User');
-    User.find(c.params.id, function (err, user) {
-        //find this user's membership for this group
-        var membership = _.find(user.membership, function(membership) {
-            return membership.groupId == c.req.group.id;
-        });
-
-        //resend invite email notification
-        user.notify('invite', _.extend({ invitationCode: membership.invitationCode }, c));
-
-        //update the date joined
-        membership.joinedAt = new Date;
-
-        //save the user to the database
-        user.save(function() {
-            c.send({ action: "resendinvite", id: user.id });
-        });
-    });
-};
-
-//shows the member lists
-exports.memberLists = function(c) {
-    //TODO: preload the first X users for each list so that we can show avatars
-
-    c.render('community/memberlists');
-};
-
-//deletes a member list
-exports.deleteMemberList = function(c) {
-    var group = c.group();
-    delete group.memberLists[c.params.id];
-    group.save(function() { c.redirect(c.pathTo.memberLists()); })
-
-    //TODO: delete all of the user membership labels associated with this list
-};
-
-//edits a member list
-exports.editMemberList = function(c) {
-    c.locals.defaultFilter = 'filter = function(user) {\n\treturn false; //add your filter criteria here\n};';
-    c.locals.list = _.find(c.group().memberLists || [], function(list) {
-        return list && list.id == c.params.id;
-    });
-    c.locals.permissions = c.api.permissions;
-
-    c.locals.renderPermissions = function(permission) {
-        var list = c.locals.list || {};
-        var html = '<li><label class="checkbox"><input type="checkbox" name="permission-' + permission.name + '" ' + (list && list.permissions && list.permissions.indexOf(permission.name) > -1 ? 'checked="checked"':'') + ' /> ' + permission.title + '</label>';
-
-        if((permission.permissions || []).length > 0) {
-            html += '<ul class="">';
-            permission.permissions.forEach(function(permission) {
-                html += c.locals.renderPermissions(permission);
-            });
-            html += '</ul>';
-        }
-        
-        html += '</li>';
-        return html;
-    };
-
-    c.render('community/editlist');
-};
-
-//shows how many users match this filter
-exports.memberListFilterCount = function(c) {
-    var group = c.group();
-    var list = group.memberLists[c.params.id];
-    if(!list) list = {};
-
-    if(c.body.filter) list.filter = c.body.filter;
-
-    //count the number of users matched
-    group.getListFilterResults(list, function(users) {
-        c.send(users.length.toString());
-    });
-};
-
-//updates a member list
-exports.updateMemberList = function(c) {
-    var group = c.group();
-
-    //validation
-    if(!c.req.body.title) {
-        return c.send({
-            message: 'Please enter a list title',
-            status: 'error',
-            icon: 'warning-sign'
-        });
-    }
-
-    var list = _.find(group.memberLists || [], function(list) {
-        return list && list.id.toString() === c.req.body.id.toString();
-    });
-
-    if(!list) {
-        if(!group.memberLists) group.memberLists = [];
-        list = { id: group.memberLists.length, memberCount: 0 };
-
-        group.memberLists.push(list);
-    }
-
-    //update list attributes
-    list.title = c.req.body.title;
-    list.description = c.req.body.description;
-    list.filter = c.body.filterEnabled ? c.body.filter : null;
-    list.permissions = [];
-
-    Object.keys(c.req.body).forEach(function(key) {
-        if(key.indexOf('permission-') == 0) {
-            list.permissions.push(key.substring(key.indexOf('-') +1));
-        }
-    });
-
-    //save the group
-    group.save(function() {
-        //add the existing users async
-        if(c.body.filterExisting) {
-            var listId = group.id + '-' + list.id;
-
-            group.getListFilterResults(list, function(users) {
-                async.forEach(users, function(user, next) {
-                    //get the membership
-                    if(!user.customListIds) user.customListIds = [];
-
-                    if(user.customListIds.indexOf(listId) == -1) {
-                        user.customListIds.push(listId);
-                        user.save(next);
-                    }
-                    else {
-                        next();
-                    }
-                }, function() {
-                    //recalc membership list counts
-                    recalcMemberLists(c);
-                });
-            });
-        }
-
-        c.send({
-            message: 'Member list saved',
-            status: 'success',
-            icon: 'ok'
-        });
-    });
-};
-
-//adds a set of users to the specified member list
-exports.addToMemberList = function(c) {
-    var User = c.model('User');
-
-    var listId = c.req.group.id + '-' + c.params.id;
     var count = 0;
-    var selectedUsers = c.req.body.selectedUsers || [];
-    var unselectedUsers = c.req.body.unselectedUsers || [];
 
-    //generate the list of users to remove
-    if(selectedUsers.indexOf("all") > -1) {
-        //inverse the list
-        selectedUsers = [];
-
-        //load all of the selected users based on the filter
-        var filter = c.req.body.filter;
-
-        //load all of the users based on the filter
-        loadMembers(c, function() {
-            //add all of the users that are NOT in the unselectedUsers list to the selectedUsers list
-            c.locals.members.forEach(function(user) {
-                if(unselectedUsers.indexOf(user.id.toString()) == -1) selectedUsers.push(user.id);
-            });
-
-            //now we have our final list, remove the users
-            setMemberships();
-        });
-    }
-    else setMemberships();
-
-    //sets the memberships for each user
-    function setMemberships() {
-        async.forEach(selectedUsers, function(id, next) {
-            User.find(id, function(err, user) {
-                if(!user.customListIds) user.customListIds = [];
-
-                if(user.customListIds.indexOf(listId) == -1) {
-                    count++;
-                    user.customListIds.push(listId);
-                    user.save(next);
-                }
-                else {
-                    next();
-                }
-            });
-        }, done);
-    }
-
-    //saves the custom user list count and returns
-    function done() {
-        var group = c.group();
-        var list = _.find(group.memberLists, function(list) {
-            return list && list.id == listId;
-        });
-
-        //save the group
-        group.recalculateMemberListCounts(function() {
+    //remove each of the members
+    async.forEach(selectedUsers, function(userId, done) {
+        //load each user
+        c.User.find(userId, function (err, user) {
+            user.removeMembership(c.req.group.id, done);   
+        }, function() {
             c.send({
-                message: count + ' users added to list',
+                message: count + ' user' + (count != 1 ? 's':'') + ' removed from community',
                 status: 'success',
                 icon: 'ok'
             });
         });
-    }
+    });
 };
 
-//shows the send message form with the specified users
-exports.sendMessageTo = function(c) {
-    var selectedUsers = c.req.body.selectedUsers || [];
-    var unselectedUsers = c.req.body.unselectedUsers || [];
+/**
+ * Upgrade the selected member to an editor. 
+ * 
+ * @param  {HttpContext} c - http context
+ */
+UsersController.prototype.upgrade = function(c) {
+    this.member.setMembershipRole(c.req.group.id, 'editor', function (err, user) {
+        c.send('ok');
+    });
+};
 
-    //generate the list of users to remove
-    if(selectedUsers.indexOf("all") > -1) {
-        //inverse the list
-        selectedUsers = [];
+/**
+ * Downgrade the selected editor to a member.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+UsersController.prototype.downgrade = function(c) {
+    this.member.setMembership(c.req.group.id, 'member', function (err, user) {
+        c.send('ok');
+    });
+};
 
-        //load all of the selected users based on the filter
-        var filter = c.req.body.filter;
+/**
+ * Accept the selected pending member's join request.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+UsersController.prototype.accept = function(c) {
+    this.member.setMembershipStatus(c.req.group.id, 'accepted', function (err, user) {
+        c.send('ok');
+    });
+};
 
-        //load all of the users based on the filter
-        loadMembers(c, function() {
-            //add all of the users that are NOT in the unselectedUsers list to the selectedUsers list
-            c.locals.members.forEach(function(user) {
-                if(unselectedUsers.indexOf(user.id.toString()) == -1) selectedUsers.push(user.id);
-            });
+/**
+ * Resend an invitation to the selected member.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+UsersController.prototype.resendInvite = function(c) {
+    var membership = this.member.getMembership(c.req.group.id);
+    this.member.notify('invite', _.extend({ invitationCode: membership.invitationCode }, c));
+    c.send('ok');
+};
 
-            //now we have our final list, remove the users
-            doRedirect();
-        });
-    }
-    //just remove the selected users
-    else doRedirect();
+/**
+ * Redirect to the send message form for the selected members (or entire community).
+ * 
+ * @param  {HttpContext} c - http context
+ */
+UsersController.prototype.sendMessageTo = function(c) {
+    //set the selectedUsers in the session so that it can be used after the redirect
+    c.req.session.selectedUsers = c.req.body.selectedUsers || [];
 
-    function doRedirect() {
-        //set the selectedUsers in the session so that it can be used after the redirect
-        c.req.session.selectedUsers = selectedUsers;
+    c.send({
+        redirect: c.pathTo.sendMessage()
+    });
+};
 
-        c.send({
-            redirect: c.pathTo.sendMessage()
-        });
-    }
-}
-
-//show the send message form
-exports.sendMessageForm = function(c) {
+/**
+ * Show the send message form for the selected members (or entire community).
+ * 
+ * @param  {HttpContext} c - http context
+ */
+UsersController.prototype.sendMessageForm = function(c) {
     c.locals.selectedUsers = c.req.session.selectedUsers || [];
     delete c.req.session.selectedUsers;
-    c.render('community/sendmessage');
-}
+    c.render();
+};
 
-//sends a message
-exports.sendMessage = function(c) {
-    var User = c.model('User');
+/**
+ * Send a message to selected members.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+UsersController.prototype.sendMessage = function(c) {
     var selectedUsers = JSON.parse(c.req.body.selectedUsers || '["all"]');
     var subject = c.req.body.subject;
     var body = c.req.body.body;
 
     //validation
-    if(!subject || !body) {
+    if (!subject || !body) {
         c.send({
             message: 'Please enter a subject and message',
             status: 'error',
@@ -587,28 +285,13 @@ exports.sendMessage = function(c) {
         return;
     }
 
-    //if we are sending to all, load the list of users from the database
-    if(selectedUsers.indexOf("all") > -1 || selectedUsers.length == 0) {
-        selectedUsers = [];
-        loadMembers(c, function() {
-            c.locals.members.forEach(function(user) {
-                 selectedUsers.push(user.id);
-            });
-
-            sendMessages();
-        });
-    }
-    else {
-        sendMessages();
-    }
-
     function sendMessages() {
         console.log('sending messages to ' + selectedUsers.length + ' users');
 
         //sends message to each selected user
         async.forEach(selectedUsers, function(userId, callback) {
             //load each user
-            User.find(userId, function (err, user) {
+            C.User.find(userId, function (err, user) {
                 //send the message via email
                 user.notify('message', { subject: subject, message: body });
 
@@ -625,14 +308,12 @@ exports.sendMessage = function(c) {
 };
 
 //shows the invite form
-exports.inviteForm = function(c) {
-    c.render('community/inviteform');
-}
+UsersController.prototype.inviteForm = function(c) {
+    c.render();
+};
 
 //sends invites
-exports.sendInvites = function(c) {
-    var User = c.model('User');
-    var group = c.group();
+UsersController.prototype.sendInvites = function(c) {
     var subject = c.req.body.subject;
     var body = c.req.body.body;
 

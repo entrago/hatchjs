@@ -1,0 +1,23 @@
+
+<li class="nav-header"><%= t('users.header.tags') %></li>
+
+<%- li('index-tags') %>
+    <%- linkTo(icon('tags') + t('content.manageTags'),
+        pathTo.tags('users')) %>
+<%- liEnd %>
+
+<% tags.forEach(function(tag) { %>
+    <% if (tag) { %>
+        <%- li('users-' + tag.id) %>
+            <%- linkTo(icon('tag') + tag.title +
+                '<span class="badge pull-right" id="tagCount-' + tag.id + '">' +
+                formatNumber(tag.count) + '</span>',
+                pathTo.filteredUsers(tag.id.toString())) %>
+        <%- liEnd %>
+    <% } %>
+<% }) %>
+
+<%- li('new-tags') %>
+    <%- linkTo(icon('plus') + t('tag.new'),
+        pathTo.newTag('users')) %>
+<%- liEnd %>

@@ -13,6 +13,7 @@ var User = define('User', function () {
     property('displayName', String, {sort: true});
     property('oneLiner', String);
     property('memberships', []);
+    property('membership', JSON);
     property('following', [], {index: true}); // [] of user.ids followed by user
     property('otherFields', JSON);
     property('mailSettings', JSON);
@@ -24,6 +25,7 @@ var User = define('User', function () {
     property('memberGroupId', JSON, {index: true});
     property('pendingGroupId', JSON, {index: true});
     property('editorGroupId', JSON, {index: true});
+    property('inviteGroupId', JSON, {index: true});
 
     set('ignoreNullValues', true);
     set('safe', true);

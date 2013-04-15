@@ -28,9 +28,17 @@ function TagController(init) {
     init.before(findTag, {only: 'new,edit,update,destroy,add,remove'});
 }
 
+function getModelName(path) {
+    var hash = {
+        users: 'User',
+        content: 'Content'
+    };
+    return hash[path];
+}
+
 function loadTags(c) {
     this.type = this.sectionName = c.params.section;
-    this.modelName = c.compound.model(this.type, false).modelName;
+    this.modelName = getModelName(this.sectionName);
 
     this.pageName = c.actionName + '-tags';
 
@@ -73,7 +81,7 @@ function getSortOrders (type) {
                 { name: 'Likes', value: 'likesTotal DESC' }
             ];
         
-        case 'user':
+        case 'users':
             return [
                 { name: 'ID', value: 'id DESC' },
                 { name: 'Username', value: 'username ASC' },
