@@ -122,6 +122,27 @@ TagController.prototype.edit = TagController.prototype.new = function (c) {
     this.defaultFilter = 'filter = function(content) {\n\treturn false; ' +
         '//add your filter criteria here\n};';
 
+    // create the recursive renderPermissions function
+    c.locals.renderPermissions = function(permission) {
+        var tag = c.locals.tag;
+        var html = '<li><label class="checkbox"><input type="checkbox" name="permission-' + 
+            permission.name + '" ' + 
+            (tag.permissions && tag.permissions.find(permission.name, 'id') ? 'checked="checked"':'') + 
+            ' /> ' + permission.title + '</label>';
+
+        if((permission.permissions || []).length > 0) {
+            html += '<ul class="">';
+            permission.permissions.forEach(function(permission) {
+                html += c.locals.renderPermissions(permission);
+            });
+            html += '</ul>';
+        }
+        
+        html += '</li>';
+        return html;
+    };
+
+    c.locals.permissions = c.compound.hatch.permissions;
     c.locals.sortOrders = getSortOrders(this.type);
     c.render();
 };
@@ -137,6 +158,16 @@ TagController.prototype.update = TagController.prototype.create = function (c) {
     c.body.groupId = c.req.group.id;
     c.body.type = this.modelName;
     c.body.filter = c.body.filterEnabled && c.body.filter;
+    c.body.count = c.body.count || 0;
+
+    // fix the permissions in req.body
+    c.body.permissions = [];
+
+    Object.keys(c.req.body).forEach(function(key) {
+        if(key.indexOf('permission-') == 0) {
+            c.body.permissions.push(key.substring(key.indexOf('-') +1));
+        }
+    });
 
     if (self.tag && self.tag.id) {
         self.tag.updateAttributes(c.req.body, done);

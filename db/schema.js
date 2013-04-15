@@ -19,6 +19,7 @@ var User = define('User', function () {
     property('mailSettings', JSON);
     property('fulltext', String);
     property('tags', [], {index: true});
+    property('tagNames', String, {sort: true});
 
     // group membership indexes
     property('membershipGroupId', JSON, {index: true});
@@ -160,6 +161,7 @@ var Content = define('Content', function () {
     property('fulltext', String);
     property('importData', JSON);
     property('tags', [], {index: true});
+    property('tagNames', String, {sort: true});
 
     set('ignoreNullValues', true);
     set('defaultSort', 'createdAt DESC');

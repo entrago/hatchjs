@@ -40,10 +40,13 @@ exports.routes = function (map) {
     map.resources('users', {as: 'community', suffix: 'member'}, function (user) {
         user.collection(function (users) {
             users.get('filter/:filterBy.:format?', '#index', {as: 'filteredUsers' });
-            users.get('sendmessageto', '#sendMessageTo', {as: 'sendMessageTo'});
+            users.post('sendmessageto', '#sendMessageTo', {as: 'sendMessageTo'});
             users.get('sendmessage', '#sendMessageForm', {as: 'sendMessageForm'});
-            users.get('invite', '#inviteForm', {as: 'inviteUsers'});
+            users.post('sendmessage', '#sendMessage', {as: 'sendMessage'});
+            users.get('invite', '#inviteForm', {as: 'inviteForm'});
+            users.post('invite', '#sendInvites', {as: 'sendInvites'});
             users.post('removeMembers', '#removeMembers', {as: 'removeMembers'});
+            users.get('ids', '#ids', {as: 'userIds'});
         });
     });
 

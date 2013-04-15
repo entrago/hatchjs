@@ -314,9 +314,9 @@ function loadContent(c, cb) {
 
     function makeQuery(cond, cb) {
         var query = c.req.query;
-        var limit = parseInt(query.iDisplayLength || query.limit || 0, 10);
+        var limit = parseInt(query.iDisplayLength || query.limit || 10, 10);
         var offset = parseInt(query.iDisplayStart || query.offset || 0, 10);
-        var colNames = ['', 'title', 'tagString', 'createdAt', 'score', ''];
+        var colNames = ['', 'title', 'tagNames', 'createdAt', 'score', ''];
         var search = query.sSearch || c.req.body.search;
         var orderBy = query.iSortCol_0 > 0 ?
             (colNames[query.iSortCol_0] + ' ' + query.sSortDir_0.toUpperCase()) :

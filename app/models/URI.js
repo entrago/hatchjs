@@ -14,7 +14,8 @@ module.exports = function (compound) {
             }
             
             var schema = model.schema.definitions[modelName];
-            var redis = model.schema.adapter;
+            var hq = model.schema.adapter
+            var redis = model.schema.adapter.client;
 
             //add the uri property to each schema
             schema.properties.uri = { type: String, index: true };
@@ -30,7 +31,7 @@ module.exports = function (compound) {
                     obj.uri = generateUri(obj.id);
                     next();
                 } else {
-                    redis.get('id:' + redis.modelName(modelName), function (err, id) {
+                    redis.get('id:' + hq.modelName(modelName), function (err, id) {
                         obj.uri = generateUri(parseInt(id || 0, 10) + 1);
                         next();
                     });

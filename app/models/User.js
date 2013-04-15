@@ -44,6 +44,15 @@ module.exports = function (compound, User) {
     };
 
     /**
+     * get the tag names as a single string for this user
+     * 
+     * @return {String} - concatenated tag names
+     */
+    User.getter.tagNames = function () {
+        return this.tags.pluck('title').join(', ');
+    };
+
+    /**
      * Get the best display name for this user. Prefers firstname + lastname but
      * falls back to username.
      * 
@@ -55,13 +64,13 @@ module.exports = function (compound, User) {
     };
 
     // Builds group index by membership status
-    function getMembershipIndex (user, status, identifier) {
+    function getMembershipIndex (user, value, identifier) {
         if (!identifier) {
             identifier = 'groupId';
         }
         var index = [];
         user.memberships.forEach(function (membership) {
-            if(!status || membership.status === status) {
+            if(!value || membership.state === value || membership.role === value) {
                 index.push(membership[identifier]);
             }
         });
@@ -646,6 +655,50 @@ module.exports = function (compound, User) {
     };
 
     /**
+     * Send an email invitation to this user for the specified group.
+     * 
+     * @param  {Number}   groupId  - id of the group to invite to
+     * @param  {String}   subject  - email subject
+     * @param  {String}   body     - email body
+     * @param  {Function} callback - callback function
+     */
+    User.prototype.invite = function (groupId, subject, body, callback) {
+        // check for existing membership
+        var membership = this.getMembership(groupId);
+
+        if(membership && membership.requested) {
+            this.acceptJoinRequest(groupId, callback);
+        } else if (!membership) {
+            var membership = {
+                groupId: groupId,
+                state: 'pending',
+                role: 'member',
+                createdAt: new Date(),
+                joinedAt: new Date()
+            };
+            this.memberships.push(membership);
+            this.save(function (err, user) {
+                user.notify('invite', { groupId: groupId, subject: subject, body: body }, callback);
+            });
+        } else {
+            // user is already a member or has already been invited - skip
+            callback(null, this);
+        }
+    };
+
+    /**
+     * Accept a join request for the specified group.
+     * 
+     * @param  {Number}   groupId  - id of the group to accept for
+     * @param  {Function} callback - callback function
+     */
+    User.prototype.acceptJoinRequest = function (groupId, callback) {
+        this.setMembershipStatus(groupId, 'accepted', function (err, user) {
+            user.notify('joinRequestAccepted', { groupId: groupId }, callback);
+        });
+    };
+
+    /**
      * Remove a membership to the specified group.
      * 
      * @param  {Number}   groupId  - group.id
@@ -707,6 +760,7 @@ module.exports = function (compound, User) {
     User.prototype.hasPermission = function(group, permission, callback) {
         var user = this;
         var redis = User.schema.adapter.client;
+        var hq = User.schema.adapter;
 
         var membership = _.find(this.memberships.items, function (membership) {
             return membership.groupId == group.id;

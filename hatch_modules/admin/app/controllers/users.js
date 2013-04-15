@@ -17,6 +17,8 @@
 //
 
 var Application = require('./application');
+var _ = require('underscore');
+var async = require('async');
 
 module.exports = UsersController;
 
@@ -58,10 +60,10 @@ function loadMembers(c, next) {
     c.locals.filterBy = c.req.params.filterBy || c.req.query.filterBy || c.req.body.filterBy || 'all';
 
     switch (c.locals.filterBy) {
-        case 'members':
+        case 'member':
             cond.memberGroupId = c.req.group.id;
             break;
-        case 'editors':
+        case 'editor':
             cond.editorGroupId = c.req.group.id;
             break;
         case 'pending':
@@ -75,9 +77,11 @@ function loadMembers(c, next) {
             break;
     }
 
-    var limit = parseInt(c.req.query.iDisplayLength || 0, 10);
-    var offset = parseInt(c.req.query.iDisplayStart || 0, 10);
-    var orderBy = c.req.query.iSortCol_0 > 0 ? (['', 'lastname', 'username', c.req.group.id + ':membership:role', c.req.group.id + ':membership:joinedAt', ''][c.req.query.iSortCol_0] + ' ' + c.req.query.sSortDir_0.toUpperCase()) : c.req.group.id + ':membership:joinedAt DESC';
+    var colNames = ['', 'username', 'tagNames', '', '', ''];
+
+    var limit = parseInt(c.req.query.iDisplayLength || c.req.query.limit || 10, 10);
+    var offset = parseInt(c.req.query.iDisplayStart || c.req.query.offset || 0, 10);
+    var orderBy = c.req.query.iSortCol_0 > 0 ? (colNames[c.req.query.iSortCol_0] + ' ' + c.req.query.sSortDir_0.toUpperCase()) : 'username';
     var search = c.req.query.sSearch || c.req.body.search;
 
     var query = {
@@ -96,7 +100,7 @@ function loadMembers(c, next) {
             c.locals.members = members;
             c.locals.allMembersCount = count;
 
-            next();
+            next(err, members);
         });
     });
 
@@ -151,7 +155,7 @@ UsersController.prototype.ids = function ids(c) {
     c.req.query.limit = 1000000;
     c.req.query.offset = 0;
 
-    loadUsers(c, function(users) {
+    loadMembers(c, function(err, users) {
         c.send({
             ids: _.pluck(users, 'id')
         });
@@ -246,7 +250,7 @@ UsersController.prototype.resendInvite = function(c) {
  */
 UsersController.prototype.sendMessageTo = function(c) {
     //set the selectedUsers in the session so that it can be used after the redirect
-    c.req.session.selectedUsers = c.req.body.selectedUsers || [];
+    c.req.session.selectedUsers = c.req.body.ids || [];
 
     c.send({
         redirect: c.pathTo.sendMessage()
@@ -270,32 +274,38 @@ UsersController.prototype.sendMessageForm = function(c) {
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.sendMessage = function(c) {
-    var selectedUsers = JSON.parse(c.req.body.selectedUsers || '["all"]');
+    var selectedUsers = JSON.parse(c.req.body.selectedUsers);
     var subject = c.req.body.subject;
     var body = c.req.body.body;
 
-    //validation
+    // validation
     if (!subject || !body) {
-        c.send({
+        return c.send({
             message: 'Please enter a subject and message',
             status: 'error',
             icon: 'warning-sign'
         });
-
-        return;
     }
 
-    function sendMessages() {
-        console.log('sending messages to ' + selectedUsers.length + ' users');
+    // are we sending to ALL users or a selected subset?
+    if (selectedUsers.length === 0) {
+        c.User.all({ where: { membershipGroupId: c.req.group.id }}, function (err, users) {
+            selectedUsers = _.pluck(users, 'id');
+            send();
+        });
+    } else {
+        send();
+    }
 
+    function send() {
         //sends message to each selected user
-        async.forEach(selectedUsers, function(userId, callback) {
+        async.forEach(selectedUsers, function(userId, done) {
             //load each user
-            C.User.find(userId, function (err, user) {
+            c.User.find(userId, function (err, user) {
                 //send the message via email
                 user.notify('message', { subject: subject, message: body });
 
-                callback();
+                done();
             });
         }, function() {
             c.send({
@@ -307,12 +317,20 @@ UsersController.prototype.sendMessage = function(c) {
     }
 };
 
-//shows the invite form
+/**
+ * Show the invite form.
+ * 
+ * @param  {HttpContext} c - http context
+ */
 UsersController.prototype.inviteForm = function(c) {
     c.render();
 };
 
-//sends invites
+/**
+ * Send invitations to the specified usernames/email addresses.
+ * 
+ * @param  {HttpContext} c - http context
+ */
 UsersController.prototype.sendInvites = function(c) {
     var subject = c.req.body.subject;
     var body = c.req.body.body;
@@ -333,51 +351,23 @@ UsersController.prototype.sendInvites = function(c) {
         });
     }
 
+    // loop through each username and wait for completion
     async.forEach(c.body.usernames, function(username, next) {
+        // find or create each user from scratch
         var data = {
-            provider: 'local',
             type: 'temporary',
             username: username,
             email: username,
             password: 'temporary'
         };
 
-        var invitationCode = randomstring.generate(8);
+        var provider = {
+            name: 'local',
+            idFields: ['username', 'email']
+        };
 
-        //find or create each user from scratch
-        User.findOrCreate(data, function(err, user) {
-            //add to the community
-            var membership = _.find(user.membership, function(m) {
-                return m.groupId == group.id;
-            });
-
-            //if there is an existing membership, approve it
-            if(membership && membership.state == 'requested') {
-                membership.state = 'approved';
-
-                //TODO: send an approval email to the new member
-
-            }
-            //otherwise, create a request
-            else if(!membership) {
-                membership = {
-                    groupId: group.id,
-                    role: 'member',
-                    state: 'pending',
-                    requested: false,
-                    invitationCode: invitationCode,
-                    joinedAt: new Date()
-                };
-
-                //save the user and don't wait for a response
-                user.membership.push(membership);
-                user.save(function() {
-                    //send the invite email
-                    user.notify('invite', _.extend({ invitationCode: invitationCode }, c));
-                });
-            }
-
-            next();
+        User.findOrCreate(provider, data, function(err, user) {
+            user.invite(c.req.group.id, subject, body, next);
         });
     }, done);
 
@@ -390,27 +380,31 @@ UsersController.prototype.sendInvites = function(c) {
     }
 };
 
-//shows the profile fields form
+/**
+ * Show the custom profile fields form.
+ * 
+ * @param  {HttpContext} c - http context
+ */
 exports.profileFields = function(c) {
-    c.locals.profileFields = c.req.group.profileFields();
-    c.render('community/profilefields');
+    c.locals.profileFields = c.req.group.profileFields;
+    c.render();
 };
 
-//edits a profile field
+/**
+ * Show the edit form for the specified custom profile field.
+ * 
+ * @param  {HttpContext} c - http context
+ */
 exports.editProfileField = function(c) {
-    var field = _.find(c.group().profileFields() || [], function(field) {
-        return field.id == c.params.id;
-    });
-
+    var field = c.req.group.profileFields.find(c.req.params.fieldId, 'id');
     if(!field) field = {};
 
     c.locals.field = field;
-    c.render('community/editprofilefield');
+    c.render();
 };
 
 //saves a profile field to the database
 exports.saveProfileField = function(c) {
-    var group = c.group();
     var field = c.req.body;
 
     //field name
@@ -472,7 +466,7 @@ exports.deleteProfileField = function(c) {
 
 //shows the profile fields form
 exports.exportForm = function(c) {
-    c.render('community/exportform');
+    c.render();
 };
 
 //exports members
@@ -524,100 +518,3 @@ exports.export = function(c) {
     });
 };
 
-//shows the community user import screen
-exports.importForm = function(c) {
-    c.render('community/import');
-};
-
-//imports user data from a csv file
-exports.importData = function(c) {
-    var User = c.model('User');
-    var group = c.req.group;
-    var filename = path.join(c.api.app.config.paths.upload, c.req.query.url.split('/').pop());
-    var header = null;
-
-    //load the csv file and loop through each row
-    csv().from.stream(fs.createReadStream(filename)).transform(function(data) {
-        if(!header) {
-            header = data;
-        } else {
-            //map data to a user
-            var user = {
-                membership: [{
-                    groupId: group.id,
-                    role: 'member',
-                    joinedAt: new Date(),
-                    state: 'approved'
-                }],
-                password: '_import_',
-                otherFields: {}
-            };
-
-            //populate all of the fields
-            for(var i=0; i<header.length; i++) {
-                var key = header[i].replace(/^\s+/, '').replace(/\s+$/, '');
-                var val = data[i].replace(/^\s+/, '').replace(/\s+$/, '');
-
-                if(key == 'joinedAt') {
-                    user.membership[0].joinedAt = new Date(val);
-                } else if(key.indexOf('otherFields.') > -1) {
-                    user.otherFields[key.replace('otherFields.', '')] = val;
-                } else if(key == 'otherFields') {
-                    try {
-                        if(typeof val == 'string') val = JSON.parse(val);
-                        user[key] = val;
-                    } catch(ex) {
-                        console.log(ex);
-                    }
-                } else {
-                    user[key] = val;
-                }
-            }
-
-            //don't upload users without a username
-            if(!user.username) {
-                return;
-            }
-
-            //don't error on blank email addresses
-            if(!user.email) {
-                user.email = 'import-' + (new Date().getTime()) + '@hatchjs.com';
-            }
-
-            //sanitize username
-            user.username = slugify(user.username);
-
-            //check for an existing user
-            User.all({ where: { username: user.username }}, function(err, users) {
-                if(users[0]) {
-                    //don't update passwords or memberships
-                    delete user.password;
-                    delete user.membership;
-
-                    users[0].updateAttributes(user, function() { });
-
-                    console.log(JSON.stringify(users[0]));
-                } else {
-                    if(!user.avatar) user.avatar = '/img/default-profile-pic.png';
-                    User.create(user, function(err, user) {
-                        if(err) console.log(user.errors);
-                    });            
-                }
-            });
-        }
-
-        //save the group to register the extra users
-        group.recalculateMemberListCounts();
-    });
-
-    //send a response
-    c.send('ok');
-
-    function slugify(text) {
-        text = text.toLowerCase();
-        text = text.replace(/[^-a-zA-Z0-9\s]+/ig, '');
-        text = text.replace(/-/gi, "_");
-        text = text.replace(/\s/gi, "-");
-        return text;
-    }
-};

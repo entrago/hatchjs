@@ -32,7 +32,8 @@
     "http-post": "latest",
     "co-mailer": "0.0.2-1",
     "connect-redis": "~1.4.5",
-    "supertest": "latest"
+    "supertest": "latest",
+    "js-yaml": "latest"
   },
   "devDependencies": {
     "mocha": "1.8.1",

@@ -54,6 +54,27 @@
 
                         <div class="clearfix"></div>
 
+                        <% if(modelName === 'User') { %>
+                            <hr/>
+
+                            <div class="accordion" id="permissions">
+                                <div class="accordion-group">
+                                    <div class="accordion-heading">
+                                        <a class="accordion-toggle" data-toggle="collapse" data-parent="#permissions" href="#list">
+                                            <i class="icon-lock"></i> <%- __('Manage permissions') %>
+                                        </a>
+                                    </div>
+                                    <div id="list" class="accordion-body collapse <%- tag.permissions && tag.permissions.length > 0 ? 'in':'' %>">
+                                        <div class="accordion-inner">
+                                            <ul class="unstyled">
+                                                <%- renderPermissions(permissions.root) %>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+
                         <style>
                             #filter
                             {
@@ -99,6 +120,11 @@
                             .filter.enabled .editor
                             {
                                 opacity : 1;
+                            }
+
+                            ul.unstyled ul
+                            {
+                                list-style: none;
                             }
                         </style>
 

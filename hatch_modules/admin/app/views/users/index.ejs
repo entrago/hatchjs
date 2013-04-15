@@ -1,8 +1,8 @@
 <div class="row">
 
-  <% include _sidebar %>
+    <% include _sidebar %>
 
-  <div class="span10">
+    <div class="span10">
       <div class="module">
           <div class="content community-table-content">
               <div class="pull-left">
@@ -54,15 +54,15 @@
                               <input type="checkbox" class="checkbox" value="all" id="selectAllUsers" rel="tooltip" title="Select all users" />
                           </th>
                           <th>
-                              <%- __('Username') %>
+                              <%- __('Member name') %>
                           </th>
                           <th width="300">
                               Tags
                           </th>
-                          <th width="150">
+                          <th width="110">
                               <%- __('Membership') %>
                           </th>
-                          <th width="150">
+                          <th width="130">
                               <%- __('Since') %>
                           </th>
                           <th width="60">
@@ -105,6 +105,11 @@
 
                             //redraw table
                             window.table.fnDraw(false);
+
+                            setTimeout(function () {
+                                // update tag counts
+                                refreshTagCounts();
+                            }, 500);
                         }
                     }
                 });
@@ -117,25 +122,37 @@
             return false;
         });
 
-        //handle the selectAllUsers checkbox events
+        // handle the selectAllContent checkbox events
         $("#selectAllUsers").on("click", function() {
             if(this.checked) {
-                //check all checkboxes
+                // check all checkboxes
                 $("#members-table tbody input[type=checkbox]").attr("checked", true);
 
-                //reset the selected users array with only the "all" value
-                window.selectedUsers = ["all"];
-                window.unselectedUsers = [];
+                // reset the selected content array with only the "all" value
+                $.ajax('<%- pathTo.userIds %>?filterBy=<%- filterBy %>&sSearch=' + $('#members-table_filter input').val(), {
+                    success: function (data) {
+                        window.selectedUsers = data.ids;        
+                    }
+                });
             }
             else {
-                //unselect all users
+                // unselect all content
                 window.selectedUsers = [];
-                window.unselectedUsers = [];
 
-                //uncheck all checkboxes
+                // uncheck all checkboxes
                 $("#members-table tbody input[type=checkbox]").attr("checked", null);
             }
         });
+
+        function refreshTagCounts() {
+            $.ajax('<%- pathTo.tagsCounts('users') %>', {
+                success: function (data) {
+                    data.tags.forEach(function (tag) {
+                        $('#tagCount-' + tag.id).text(tag.count);
+                    });
+                }
+            });
+        }
 
         //setup user arrays
         window.selectedUsers = [];
@@ -240,7 +257,7 @@
                 }
             },
             "aoColumnDefs": [
-                { "bSortable": false, "aTargets": [ 0, 5 ] }
+                { "bSortable": false, "aTargets": [ 0, 3,4,5 ] }
             ]
         });
     });

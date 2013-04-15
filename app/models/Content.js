@@ -91,6 +91,15 @@ module.exports = function (compound, Content) {
     };
 
     /**
+     * get the tag names as a single string for this post
+     * 
+     * @return {String} - concatenated tag names
+     */
+    Content.getter.tagNames = function () {
+        return this.tags.pluck('title').join(', ');
+    };
+
+    /**
      * gets the total likes - total dislikes
      * 
      * @return {[Number]} 
