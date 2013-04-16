@@ -63,7 +63,7 @@ module.exports = function (compound, User) {
             (this.firstname + ' ' + this.lastname) : this.username; 
     };
 
-    // Builds group index by membership status
+    // Builds group index by membership state
     function getMembershipIndex (user, value, identifier) {
         if (!identifier) {
             identifier = 'groupId';
@@ -79,7 +79,7 @@ module.exports = function (compound, User) {
 
     /**
      * Get an array of ids for all groups this user is a member of with any
-     * status (member, pending, editor).
+     * state (member, pending, editor).
      * 
      * @return {Array} - an array of group ids
      */
@@ -88,7 +88,7 @@ module.exports = function (compound, User) {
     };
 
     /**
-     * Get an array of ids for all groups this user is a member of with status
+     * Get an array of ids for all groups this user is a member of with state
      * of 'member'.
      * 
      * @return {Array} - an array of group ids
@@ -98,7 +98,7 @@ module.exports = function (compound, User) {
     };
 
     /**
-     * Get an array of ids for all groups this user is a member of with status
+     * Get an array of ids for all groups this user is a member of with state
      * of 'pending'.
      * 
      * @return {Array} - an array of group ids
@@ -108,7 +108,7 @@ module.exports = function (compound, User) {
     };
 
     /**
-     * Get an array of ids for all groups this user is a member of with status
+     * Get an array of ids for all groups this user is a member of with state
      * of 'editor'.
      * 
      * @return {Array} - an array of group ids
@@ -537,7 +537,7 @@ module.exports = function (compound, User) {
      */
     User.prototype.joinGroup = function(group, code, callback) {
 
-        // default status
+        // default state
         var user = this;
         var state = 'pending';
         var requested = true;
@@ -620,9 +620,6 @@ module.exports = function (compound, User) {
         var membership = this.memberships.find(groupId, 'groupId');
         if (membership) {
             membership.timeSince = moment(membership.joinedAt).fromNow();
-            if (membership.state === 'pending') {
-                membership.role = 'pending';
-            }
         }
         return membership;
     };
@@ -643,16 +640,16 @@ module.exports = function (compound, User) {
     };
 
     /**
-     * Set a user's membership status within the specified group.
+     * Set a user's membership state within the specified group.
      * 
      * @param {Number}   groupId  - group.id
-     * @param {String}   status   - status to set
+     * @param {String}   state    - state to set
      * @param {Function} callback - callback function
      */
-    User.prototype.setMembershipStatus = function (groupId, status, callback) {
+    User.prototype.setMembershipState = function (groupId, state, callback) {
         var membership = this.memberships.find(groupId, 'groupId');
         if (membership) {
-            membership.status = status;
+            membership.state = state;
         }
         this.save(callback);
     };
@@ -696,7 +693,7 @@ module.exports = function (compound, User) {
      * @param  {Function} callback - callback function
      */
     User.prototype.acceptJoinRequest = function (groupId, callback) {
-        this.setMembershipStatus(groupId, 'accepted', function (err, user) {
+        this.setMembershipState(groupId, 'accepted', function (err, user) {
             user.notify('joinRequestAccepted', { groupId: groupId }, callback);
         });
     };

@@ -227,7 +227,7 @@ UsersController.prototype.downgrade = function(c) {
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.accept = function(c) {
-    this.member.setMembershipStatus(c.req.group.id, 'accepted', function (err, user) {
+    this.member.setMembershipState(c.req.group.id, 'accepted', function (err, user) {
         c.send('ok');
     });
 };
