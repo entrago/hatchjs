@@ -473,52 +473,19 @@ UsersController.prototype.exportForm = function(c) {
     c.render();
 };
 
-//exports members
+/**
+ * Export the entire member list as JSON or CSV.
+ * 
+ * @param  {HttpContext} c - http context
+ */
 UsersController.prototype.export = function(c) {
-    var format = c.req.query.format;
+    var filename = 'users-' + (new Date().getTime()) + '.' + c.req.body.format;
 
-    loadMembers(c, function() {
-        var members = c.locals.members;
-        var outputMembers = [];
+    c.req.query.limit = 1000000;
+    c.req.query.offset = 0;
 
-        //sanitize
-        members.forEach(function(member) {
-            var obj = member.toPublicObject();
-            
-            //fix null values
-            Object.keys(obj).forEach(function(key) {
-                if(obj[key] === null) obj[key] = '';
-                else obj[key] = obj[key].toString();
-            });
-
-            //fix other fields
-            if(typeof obj.otherFields === 'object') {
-                Object.keys(obj.otherFields || {}).forEach(function(key) {
-                    obj[key] = obj.otherFields[key];
-                });
-                delete obj.otherFields;
-            }
-
-            outputMembers.push(obj);
-        });
-
-        switch(format) {
-            case 'csv':
-                csv().from.array(outputMembers).to.string(function(data, count) { 
-                    var headers = Object.keys(outputMembers[0] || {}).join(',');
-
-                    c.res.setHeader('Content-disposition', 'attachment; filename=exportdata.csv');
-                    c.res.setHeader('Content-Type', 'text/csv');
-                    c.send(headers + '\n' + data);
-                });
-                break;
-            case 'json':
-            default:
-                c.res.setHeader('Content-disposition', 'attachment; filename=exportdata.json');
-                c.res.setHeader('Content-Type', 'text/json');
-                c.send(members);
-                break;
-        }
+    loadMembers(c, function(err, users) {
+        c.compound.hatch.exportData.export(c, users, filename);
     });
 };
 

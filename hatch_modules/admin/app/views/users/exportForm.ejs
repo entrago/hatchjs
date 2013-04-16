@@ -1,0 +1,32 @@
+<div class="row">
+
+    <% include _sidebar %>
+
+    <div class="span10">
+        <div class="module">
+            <div class="content">
+
+                <h3><%- __('Export members') %></h3>
+
+                <hr/>
+
+                <%- formTagBegin(pathTo.export, { class: 'form-vertical', method: 'post' }) %>
+                    <div class="control-group">
+                        <label class="control-label" for="format"><%- __('Export format') %></label>
+                        <div class="controls">
+                            <select id="format" name="format">
+                                <option value="csv">CSV</option>
+                                <option value="json">JSON</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"><%- __('Export members') %></button>
+                    </div>
+                <%- formTagEnd() %>
+
+            </div>
+        </div>
+    </div>
+</div>

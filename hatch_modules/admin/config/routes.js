@@ -60,6 +60,8 @@ exports.routes = function (map) {
             users.post('profilefields/reorder', '#reorderProfileFields', {as: 'reorderProfileFields'});
             users.post('profilefields/save', '#saveProfileField', {as: 'saveProfileField'});
             users.post('profilefields/:id/delete', '#deleteProfileField', {as: 'deleteProfileField'});
+            users.get('export', '#exportForm', {as: 'export'});
+            users.post('export', '#export', {as: 'export'});
         });
     });
 
