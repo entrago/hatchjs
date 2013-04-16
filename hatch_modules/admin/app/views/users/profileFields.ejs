@@ -1,0 +1,172 @@
+<div class="row">
+
+    <%- include _sidebar %>
+
+    <div class="span10">
+        <div class="module">
+            <div class="content">
+
+                <h3><%- __('Manage profile fields') %></h3>
+
+                <p><%- __('Re-order profile fields by dragging them around using the %s symbol', '<i class="icon-move"></i>') %>
+
+                <hr/>
+
+                <table class="table table-striped pages-table" id="fields-table">
+                    <thead>
+                    <tr>
+                        <th>
+                            <%- __('Field name') %>
+                        </th>
+                        <th width="15%">
+                            <%- __('Type') %>
+                        </th>
+                        <th width="12%">
+                            <%- __('Mandatory') %>
+                        </th>
+                        <th width="15%">
+                            <%- __('Privacy') %>
+                        </th>
+                        <th width="7%">
+                            <%- __('Actions') %>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr class="core">
+                        <td>
+                            <i class="icon-lock"></i>
+                            <%- __('Full name') %> 
+                        </td>
+                        <td>
+                            <%- __('name') %>
+                        </td>
+                        <td>
+
+                        </td>
+                        <td>
+                            <%- __('public') %>
+                        </td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                    <tr class="core">
+                        <td>
+                            <i class="icon-lock"></i>
+                            <%- __('Username') %>
+                        </td>
+                        <td>
+                            <%- __('text') %>
+                        </td>
+                        <td>
+                            <i class="icon-ok"></i>
+                        </td>
+                        <td>
+                            <%- __('public') %>
+                        </td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                    <tr class="core">
+                        <td>
+                            <i class="icon-lock"></i>
+                            <%- __('Email address') %>
+                        </td>
+                        <td>
+                            <%- __('email') %>
+                        </td>
+                        <td>
+                            <i class="icon-ok"></i>
+                        </td>
+                        <td>
+                            <%- __('private') %>
+                        </td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+
+                    <% profileFields.forEach(function(field) { %>
+                        <tr data-id="<%- field.id %>">
+                            <td>
+                                <i class="icon-move"></i>
+                                <%- field.title %>
+                            </td>
+                            <td>
+                                <%- __(field.type) %>
+                            </td>
+                            <td>
+                                <% if(field.mandatory) { %>
+                                    <i class="icon-ok"></i>
+                                <% } %>
+                            </td>
+                            <td>
+                                <%- __(field.privacy) %>
+                            </td>
+                            <td>
+                                <a href="<%- pathTo.editProfileField(field.id.toString()) %>">Edit</a> &nbsp;
+                                <a href="<%- pathTo.deleteProfileField(field.id.toString()) %>" rel="delete-field"><i class="icon-remove"></i></a>
+                            </td>
+                        </tr>
+                    <% }) %>
+
+                    </tbody>
+                </table>
+
+                <div class="form-actions">
+                    <a href="<%- pathTo.newProfileField() %>" class="btn btn-primary"><i class="icon-plus"></i> <%- __('Add new profile field') %></a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#fields-table tbody').sortable({
+            handle: ".icon-move",
+            items: "tr:not(.core)",
+            placeholder: {
+                element: function(currentItem) {
+                    return $("<tr class=\"placeholder\"><td colspan=\"5\"><div></div></td></tr>")[0];
+                },
+                update: function(container, p) {
+                    return;
+                }
+            },
+            //fix the column widths
+            create: function() {
+                var ui = $('#fields-table tbody');
+                $("td", ui).each(function(i, td) {
+                    $(td).css({ width: $(td).width() + "px" });
+                });
+            },
+            update: function() {
+                var data = [];
+
+                $("#fields-table tbody tr:not(.core)").each(function(i, tr) {
+                    data.push($(tr).attr("data-id"));
+                });
+
+                $.ajax('<%- pathTo.reorderProfileFields() %>', { type: 'POST', data: { ids: data }, success: function(data) {
+                    //display notification
+                    $.noty({text: '<i class="icon-' + data.icon + '"></i> ' + data.message, type: data.status});
+                }});
+            }
+        });
+
+        $("a[rel=delete-field]").die().live("click", function() {
+            var el = this;
+            if(confirm("Are you sure you wish to delete this field?")) {
+                $.post(this.href, { success: function() {
+                    $(el).parents("tr").remove();
+                }});
+            }
+
+            return false;
+        });
+    } );
+</script>

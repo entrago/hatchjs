@@ -24,7 +24,7 @@
     "findit": "latest",
     "csso": "latest",
     "async": "latest",
-    "jugglingdb-redis-hq": "latest",
+    "jugglingdb-redis-hq": "https://github.com/jugglingdb/redis-hq-adapter/tarball/master",
     "chrono-node": "latest",
     "co-assets-compiler": "0.0.1",
     "unzip": "~0.1.5",
@@ -33,7 +33,8 @@
     "co-mailer": "0.0.2-1",
     "connect-redis": "~1.4.5",
     "supertest": "latest",
-    "js-yaml": "latest"
+    "js-yaml": "latest",
+    "csv": "latest"
   },
   "devDependencies": {
     "mocha": "1.8.1",

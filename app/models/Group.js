@@ -584,7 +584,7 @@ module.exports = function (compound, Group) {
     /**
      * updates the URL for this group
      * 
-     * @param  {[String]} url [new URL]
+     * @param  {String} url - new URL
      */
     Group.prototype.updateUrl = function(url, next) {
         var group = this;
@@ -636,6 +636,32 @@ module.exports = function (compound, Group) {
         return _.find(this.modules, function(module) {
             return module && module.name == name;
         });
+    };
+
+    /**
+     * Save a custom profile field for this group.
+     * 
+     * @param  {Object}   field    - custom profile field object
+     * @param  {Function} callback - callback function
+     */
+    Group.prototype.saveCustomProfileField = function (field, callback) {
+        if (field.id) {
+            this.customProfileFields.remove(this.customProfileFields.find(field.id, 'id'));
+        }
+
+        this.customProfileFields.push(field);
+        this.save(callback);
+    };
+
+    /**
+     * Remove a custom profile field from this group.
+     * 
+     * @param  {Number}   fieldId  - id of the field to remove
+     * @param  {Function} callback - callback function
+     */
+    Group.prototype.removeCustomProfileField = function (fieldId, callback) {
+        this.customProfileFields.remove(this.customProfileFields.find(fieldId, 'id'));
+        this.save(callback);
     };
 };
 

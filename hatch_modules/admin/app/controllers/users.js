@@ -28,7 +28,7 @@ function UsersController(init) {
         this.sectionName = 'users';
         c.next();
     });
-    init.before(findMember, {only: 'edit, update, destroy'});
+    init.before(findMember, {only: 'edit, update, destroy, resendInvite, accept, remove, upgrade, downgrade, resendInvite'});
     init.before(loadTags);
 }
 
@@ -169,7 +169,7 @@ UsersController.prototype.ids = function ids(c) {
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.remove = function(c) {
-    this.user.removeMembership(c.req.group.id, function (err, user) {
+    this.member.removeMembership(c.req.group.id, function (err, user) {
         c.send('ok');
     });
 };
@@ -356,22 +356,25 @@ UsersController.prototype.sendInvites = function(c) {
         // find or create each user from scratch
         var data = {
             type: 'temporary',
-            username: username,
+            username: username.split('@')[0],
             email: username,
             password: 'temporary'
         };
 
         var provider = {
             name: 'local',
-            idFields: ['username', 'email']
+            idFields: ['username']
         };
 
-        User.findOrCreate(provider, data, function(err, user) {
+        c.User.findOrCreate(provider, data, function(err, user) {
+            if (err) {
+                next(err);
+            }
             user.invite(c.req.group.id, subject, body, next);
         });
     }, done);
 
-    function done() {
+    function done(err) {
         c.send({
             message: 'Invites sent to ' + c.body.usernames.length + ' users',
             status: 'success',
@@ -385,8 +388,8 @@ UsersController.prototype.sendInvites = function(c) {
  * 
  * @param  {HttpContext} c - http context
  */
-exports.profileFields = function(c) {
-    c.locals.profileFields = c.req.group.profileFields;
+UsersController.prototype.profileFields = function(c) {
+    c.locals.profileFields = c.req.group.customProfileFields;
     c.render();
 };
 
@@ -395,18 +398,20 @@ exports.profileFields = function(c) {
  * 
  * @param  {HttpContext} c - http context
  */
-exports.editProfileField = function(c) {
-    var field = c.req.group.profileFields.find(c.req.params.fieldId, 'id');
+UsersController.prototype.newProfileField = UsersController.prototype.editProfileField = function(c) {
+    var field = c.req.group.customProfileFields.find(c.req.params.id, 'id');
     if(!field) field = {};
 
     c.locals.field = field;
-    c.render();
+    c.render('editProfileField');
 };
 
-//saves a profile field to the database
-exports.saveProfileField = function(c) {
-    var field = c.req.body;
-
+/**
+ * Save a custom profile field to the current group.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+UsersController.prototype.saveProfileField = function(c) {
     //field name
     c.req.body.name = c.req.body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
@@ -419,16 +424,7 @@ exports.saveProfileField = function(c) {
         });
     }
 
-    if(!group.customProfileFields) group.customProfileFields = [];
-
-    if(field.id) group.customProfileFields[field.id] = field;
-    else {
-        field.id = group.customProfileFields.length;
-        field.order = group.customProfileFields.length;
-        group.customProfileFields.push(field);
-    }
-
-    group.save(function() {
+    c.req.group.saveCustomProfileField(c.req.body, function (err, group) {
         c.send({
             message: 'Profile field saved',
             status: 'success',
@@ -437,15 +433,18 @@ exports.saveProfileField = function(c) {
     });
 };
 
-//re-orders the profile fields
-exports.reorderProfileFields = function(c) {
-    var group = c.group();
+/**
+ * Re-order the custom profile fields within this group.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+UsersController.prototype.reorderProfileFields = function(c) {
     var order = 0;
     c.body.ids.forEach(function(id) {
-        group.customProfileFields[id].order = order++;
+        c.req.group.customProfileFields.find(id, 'id').order = order++;
     });
 
-    group.save(function() {
+    c.req.group.save(function() {
         c.send({
             message: 'Profile fields order saved',
             status: 'success',
@@ -454,23 +453,28 @@ exports.reorderProfileFields = function(c) {
     });
 }
 
-//deletes a profile field
-exports.deleteProfileField = function(c) {
-    var group = c.group();
-    delete group.customProfileFields[c.params.id];
-
-    group.save(function() {
+/**
+ * Delete a custom profile field.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+UsersController.prototype.deleteProfileField = function(c) {
+    c.req.group.removeCustomProfileField(c.req.params.id, function (err, group) {
         c.send('ok');
     });
 };
 
-//shows the profile fields form
-exports.exportForm = function(c) {
+/**
+ * Show the data export form.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+UsersController.prototype.exportForm = function(c) {
     c.render();
 };
 
 //exports members
-exports.export = function(c) {
+UsersController.prototype.export = function(c) {
     var format = c.req.query.format;
 
     loadMembers(c, function() {

@@ -620,6 +620,9 @@ module.exports = function (compound, User) {
         var membership = this.memberships.find(groupId, 'groupId');
         if (membership) {
             membership.timeSince = moment(membership.joinedAt).fromNow();
+            if (membership.state === 'pending') {
+                membership.role = 'pending';
+            }
         }
         return membership;
     };
@@ -705,10 +708,20 @@ module.exports = function (compound, User) {
      * @param  {Function} callback - callback function
      */
     User.prototype.rejectInvitation = User.prototype.removeMembership = function (groupId, callback) {
-        this.memberships.items = _.reject(this.memberships, function (membership) {
+        var user = this;
+
+        user.memberships.items = _.reject(user.memberships.items, function (membership) {
             return membership.groupId == groupId;
         });
-        this.save(callback);
+
+        // remove any tags for this group
+        compound.models.Tag.all({ where: { groupId: groupId }}, function (err, tags) {
+            var tagIds = _.pluck(tags, 'id');
+            user.tags.items = _.reject(user.tags.items, function (tag) { 
+                return tagIds.indexOf(tag) > -1;
+            });
+            user.save(callback);
+        });
     };
 
     /**

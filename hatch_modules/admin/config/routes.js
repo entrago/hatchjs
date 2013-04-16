@@ -3,7 +3,9 @@ exports.routes = function (map) {
     map.camelCaseHelperNames = true;
     map.root('pages#index');
     
-    map.resources('groups');
+    map.collection(function (group) {
+        group.get('group', 'group#show');
+    });
 
     map.resources('modules', function (module) {
         module.collection(function (modules) {
@@ -47,6 +49,17 @@ exports.routes = function (map) {
             users.post('invite', '#sendInvites', {as: 'sendInvites'});
             users.post('removeMembers', '#removeMembers', {as: 'removeMembers'});
             users.get('ids', '#ids', {as: 'userIds'});
+            users.post(':id/resendinvite', '#resendInvite');
+            users.post(':id/remove', '#remove');
+            users.post(':id/upgrade', '#upgrade');
+            users.post(':id/downgrade', '#downgrade');
+            users.post(':id/accept', '#accept');
+            users.get('profilefields', '#profileFields', {as: 'profileFields'});
+            users.get('profilefields/new', '#newProfileField', {as: 'newProfileField'});
+            users.get('profilefields/:id/edit', '#editProfileField', {as: 'editProfileField'});
+            users.post('profilefields/reorder', '#reorderProfileFields', {as: 'reorderProfileFields'});
+            users.post('profilefields/save', '#saveProfileField', {as: 'saveProfileField'});
+            users.post('profilefields/:id/delete', '#deleteProfileField', {as: 'deleteProfileField'});
         });
     });
 

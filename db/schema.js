@@ -85,8 +85,7 @@ var Group = define('Group', function () {
     property('cssVersion', String);
     property('cssUrl', String);
     property('googleAnalyticsId', String);
-    property('customProfileFields', JSON);
-    property('memberLists', JSON);
+    property('customProfileFields', []);
     property('tags', [], {index: true});
     property('importStreams', JSON);
 

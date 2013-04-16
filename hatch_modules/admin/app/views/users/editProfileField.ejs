@@ -1,0 +1,116 @@
+<div class="row">
+
+    <% include _sidebar %>
+
+    <div class="span10">
+        <div class="module">
+            <div class="content">
+
+                <h3><%- __('Edit field details') %></h3>
+
+                <hr/>
+
+                <%- formTagBegin({ action: pathTo.saveProfileField(), remote: true, id: 'profile-field-form', method: 'POST' }) %>
+                    <input type="hidden" name="id" value="<%- field.id %>" />
+                    <input type="hidden" name="order" value="<%- field.order %>" />
+
+                    <div class="control-group">
+                        <label class="control-label" for="title"><%- __('Field name') %></label>
+                        <div class="controls">
+                            <input type="text" id="title" name="title" value="<%- field.title %>"/>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="fieldType"><%- __('Field type') %></label>
+                        <div class="controls">
+                            <select id="fieldType" name="type">
+                                <option value="text" <%- field.type == 'text' ? 'selected="selected"':'' %>><%- __('Text') %></option>
+                                <option value="textarea" <%- field.type == 'textarea' ? 'selected="selected"':'' %>><%- __('Textarea') %></option>
+                                <option value="name" <%- field.type == 'name' ? 'selected="selected"':'' %>>Name</option>
+                                <option value="radio-list" <%- field.type == 'radio-list' ? 'selected="selected"':'' %>><%- __('Radio button list') %></option>
+                                <option value="check-list" <%- field.type == 'check-list' ? 'selected="selected"':'' %>><%- __('Check list') %></option>
+                                <option value="select-list" <%- field.type == 'select-list' ? 'selected="selected"':'' %>><%- __('Select list') %></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="control-group" id="optionsControl" <%- (field.type || '').indexOf('-list') > -1 ? '':'style="display: none"' %>>
+                        <label class="control-label" for="options"><%- __('Options') %></label>
+                        <div class="controls">
+                            <select id="options" name="options[]" multiple="multiple" class="span4 chzn-select-create" data-placeholder="Enter some list options">>
+                                <% (field.options || []).forEach(function(option) { %>
+                                    <option value="<%- option %>" selected="selected"><%- option %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="controls">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox" value="true" name="mandatory" <%- field.mandatory ? ' checked="checked"':'' %> />
+                                <%- __('Mandatory field') %>
+                            </label>
+                        </div>
+                    </div>
+
+                    <hr/>
+
+                    <div class="control-group">
+                        <label class="control-label" for="privacy"><%- __('Visibility') %></label>
+                        <div class="controls">
+                            <select id="privacy" name="privacy">
+                                <option value="public"<%- field.privacy == 'public' ? ' selected="selected"':'' %>><%- __('Public') %></option>
+                                <option value="members-only"<%- field.privacy == 'members-only' ? ' selected="selected"':'' %>><%- __('Members only') %></option>
+                                <option value="private"<%- field.privacy == 'private' ? ' selected="selected"':'' %>><%- __('Private') %></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="description"><%- __('Description on registration form') %></label>
+                        <div class="controls">
+                            <textarea id="description" class="span6 richtext" rows="6" name="description"><%- field.description %></textarea>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="helpText"><%- __('Help text (optional)') %></label>
+                        <div class="controls">
+                            <input type="text" id="helpText" name="helpText" class="span4" value="<%- field.helpText %>"/>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"><%- __('Save changes') %></button>
+                        <a href="<%- pathTo.profileFields() %>" class="btn"><%- __('Cancel') %></a>
+                    </div>
+                <%- formTagEnd() %>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#fieldType').bind("change", function() {
+            if(this.value.indexOf("-list") > -1) $("#optionsControl").show();
+            else $("#optionsControl").hide();
+        });
+
+        //convert richtexts
+        setupRichtextEditors();
+
+        //bind the form ajax
+        $('#profile-field-form').bind('ajax:success', function(e, data) {
+            $.noty({text: '<i class="icon-' + data.icon + '"></i> ' + data.message, type: data.status});
+
+            if(data.status == "success") {
+                //refresh the page
+                setTimeout(function() { window.location = '<%- pathTo.profileFields() %>'; }, 1000);
+            }
+        });
+    });
+</script>

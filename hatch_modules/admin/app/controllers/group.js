@@ -1,9 +1,9 @@
 
 var Application = require('./application');
 
-module.exports = GroupsController;
+module.exports = GroupController;
 
-function GroupsController(init) {
+function GroupController(init) {
     Application.call(this, init);
     init.before(function setup(c) {
         this.sectionName = 'group';
@@ -11,8 +11,8 @@ function GroupsController(init) {
     });
 }
 
-require('util').inherits(GroupsController, Application);
+require('util').inherits(GroupController, Application);
 
-GroupsController.prototype.show = function (c) {
+GroupController.prototype.show = function (c) {
     c.render();
 };
