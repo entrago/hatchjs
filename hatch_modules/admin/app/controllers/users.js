@@ -227,7 +227,7 @@ UsersController.prototype.downgrade = function(c) {
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.accept = function(c) {
-    this.member.setMembershipStatus(c.req.group.id, 'accepted', function (err, user) {
+    this.member.setMembershipState(c.req.group.id, 'accepted', function (err, user) {
         c.send('ok');
     });
 };
@@ -389,7 +389,9 @@ UsersController.prototype.sendInvites = function(c) {
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.profileFields = function(c) {
-    c.locals.profileFields = c.req.group.customProfileFields;
+    c.locals.profileFields = _.sortBy(c.req.group.customProfileFields.items, function (field) {
+        return field && field.order || 0;
+    });
     c.render();
 };
 
