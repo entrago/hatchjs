@@ -44,6 +44,7 @@ module.exports = function (c) {
     var fontAwesome = __dirname + '/../../node_modules/FontAwesome/font';
 
     fs.readdir(fontAwesome, function (err, files) {
+        if (files)
         files.forEach(function (file) {
             if (!fs.existsSync(fontRoot + '/' + file)) {
                 fsTools.copy(fontAwesome + '/' + file, fontRoot + '/' + file,

@@ -12,7 +12,7 @@ if (!process.env.TRAVIS) {
         });
     }
 
-    semicov.init('hatch_modules', 'Hatch.js modules');
+    semicov.init('lib', 'Hatch.js modules');
 }
 
 global.getApp = function() {
