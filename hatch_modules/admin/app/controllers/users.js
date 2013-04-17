@@ -180,8 +180,7 @@ UsersController.prototype.remove = function(c) {
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.removeMembers = function(c) {
-    var selectedUsers = c.req.body.selectedUsers || [];
-
+    var selectedUsers = c.req.body.ids || [];
     var count = 0;
 
     //remove each of the members
@@ -189,15 +188,65 @@ UsersController.prototype.removeMembers = function(c) {
         //load each user
         c.User.find(userId, function (err, user) {
             user.removeMembership(c.req.group.id, done);   
-        }, function() {
-            c.send({
-                message: count + ' user' + (count != 1 ? 's':'') + ' removed from community',
-                status: 'success',
-                icon: 'ok'
-            });
+            count++;
+        });
+    }, function() {
+        c.send({
+            message: count + ' user' + (count != 1 ? 's':'') + ' removed from community',
+            status: 'success',
+            icon: 'ok'
         });
     });
 };
+
+/**
+ * Black-list multiple selected members from the community.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+UsersController.prototype.blacklistMembers = function(c) {
+    var selectedUsers = c.req.body.ids || [];
+    var count = 0;
+
+    //blacklist each of the members
+    async.forEach(selectedUsers, function(userId, done) {
+        c.User.find(userId, function (err, user) {
+            user.setMembershipState(c.req.group.id, 'blacklisted', done);   
+            count++;
+        });
+    }, function() {
+        c.send({
+            message: count + ' user' + (count != 1 ? 's':'') + ' blacklisted',
+            status: 'success',
+            icon: 'ok'
+        });
+    });
+};
+
+/**
+ * Un-black-list multiple selected members from the community.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+UsersController.prototype.unblacklistMembers = function(c) {
+    var selectedUsers = c.req.body.ids || [];
+    var count = 0;
+
+    //un-blacklist each of the members
+    async.forEach(selectedUsers, function(userId, done) {
+        c.User.find(userId, function (err, user) {
+            user.setMembershipState(c.req.group.id, 'accepted', done);   
+            count++;
+        });
+    }, function() {
+        c.send({
+            message: count + ' user' + (count != 1 ? 's':'') + ' un-blacklisted',
+            status: 'success',
+            icon: 'ok'
+        });
+    });
+};
+
 
 /**
  * Upgrade the selected member to an editor. 

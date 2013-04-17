@@ -65,7 +65,7 @@ SetupController.prototype.setup = function(c) {
     }
 
     // load the seed data and modify
-    var seeds = require('../seed.yml')[0];
+    var seeds = require('../seed.yml');
 
     seeds[0].Group.name = req.body.name;
     seeds[0].Group.url = req.body.url;
@@ -77,6 +77,8 @@ SetupController.prototype.setup = function(c) {
     seeds[2].User.username = req.body.username;
     seeds[2].User.email = req.body.email;
     seeds[2].User.password = req.body.password;
+
+    console.log(seeds[0].Group);
 
     // create the group and administrator user
     (function next(seeds) {

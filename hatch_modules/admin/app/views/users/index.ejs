@@ -13,6 +13,8 @@
                       <ul class="dropdown-menu">
                           <li><%- linkTo('<i class="icon-envelope"></i> ' + __('Send message'), pathTo.sendMessageTo(), { rel: 'multiAjaxLink' }) %></li>
                           <li><%- linkTo('<i class="icon-remove"></i> ' + __('Remove members'), pathTo.removeMembers(), { rel: 'multiAjaxLink' }) %></li>
+                          <li><%- linkTo('<i class="icon-flag"></i> ' + __('Blacklist members'), pathTo.blacklistMembers(), { rel: 'multiAjaxLink' }) %></li>
+                          <li><%- linkTo('<i class="icon-heart"></i> ' + __('Un-blacklist members'), pathTo.unblacklistMembers(), { rel: 'multiAjaxLink' }) %></li>
                       </ul>
                   </div>
 
@@ -213,7 +215,21 @@
                         return html;
                     }
                 },
-                { "mDataProp": "membership.role" },
+                { "mDataProp": "membership.role", 
+                    "fnRender": function(obj, val) {
+                        var html = '';
+                        var user = obj.aData;
+
+                        if (user.membership.state === 'blacklisted') {
+                            html += '<i class="icon-flag"></i> ';
+                        } else if (user.membership.state === 'pending') {
+                            html += '<i class="icon-time"></i> ';
+                        }
+
+                        html += user.membership.role;
+                        return html;
+                    } 
+                },
                 { "mDataProp": "membership.timeSince" },
                 { "mDataProp": null,
                     "fnRender" : function(obj, val) {

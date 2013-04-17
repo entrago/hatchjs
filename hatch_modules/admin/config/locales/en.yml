@@ -9,6 +9,7 @@ en:
   tabs:
     users: Community
     content: Content
+    moderation: Moderation
     pages: Pages
     group: Settings
     modules: Modules

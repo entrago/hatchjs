@@ -35,6 +35,10 @@ exports.routes = function (map) {
         });
     });
 
+    map.collection(function (moderation) {
+        moderation.get('moderation', 'moderation#index');
+    });
+
     map.resources('streams', function (stream) {
         stream.get('toggle');
     });
@@ -48,6 +52,8 @@ exports.routes = function (map) {
             users.get('invite', '#inviteForm', {as: 'inviteForm'});
             users.post('invite', '#sendInvites', {as: 'sendInvites'});
             users.post('removeMembers', '#removeMembers', {as: 'removeMembers'});
+            users.post('blacklistMembers', '#blacklistMembers', {as: 'blacklistMembers'});
+            users.post('unblacklistMembers', '#unblacklistMembers', {as: 'unblacklistMembers'});
             users.get('ids', '#ids', {as: 'userIds'});
             users.post(':id/resendinvite', '#resendInvite');
             users.post(':id/remove', '#remove');
