@@ -302,7 +302,9 @@ function loadContent(c, cb) {
         if (typeof filter === 'string' && filter.indexOf("[native code]") === -1) {
             // filter by tag
             if (!isNaN(parseInt(filter, 10))) {
-                cond['tags'] = filter;
+                cond = {
+                    tags: filter
+                }
             }
             // filter by content type
             else {
@@ -320,7 +322,7 @@ function loadContent(c, cb) {
         var search = query.sSearch || c.req.body.search;
         var orderBy = query.iSortCol_0 > 0 ?
             (colNames[query.iSortCol_0] + ' ' + query.sSortDir_0.toUpperCase()) :
-            'createdAt DESC';
+            null;
        
         // count the total number of records so that we can show count before filter
         c.Content.count(cond, function(err, count) {

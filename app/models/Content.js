@@ -20,6 +20,7 @@ module.exports = function (compound, Content) {
     var api = compound.hatch.api;
     var User = compound.models.User;
     var Page = compound.models.Page;
+    var Comment = compound.models.Comment;
 
     var Group = compound.models.Group;
     var redis = Content.schema.adapter;
@@ -27,6 +28,9 @@ module.exports = function (compound, Content) {
     var moment = require('moment');
     var chrono = require('chrono-node');
     var async = require('async');
+
+    // determines the number of comments which are cached with each content item
+    Content.CACHEDCOMMENTS = 3;
 
     Content.validatesPresenceOf('createdAt', 'title', 'text');
 
@@ -470,7 +474,23 @@ module.exports = function (compound, Content) {
         } else {
             return moment(post.createdAt).format('ddd DD MMM YYYY');
         }
+    };
 
+    /**
+     * Update the comments cached on a content record and the total comment 
+     * count.
+     * 
+     * @param  {Number}   contentId - id of the content
+     * @param  {Function} callback  - callback function
+     */
+    Content.updateComments = function (contentId, callback) {
+        Content.find(contentId, function (err, post) {
+            Comment.all({ where: { contentId: post.id }, limit: Content.CACHEDCOMMENTS }, function (err, comments) {
+                post.commentsTotal = post.countBeforeLimit;
+                post.comments = comments;
+                post.save(callback);
+            });
+        });
     };
 };
 
