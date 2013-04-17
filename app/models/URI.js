@@ -39,7 +39,7 @@ module.exports = function (compound) {
 
                 function next() {
                     if (beforeSave) {
-                        beforeSave(done);
+                        beforeSave.call(obj, done);
                     } else {
                         done();
                     }

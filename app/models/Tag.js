@@ -44,7 +44,7 @@ module.exports = function (compound, Tag) {
      * 
      * @param  {Function} next - continuation function
      */
-    Tag.beforeCreate = function (next) {
+    Tag.beforeSave = function (next) {
         if (!this.name) {
             this.name = (this.groupId ? (this.groupId + '-') : '') + slugify(this.title);
         }
@@ -132,6 +132,9 @@ module.exports = function (compound, Tag) {
                 }
 
                 function pushTag(tag) {
+                    // update the tag model
+                    tag.updateModel();
+
                     obj.tags.push({
                         id: tag.id,
                         title: tag.title
@@ -255,7 +258,7 @@ module.exports = function (compound, Tag) {
             return;
         }
 
-        var settings = compound.models[tag.type].schema.settings;
+        var settings = compound.models[tag.type].schema.definitions[tag.type].settings;
         if (!settings.customSort) {
             settings.customSort = {};
         }
