@@ -221,7 +221,10 @@ module.exports = function (compound, Media) {
     };
 
     /**
-     * Upload the files for this media object to S3.
+     * Upload the files for this media object to S3. Replace the Media.uploadToCDN
+     * function with this to turn on uploading to S3 for CDN. You also need to
+     * set the Media.s3 settings object with your AWS credentials and S3 bucket.
+     * See below for required parameters.
      * 
      * @param  {Object}   data     - media creation data
      * @param  {Function} callback - callback function

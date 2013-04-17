@@ -35,11 +35,7 @@ function UploadController(init) {
  * @param  {HttpContext} c - http context
  */
 UploadController.prototype.upload = function (c) {
-    c.compound.hatch.upload.upload(c.req, function (err, urls) {
-        
-        // needed for flash response
-        c.res.contentType('text/html');
-
+    c.Media.createWithRequest(c.req, function (err, media) {
         if (err) {
             return c.send({
                 status: 'error',
@@ -47,17 +43,14 @@ UploadController.prototype.upload = function (c) {
             });
         }
 
-        if (urls.length === 1) {
-            c.send({
-                status: 'success',
-                url: urls[0]
-            });
-        } else {
-            c.send({
-                status: 'success',
-                urls: urls
-            });
-        }
+        // needed for flash response = meh!
+        c.res.contentType('text/html');
+
+        c.send({
+            status: 'success',
+            url: media.url,
+            media: media
+        });
     });
 };
 
