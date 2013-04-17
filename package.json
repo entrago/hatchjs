@@ -35,7 +35,11 @@
     "supertest": "latest",
     "js-yaml": "latest",
     "csv": "~0.3.0",
-    "reds": "~0.2.3"
+    "reds": "~0.2.3",
+    "imagemagick": "latest",
+    "fs-tools": "latest",
+    "knox": "latest",
+    "mime": "latest"
   },
   "devDependencies": {
     "mocha": "1.8.1",

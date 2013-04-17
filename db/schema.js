@@ -1,6 +1,6 @@
 
 var User = define('User', function () {
-    property('username', String, {index: true, sort: true});
+    property('username', String, {index: true, sort: true, fulltext: true});
     property('email', String, {index: true});
     property('type', String, {index: true});
     property('password', String);
@@ -17,8 +17,8 @@ var User = define('User', function () {
     property('following', [], {index: true}); // [] of user.ids followed by user
     property('otherFields', JSON);
     property('mailSettings', JSON);
-    property('fulltext', String);
-    property('tags', [], {index: true});
+    property('fulltext', String, {fulltext: true});
+    property('tags', [], {index: true, fulltext: true});
     property('tagNames', String, {sort: true});
 
     // group membership indexes
@@ -140,6 +140,7 @@ var Content = define('Content', function () {
     property('poll', JSON);
     property('location', JSON);
     property('comments', [], {fulltext: true });
+    property('commentsTotal', Number);
     property('repliesTotal', Number, {index: true, sort: true });
     property('likes', []);
     property('dislikes', []);
@@ -166,6 +167,18 @@ var Content = define('Content', function () {
     set('defaultSort', 'createdAt DESC');
 });
 
+var Comment = define('Comment', function () {
+    property('text', String, {fulltext: true});
+    property('contentId', Number, {index: true});
+    property('authorId', Number, {index: true});
+    property('createdAt', Date, {sort: true});
+    property('likes', []);
+    property('flags', []);
+    property('hasFlag', Boolean, {index: true});
+
+    set('defaultSort', 'createdAt');
+});
+
 Content.schema.adapter.defineFulltextIndex('Content', 'fulltext');
 
 var ContentFeedItem = define('ContentFeedItem', function () {
@@ -180,8 +193,12 @@ var ContentFeedItem = define('ContentFeedItem', function () {
 var Media = define('Media', function () {
     property('type', String, {index: true});
     property('userId', Number, {index: true});
-    property('createdAt', Date, {index: true, sort: true});
+    property('createdAt', Date);
     property('url', String);
+    property('width', Number);
+    property('height', Number);
+    property('resized', []);
+    property('encodingKey', String, {index: true});
 
     set('ignoreNullValues', true);
     set('defaultSort', 'createdAt DESC');
