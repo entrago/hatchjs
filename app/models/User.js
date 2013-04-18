@@ -560,21 +560,21 @@ module.exports = function (compound, User) {
                         user.destroy();
 
                         // transfer the ownership of the invitation
-                        state = 'approved';
+                        state = 'accepted';
                         requested = false;
                     }
                 });
             }
 
             // if we weren't able to find an invitation, cancel out
-            if (state !== 'approved' && group.joinPermissions === 'closed') {
+            if (state !== 'accepted' && group.joinPermissions === 'closed') {
                 return callback();
             }
         }
 
         // group:free - automatically join
         if (group.joinPermissions === 'free') {
-            state = 'approved';
+            state = 'accepted';
         }
 
         if (membership) {
@@ -583,7 +583,7 @@ module.exports = function (compound, User) {
             if (membership.state === 'pending') {
                 // if there is already an invite - approve
                 if (!membership.requested) {
-                    state = 'approved';
+                    state = 'accepted';
                 } 
                 // if there is already a request to join - do nothing
                 else {
@@ -776,7 +776,10 @@ module.exports = function (compound, User) {
             return membership.groupId == group.id;
         });
 
-        if(!membership) {
+        console.log(membership)
+
+        // non-members or not-accepted members - return false
+        if(!membership || membership.state !== 'accepted') {
             return callback(null, false);
         }
         // special case for 'view' permission - only need to be a member
