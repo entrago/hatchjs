@@ -69,6 +69,15 @@ module.exports = function (compound, Content) {
     };
 
     /**
+     * Get whether this content has been flagged.
+     * 
+     * @return {Boolean}
+     */
+    Content.getter.hasFlag = function () {
+        return this.flags.length > 0;
+    };
+
+    /**
      * gets the timestamp for this content
      * 
      * @return {[Number]}
@@ -434,7 +443,7 @@ module.exports = function (compound, Content) {
     Content.prototype.doesLike = function(user) {
         if(!user) return false;
         var id = user.id || user;
-        return this.likes.find(function(r) { return r.userId == id });
+        return this.likes.find(id, 'userId');
     };
 
     /**
@@ -446,7 +455,7 @@ module.exports = function (compound, Content) {
     Content.prototype.doesDislike = function(user) {
         if(!user) return false;
         var id = user.id || user;
-        return this.dislikes.find(function(r) { return r.userId == id });
+        return this.dislikes.find(id, 'userId');
     };
 
     /**
@@ -477,6 +486,25 @@ module.exports = function (compound, Content) {
     };
 
     /**
+     * Post a comment on this content item.
+     * 
+     * @param  {Number}   authorId - id of the author
+     * @param  {String}   text     - comment text
+     * @param  {Function} callback - callback function
+     */
+    Content.prototype.postComment = function (authorId, text, callback) {
+        var data = {
+            contentId: this.id,
+            groupId: this.groupId,
+            authorId: authorId,
+            createdAt: new Date(),
+            text: text
+        };
+
+        Comment.create(data, callback);
+    };
+
+    /**
      * Update the comments cached on a content record and the total comment 
      * count.
      * 
@@ -486,11 +514,78 @@ module.exports = function (compound, Content) {
     Content.updateComments = function (contentId, callback) {
         Content.find(contentId, function (err, post) {
             Comment.all({ where: { contentId: post.id }, limit: Content.CACHEDCOMMENTS }, function (err, comments) {
-                post.commentsTotal = post.countBeforeLimit;
-                post.comments = comments;
+                post.commentsTotal = comments.countBeforeLimit;
+                while (post.comments.items.length > 0) {
+                    post.comments.items.remove(post.comments.items[0]);
+                }
+                comments.forEach (function (comment) {
+                    if (comment.id) {
+                        post.comments.push(comment.toObject());
+                    }
+                });
                 post.save(callback);
             });
         });
+    };
+
+    /**
+     * Like or unlike a content item.
+     * 
+     * @param  {User}     user     - user performing the like
+     * @param  {Function} callback - callback function
+     */
+    Content.prototype.like = function (user, callback) {
+        if (this.likes.find(user.id, 'userId')) {
+            this.likes.remove(this.likes.find(user.id, 'userId'));
+        } else {
+            this.likes.push({
+                userId: user.id,
+                username: user.username,
+                createdAt: new Date()
+            });
+        }
+
+        this.save(callback);
+    };
+
+    /**
+     * Dislike or un-dislike a content item.
+     * 
+     * @param  {User}     user     - user performing the dislike
+     * @param  {Function} callback - callback function
+     */
+    Content.prototype.dislike = function (user, callback) {
+        if (this.dislikes.find(user.id, 'userId')) {
+            this.dislikes.remove(this.dislikes.find(user.id, 'userId'));
+        } else {
+            this.dislikes.push({
+                userId: user.id,
+                username: user.username,
+                createdAt: new Date()
+            });
+        }
+
+        this.save(callback);
+    };
+
+    /**
+     * Flag or unflag a content item.
+     * 
+     * @param  {User}     user     - user performing the flag
+     * @param  {Function} callback - callback function
+     */
+    Content.prototype.flag = function (user, callback) {
+        if (this.flags.find(user.id, 'userId')) {
+            this.flags.remove(this.flags.find(user.id, 'userId'));
+        } else {
+            this.flags.push({
+                userId: user.id,
+                username: user.username,
+                createdAt: new Date()
+            });
+        }
+
+        this.save(callback);
     };
 };
 

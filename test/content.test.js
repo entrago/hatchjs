@@ -11,7 +11,7 @@ describe('Content', function() {
         });
     });
 
-    it('should create content with some score', function(done) {
+    it('should create content with some score', function (done) {
         Content.create({
             createdAt: new Date,
             title: 'Hello',
@@ -26,4 +26,32 @@ describe('Content', function() {
         });
     });
 
+    it('should like a comment', function (done) {
+        Content.create({
+            createdAt: new Date,
+            title: 'Hello',
+            text: 'World'
+        }, function(err, content) {
+            content.like({ username: 'test_user', id: 1 }, function (err, content) {
+                content.likes.length.should.equal(1);
+                content.doesLike({ id: 1 }).should.be.ok;
+                done();
+            });
+        });
+    });
+
+    it('should flag a comment', function (done) {
+        Content.create({
+            createdAt: new Date,
+            title: 'Hello',
+            text: 'World'
+        }, function(err, content) {
+            content.flag({ username: 'test_user', id: 1 }, function (err, content) {
+                content.flags.length.should.equal(1);
+                content.hasFlag.should.be.ok;
+                done();
+            });
+        });
+    });
+    
 });

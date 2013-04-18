@@ -90,7 +90,7 @@
         groupId: 1
         role: owner
         joinedAt: "2000-01-01T00:00:01.000Z"
-        state: approved
+        state: accepted
 - User:
     id: 2
     username: user102

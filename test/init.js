@@ -17,5 +17,10 @@ if (!process.env.TRAVIS) {
 
 global.getApp = function() {
     var app = require('../')();
+    
+    app.compound.on('ready', function () {
+        app.enable('quiet');
+    });
+
     return app;
 };

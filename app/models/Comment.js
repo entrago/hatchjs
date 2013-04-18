@@ -49,7 +49,7 @@ module.exports = function (compound, Comment) {
      * @param  {Function} next - callback function
      */
     Comment.afterSave = function (next) {
-        Content.updateComments(this.contentId);
+        Content.updateComments(this.contentId, next);
     };
 
     /**
@@ -58,6 +58,46 @@ module.exports = function (compound, Comment) {
      * @param  {Function} next - callback function
      */
     Comment.afterDestroy = function (next) {
-        Content.updateComments(this.contentId);
+        Content.updateComments(this.contentId, next);
+    };
+
+    /**
+     * Like or unlike a comment.
+     * 
+     * @param  {User}     user     - user performing the like
+     * @param  {Function} callback - callback function
+     */
+    Comment.prototype.like = function (user, callback) {
+        if (this.likes.find(user.id, 'userId')) {
+            this.likes.remove(this.likes.find(user.id, 'userId'));
+        } else {
+            this.likes.push({
+                userId: user.id,
+                username: user.username,
+                createdAt: new Date()
+            });
+        }
+
+        this.save(callback);
+    };
+
+    /**
+     * Flag or unflag a comment.
+     * 
+     * @param  {User}     user     - user performing the flag
+     * @param  {Function} callback - callback function
+     */
+    Comment.prototype.flag = function (user, callback) {
+        if (this.flags.find(user.id, 'userId')) {
+            this.flags.remove(this.flags.find(user.id, 'userId'));
+        } else {
+            this.flags.push({
+                userId: user.id,
+                username: user.username,
+                createdAt: new Date()
+            });
+        }
+
+        this.save(callback);
     };
 };

@@ -144,6 +144,8 @@ var Content = define('Content', function () {
     property('repliesTotal', Number, {index: true, sort: true });
     property('likes', []);
     property('dislikes', []);
+    property('flags', []);
+    property('hasFlag', Boolean, {index: true});
     property('likesTotal', Number, {index: true, sort: true });
     property('views', Number, {index: true, sort: true });
     property('score', Number, {index: true, sort: true });
@@ -169,6 +171,7 @@ var Content = define('Content', function () {
 
 var Comment = define('Comment', function () {
     property('text', String, {fulltext: true});
+    property('groupId', Number, {index: true});
     property('contentId', Number, {index: true});
     property('authorId', Number, {index: true});
     property('createdAt', Date, {sort: true});
