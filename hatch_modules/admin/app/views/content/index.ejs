@@ -15,7 +15,7 @@
                         <ul class="dropdown-menu">
                             <li><%- linkTo(icon('remove') + t('content.actions.delete'),
                                 pathTo.destroySelectedContent,
-                                {rel: 'multiAjaxLink'}) %></li>
+                                {rel: 'multiAjaxLink', method: 'DELETE'}) %></li>
                         </ul>
                     </div>
 
