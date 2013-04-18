@@ -27,11 +27,51 @@ module.exports = function (compound, Media) {
     var fsTools = require('fs-tools');
     var knox = require('knox');
     var mime = require('mime');
+    var _ = require('underscore');
 
     /**
-     * Create a new media object from an HttpRequest. Can either accept request
-     * files or req.body/query.file as a URL, in which case we download the file
-     * to local storage.
+     * Create a new media object with a URL of a file on the web. The file will
+     * be downloaded to disk before a new media object is created.
+     * 
+     * @param  {String}   url      - URL of the original file
+     * @param  {Object}   params   - additional creation params
+     * @param  {Function} callback - callback function
+     */
+    Media.createWithUrl = function (url, params, callback) {
+        var uploadPath = compound.app.get('upload path');
+        var filename = path.join(uploadPath, new Date().getTime() + '-' + url.split('/').slice(-1)[0]);
+
+        request.get(url, function (err, resp, body) {
+            Media.createWithFilename(filename, params, callback);
+        }).pipe(fs.createWriteStream(filename));
+    };
+
+    /**
+     * Create a new media object from an HttpRequest files collection.
+     * 
+     * @param  {Object}   files    - http request files collection
+     * @param  {Object}   params   - additional creation params
+     * @param  {Function} callback - callback function
+     */
+    Media.createWithFiles = function (files, params, callback) {
+        var uploadPath = compound.app.get('upload path');
+        var file = files[Object.keys(files)[0]];
+        var filename = file.path;
+        var filePath = filename.split('/').slice(0, -1).join('/');
+
+        // move the file to the upload path if it's not already there
+        if (uploadPath.indexOf(filePath) === -1) {
+            var newFilename = path.join(uploadPath, new Date().getTime() + '-' + filename.split('/').slice(-1)[0]);
+            fsTools.move(filename, newFilename, function (err) {
+                Media.createWithFilename(newFilename, params, callback);
+            });
+        } else {
+            Media.createWithFilename(filename, params, callback);
+        }
+    };
+
+    /**
+     * Create a new media object from a filename. 
      *
      * If the file is an image, it will be resized to the standard image sizes
      * before creating the media object.
@@ -39,63 +79,35 @@ module.exports = function (compound, Media) {
      * If there is a uploadToCDN function defined, this will be called to upload
      * the file to CDN storage before creating the media object.
      * 
-     * @param  {[type]}   req      [description]
-     * @param  {Function} callback [description]
-     * @return {[type]}            [description]
+     * @param  {String}   filename - filename of the file to create with
+     * @param  {Object}   params   - additional creation params
+     * @param  {Function} callback - callback function
      */
-    Media.createWithRequest = function (req, callback) {
-        var uploadPath = compound.app.get('upload path');
+    Media.createWithFilename = function (filename, params, callback) {
+        var data = {
+            filename: filename
+        };
 
-        // check the request files collection or fall back to body/querystring
-        if(req.files && req.files.length > 0) {
-            var file = req.files[Object.keys(req.files)[0]];
-            var filename = file.path;
-            var filePath = filename.split('/').slice(0, -1).join('/');
+        data = _.extend(data, params);
 
-            // move the file to the upload path if it's not already there
-            if (uploadPath.indexOf(filePath) === -1) {
-                var newFilename = path.join(uploadPath, new Date().getTime() + '-' + filename.split('/').slice(-1)[0]);
-                fsTools.move(filename, newFilename, function (err) {
-                    handleFile(newFilename);
+        // if this is an image, resize to the standard dimensions
+        if (Media.isImage(filename)) {
+            // but first work out the original image dimension
+            im.identify(filename, function (err, features) {
+                data.width = features.width;
+                data.height = features.height;
+
+                // now resize the image
+                Media.resizeImage(data, function (err, data) {
+                    if (err) {
+                        return callback(err);
+                    } else {
+                        upload(data);
+                    }
                 });
-            } else {
-                handleFile(filename);
-            }
+            });
         } else {
-            // download the file to disk before manipulation
-            var url = req.body.file || req.query.file;
-            var filename = path.join(uploadPath, new Date().getTime() + '-' + url.split('/').slice(-1)[0]);
-            request.get(url, function (err, resp, body) {
-                handleFile(filename);
-            }).pipe(fs.createWriteStream(filename));
-        }
-
-        function handleFile(filename) {
-            var data = {
-                filename: filename,
-                authorId: req.user && req.user.id
-                groupId: req.group && req.group.id
-            };
-
-            // if this is an image, resize to the standard dimensions
-            if (Media.isImage(filename)) {
-                // but first work out the original image dimension
-                im.identify(filename, function(err, features) {
-                    data.width = features.width;
-                    data.height = features.height;
-
-                    // now resize the image
-                    Media.resizeImage(data, function (err, data) {
-                        if (err) {
-                            return callback(err);
-                        } else {
-                            upload(data);
-                        }
-                    });
-                });
-            } else {
-                upload(data);
-            }
+            upload(data);
         }
 
         function upload(data) {
@@ -169,11 +181,11 @@ module.exports = function (compound, Media) {
                 dstPath: resizeFilename,
                 width: width,
                 height: height
-            }, function(err, stdout, stderr){
+            }, function (err, stdout, stderr) {
                 if (err) {
                     return done(err);
                 } else {
-                    im.identify(resizeFilename, function(err, features) {
+                    im.identify(resizeFilename, function (err, features) {
                         data.resized.push({
                             size: size,
                             width: features.width,
@@ -201,6 +213,8 @@ module.exports = function (compound, Media) {
      * @return {String}      - URL for the resized image
      */
     Media.prototype.getUrl = function (size) {
+        var i;
+
         if (!this.resized.length) {
             return this.url;
         }
@@ -209,7 +223,7 @@ module.exports = function (compound, Media) {
         var height = parseInt(size.split('x')[1] || 0);
 
         // check for larger/equal images
-        for (var i=0; i<this.resized.length; i++) {
+        for (i=0; i < this.resized.length; i++) {
             var resize = this.resized.items[i];
             if (resize.width >= width && resize.height >= height) {
                 return this.url.split('/').slice(0, -1).join('/') + '/' + resize.filename;
@@ -252,7 +266,7 @@ module.exports = function (compound, Media) {
         files.push(data.filename);
 
         async.forEach(files, function (filename, done) {
-            client.putFile(filename, (settings.path && (settings.path.split('/')[0] + '/') || '/') + filename.split('/').slice(-1)[0], params, function(err, res) {
+            client.putFile(filename, (settings.path && ((settings.path.split('/')[0] + '/') || '/')) + filename.split('/').slice(-1)[0], params, function(err, res) {
                 if (err) {
                     return callback(err);
                 }
