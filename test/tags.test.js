@@ -15,60 +15,59 @@ describe('tags', function() {
     });
 
     it('should get all content tagged with "popular" sorted by "score desc"', function (done) {
-        Content.schema.definitions.Content.settings.customSort = {
-            'tags.popular': 'score'
-        };
         var Tag = compound.models.Tag;
 
         //setup
         var popular = new Tag({
+            groupId: 1,
+            count: 0,
             type: 'Content',
             name: 'popular',
             title: 'Most popular posts',
-            sortOrder: 'createdAt'
+            sortOrder: 'score DESC'
         });
 
-        popular.save();
+        popular.save(function () {
+            popular.updateModel();    
 
-        popular.updateModel();
-
-        Content.create({
-            createdAt: new Date(),
-            title: 'test 1',
-            text: 'blah blah',
-            groupId: 1,
-            url: 'one',
-            // score: 2,
-            likes: Array(4),
-            tags: [ 'popular', 'test' ]
-        }, function (err, content) {
             Content.create({
                 createdAt: new Date(),
                 title: 'test 1',
                 text: 'blah blah',
                 groupId: 1,
-                url: 'three',
-                // score: 3,
-                likes: Array(6),
-                tags: [ 'popular' ]
-            }, function () {
+                url: 'one',
+                // score: 2,
+                likes: Array(4),
+                tags: [ popular.id ]
+            }, function (err, content) {
                 Content.create({
                     createdAt: new Date(),
                     title: 'test 1',
                     text: 'blah blah',
-                    url: 'two',
-                    // score: 1,
-                    likes: Array(2),
-                    tags: [ 'popular' ]
+                    groupId: 1,
+                    url: 'three',
+                    // score: 3,
+                    likes: Array(6),
+                    tags: [ popular.id ]
                 }, function () {
-                    Content.all({where: {tags: 'popular'}, reverse: true}, function (e, c) {
+                    Content.create({
+                        createdAt: new Date(),
+                        title: 'test 1',
+                        text: 'blah blah',
+                        url: 'two',
+                        // score: 1,
+                        likes: Array(2),
+                        tags: [ popular.id ]
+                    }, function () {
+                        Content.all({where: {tags: popular.id}}, function (e, c) {
 
-                        c.length.should.equal(3);
-                        c[0].score.should.equal(3);
-                        c[1].score.should.equal(2);
-                        c[2].score.should.equal(1);
+                            c.length.should.equal(3);
+                            c[0].score.should.equal(3);
+                            c[1].score.should.equal(2);
+                            c[2].score.should.equal(1);
 
-                        done();
+                            done();
+                        });
                     });
                 });
             });
@@ -81,13 +80,16 @@ describe('tags', function() {
 
         var moreThan5Likes = new Tag({
             type: 'Content',
+            count: 0,
             name: 'more-5-likes',
             title: 'Content with more than 5 likes',
-            sortOrder: 'likesTotal',
+            sortOrder: 'likesTotal DESC',
             filter: 'return obj.likesTotal > 5'
         });
 
-        moreThan5Likes.save(function() {
+        moreThan5Likes.save(function(err, moreThan5Likes) {
+            moreThan5Likes.updateModel();
+
             var content = new Content({
                 createdAt: new Date(),
                 title: 'likes 5',
@@ -98,10 +100,10 @@ describe('tags', function() {
                 likes: Array(10)
             });
             Tag.applyMatchingTags(content, function() {
-                content.tags.items[0].id.should.equal('more-5-likes');
+                content.tags.find(moreThan5Likes.id, 'id').id.should.equal(moreThan5Likes.id);
 
                 Content.create(content, function (err, content) {
-                    Content.all({where: {tags: 'more-5-likes'}}, function (err, posts) {
+                    Content.all({where: {tags: moreThan5Likes.id}}, function (err, posts) {
 
                         posts.length.should.equal(1);
                         posts[0].url.should.equal('hey');

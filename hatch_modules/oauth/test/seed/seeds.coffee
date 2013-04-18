@@ -6,7 +6,7 @@ User.seed ->
 
 Group.seed ->
     id: 1001
-    title: 'OAuth test group'
+    name: 'OAuth test group'
     url: '127.0.0.1:3456'
     homepage:
         id: 1001

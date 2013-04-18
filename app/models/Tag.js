@@ -520,9 +520,15 @@ module.exports = function (compound, Tag) {
      */
     Tag.applyMatchingTags = function (obj, callback) {
         Tag.getMatchingTags(obj, function (err, tags) {
+            console.log('MATCHING TAGS')
+            console.log(tags)
+
             tags.forEach(function (tag) {
-                if (!obj.tags[tag.name]) {
-                    obj.tags.push(tag.name);
+                if (!obj.tags.find[tag.id, 'id']) {
+                    obj.tags.push({
+                        id: tag.id,
+                        title: tag.title
+                    });
                 }
             });
 
