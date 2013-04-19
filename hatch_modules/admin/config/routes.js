@@ -32,8 +32,10 @@ exports.routes = function (map) {
             items.del('destroyAll', {as: 'destroySelectedContent'});
             items.get('new/:type', '#new', {as: 'newContentForm'});
             items.get('ids', '#ids', {as: 'contentIds'});
+            items.post(':id/unflag', '#clearFlags', {as: 'unflag'});
             items.get('moderation/load', 'moderation#load', {as: 'loadModeration'})
             items.get('moderation/:type.:format?', 'moderation#index', {as: 'moderation'})
+            items.get('moderation/ids', 'moderation#ids', {as: 'moderationIds'})
         });
     });
 

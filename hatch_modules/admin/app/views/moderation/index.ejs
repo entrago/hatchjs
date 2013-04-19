@@ -15,7 +15,7 @@
                             'data-toggle': 'dropdown'}) %>
                         <ul class="dropdown-menu">
                             <li><%- linkTo(icon('remove') + t('content.actions.delete'),
-                                pathTo.destroySelectedContent,
+                                pathTo.destroySelectedContent + '?type=' + type,
                                 {rel: 'multiAjaxLink', method: 'DELETE'}) %></li>
                         </ul>
                     </div>
@@ -117,7 +117,7 @@
                 $("#content-table tbody input[type=checkbox]").attr("checked", true);
 
                 // reset the selected content array with only the "all" value
-                $.ajax('<%- pathTo.contentIds %>?type=<%- type %>&sSearch=' + $('#content-table_filter input').val(), {
+                $.ajax('<%- pathTo.moderationIds %>?type=<%- type %>&sSearch=' + $('#content-table_filter input').val(), {
                     success: function (data) {
                         window.selectedContent = data.ids;        
                     }
@@ -204,7 +204,7 @@
                         var content = obj.aData;
                         var html = '<div class="pull-right">';
 
-                        html += '<a href="<%- pathTo.content %>/' + content.id + '/unflag" rel="tooltip" title="Unflag"><i class="icon-ok"></i></a>';
+                        html += '<a href="<%- pathTo.content %>/' + content.id + '/unflag" data-remote="true" data-success="Unflagged" rel="tooltip" title="Unflag"><i class="icon-ok"></i></a>';
                         html += ' &nbsp;<a href="<%- pathTo.content %>/' + content.id + '" data-remote="true" data-method="DELETE" data-confirm="<%= t('content.actions.destroyConfirm') %>" rel="tooltip" title="<%- t('content.actions.destroy') %>" data-success="<%= t('content.actions.destroyed') %>"><i class="icon-remove"></i></a>';
                         html += ' &nbsp;<a href="<%- pathTo.content %>/' + content.id + '/ban" rel="tooltip" title="Delete and blacklist author"><i class="icon-ban-circle"></i></a>';
 

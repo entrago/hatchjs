@@ -32,32 +32,7 @@ function ModerationController(init) {
 
 require('util').inherits(ModerationController, Content);
 
-/**
- * Show the content or comments moderation index. This displays all of the posts
- * that have been flagged for moderation by users.
- * 
- * @param  {HttpContext} c - http context
- */
-ModerationController.prototype.index = function (c) {
-    this.pageName = 'moderation-' + c.req.params.type;
-    this.type = c.req.query.type || c.req.params.type;
-    
-    c.render();
-};
-
-ModerationController.prototype.load = function (c) {
-    c.type = c.req.query.type;
-
-    loadContentOrComments(c, function(posts) {
-        c.send({
-            sEcho: c.req.query.sEcho || 1,
-            iTotalRecords: posts.count,
-            iTotalDisplayRecords: posts.countBeforeLimit || 0,
-            aaData: posts
-        });
-    });
-};
-
+// loads all of the content or comments for this controller
 function loadContentOrComments (c, callback) {
     if (c.type === 'comments') {
         var cond = {
@@ -125,3 +100,51 @@ function loadContentOrComments (c, callback) {
         });
     }
 }
+
+/**
+ * Show the content or comments moderation index. This displays all of the posts
+ * that have been flagged for moderation by users.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+ModerationController.prototype.index = function (c) {
+    this.pageName = 'moderation-' + c.req.params.type;
+    this.type = c.req.query.type || c.req.params.type;
+    
+    c.render();
+};
+
+ModerationController.prototype.load = function (c) {
+    c.type = c.req.query.type;
+
+    loadContentOrComments(c, function(posts) {
+        c.send({
+            sEcho: c.req.query.sEcho || 1,
+            iTotalRecords: posts.count,
+            iTotalDisplayRecords: posts.countBeforeLimit || 0,
+            aaData: posts
+        });
+    });
+};
+
+/**
+ * Return only the IDs for a search query. This is used when a user clicks the
+ * 'select all' checkbox so that we can get ALL of the ids of the content rather
+ * than just the ids of the content on the current page of results.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+ModerationController.prototype.ids = function ids(c) {
+    this.filterBy = c.req.query.filterBy || c.req.params.filterBy;
+    var suffix = 'string' === typeof this.filterBy ? '-' + this.filterBy : '';
+    this.pageName = 'content' + suffix;
+
+    c.req.query.limit = 1000000;
+    c.req.query.offset = 0;
+
+    loadContentOrComments(c, function(err, posts) {
+        c.send({
+            ids: _.pluck(posts, 'id')
+        });
+    });
+};

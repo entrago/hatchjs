@@ -115,11 +115,11 @@ function loadContent(c, callback) {
 function findContent (c) {
     var self = this;
     var id = c.req.params.id || c.req.body.id || c.req.query.id;
-    var type = c.req.params.type || c.req.body.type || c.req.query.type || 'Content';
+    var type = (c.req.params.type || c.req.body.type || c.req.query.type || 'Content').toLowerCase();
 
     if (id) {
         // find the comment or content item for this action
-        if (type.toLowerCase() === 'comment') {
+        if (type === 'comment' || type === 'comments') {
             c.Comment.find(id, function (err, post) {
                 this.post = c.locals.post = post;
                 c.next();
@@ -333,30 +333,52 @@ ContentController.prototype.destroyAll = function(c) {
     var group = c.req.group;
     var selectedContent = c.body.selectedContent || [];
     var count = 0;
+    var type = (c.req.params.type || c.req.body.type || c.req.query.type || 'Content').toLowerCase();
 
-    async.forEach(selectedContent, function(id, next) {
-        Content.find(id, function(err, content) {
-            if (!content) {
-                return next();
-            }
+    if (type === 'comment' || type === 'comments') {
+        async.forEach(selectedContent, function(id, next) {
+            Comment.find(id, function(err, comment) {
+                if (!comment) {
+                    return next();
+                }
 
-            content.destroy(function(err) {
-                count++;
-                next();
+                comment.destroy(function(err) {
+                    count++;
+                    next();
+                });
+            });
+        }, function () {
+            c.send({
+                message: count + ' comments deleted',
+                status: 'success',
+                icon: 'ok'
             });
         });
-    }, function() {
-        // finally, update the group tag counts
-        c.locals.tags.forEach(function (tag) {
-            tag.updateCount();
-        });
+    } else {
+        async.forEach(selectedContent, function(id, next) {
+            Content.find(id, function(err, content) {
+                if (!content) {
+                    return next();
+                }
 
-        c.send({
-            message: count + ' posts deleted',
-            status: 'success',
-            icon: 'ok'
+                content.destroy(function(err) {
+                    count++;
+                    next();
+                });
+            });
+        }, function() {
+            // finally, update the group tag counts
+            c.locals.tags.forEach(function (tag) {
+                tag.updateCount();
+            });
+
+            c.send({
+                message: count + ' posts deleted',
+                status: 'success',
+                icon: 'ok'
+            });
         });
-    });
+    }
 };
 
 /**
@@ -364,8 +386,8 @@ ContentController.prototype.destroyAll = function(c) {
  * 
  * @param  {HttpContext} c - http context
  */
-ContentController.prototype.removeFlags = function (c) {
-    post.removeFlags(function (err, post) {
+ContentController.prototype.clearFlags = function (c) {
+    post.clearFlags(function (err, post) {
         c.send({
             message: 'Flags removed',
             status: 'success',
