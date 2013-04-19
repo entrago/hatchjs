@@ -39,7 +39,8 @@ function loadMemberRoles(c) {
     c.locals.memberRoles = [
         { name: 'members', icon: 'user', filter: 'member' },
         { name: 'editors', icon: 'star', filter: 'editor' },
-        { name: 'pending', icon: 'time', filter: 'pending' }
+        { name: 'pending', icon: 'time', filter: 'pending' },
+        { name: 'blacklisted', icon: 'flag', filter: 'blacklisted' }
     ];
     c.next();
 }

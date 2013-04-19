@@ -79,7 +79,7 @@ module.exports = function (compound, User) {
 
     /**
      * Get an array of ids for all groups this user is a member of with any
-     * state (member, pending, editor).
+     * state/role (member, pending, editor).
      * 
      * @return {Array} - an array of group ids
      */
@@ -88,7 +88,7 @@ module.exports = function (compound, User) {
     };
 
     /**
-     * Get an array of ids for all groups this user is a member of with state
+     * Get an array of ids for all groups this user is a member of with role
      * of 'member'.
      * 
      * @return {Array} - an array of group ids
@@ -108,7 +108,7 @@ module.exports = function (compound, User) {
     };
 
     /**
-     * Get an array of ids for all groups this user is a member of with state
+     * Get an array of ids for all groups this user is a member of with role
      * of 'editor'.
      * 
      * @return {Array} - an array of group ids
@@ -125,6 +125,16 @@ module.exports = function (compound, User) {
      */
     User.getter.inviteGroupId = function() {
         return getMembershipIndex(this, 'pending', 'invitationCode');
+    };
+
+    /**
+     * Get an array of ids for all groups this user is a member of with state
+     * of 'blacklisted'.
+     * 
+     * @return {Array} - an array of group ids
+     */
+    User.getter.blacklistedGroupId = function() {
+        return getMembershipIndex(this, 'blacklisted');
     };
 
     /**
@@ -648,7 +658,8 @@ module.exports = function (compound, User) {
      */
     User.prototype.setMembershipState = function (groupId, state, callback) {
         var membership = this.memberships.find(groupId, 'groupId');
-        if (membership) {
+        // don't set the state for owner - their state cannot be changed
+        if (membership && membership.role !== 'owner') {
             membership.state = state;
         }
         this.save(callback);

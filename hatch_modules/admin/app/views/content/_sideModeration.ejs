@@ -1,0 +1,11 @@
+<li class="nav-header"><%= t('content.header.moderation') %></li>
+
+<%- li('moderation-content') %>
+    <%- linkTo(icon('star') + t('moderation.content'),
+        pathTo.moderation('content')) %>
+<%- liEnd %>
+
+<%- li('moderation-comments') %>
+    <%- linkTo(icon('comments') + t('moderation.comments'),
+        pathTo.moderation('comments')) %>
+<%- liEnd %>

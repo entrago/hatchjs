@@ -26,6 +26,7 @@ var User = define('User', function () {
     property('memberGroupId', JSON, {index: true});
     property('pendingGroupId', JSON, {index: true});
     property('editorGroupId', JSON, {index: true});
+    property('blacklistedGroupId', JSON, {index: true});
     property('inviteGroupId', JSON, {index: true});
 
     set('ignoreNullValues', true);

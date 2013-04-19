@@ -35,7 +35,12 @@ function UploadController(init) {
  * @param  {HttpContext} c - http context
  */
 UploadController.prototype.upload = function (c) {
-    c.Media.createWithRequest(c.req, function (err, media) {
+    var params = {
+        groupId: c.req.group.id,
+        authorId: c.req.user && c.req.user.id
+    };
+
+    c.Media.createWithFiles(c.req.files, params, function (err, media) {
         if (err) {
             return c.send({
                 status: 'error',

@@ -69,6 +69,9 @@ function loadMembers(c, next) {
         case 'pending':
             cond.pendingGroupId = c.req.group.id;
             break;
+        case 'blacklisted':
+            cond.blacklistedGroupId = c.req.group.id;
+            break;
         case 'all':
             cond.membershipGroupId = c.req.group.id;
             break;

@@ -26,7 +26,7 @@
         <link rel="stylesheet" href="/javascripts/redactor/redactor.css" />
     <% } %>
 </head>
-<body class="navbar-fixed">
+<body class="navbar-fixed-not">
     
     <div id="all">
     <% } else { %>
@@ -34,9 +34,9 @@
         <title><%- t(['admin.title', group.name]) %></title>
     <% } %>
 
-    <div class="navbar navbar-fixed-top">
+    <div class="navbar navbar-fixed-top-not">
         <div class="navbar-inner">
-            <div class="container">
+            <div class="container-fluid">
                 <div class="navbar-container">
                     <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                         <span class="icon-bar"></span>
@@ -57,7 +57,7 @@
                                     <%= user.displayName || user.username || user.email %>
                                     <b class="caret"></b>
                                 </a>
-                                <ul class="dropdown-menu">
+                                <ul class="dropdown-menu pull-right">
                                     <li><%- linkTo(icon('user') + t('user.viewProfile'), specialPagePath('profile', { username: req.user.username })) %></li>
                                     <li><%- linkTo(icon('cogs') + t('user.editAccont'), specialPagePath('account')) %></a></li>
                                     <li class="divider"></li>
@@ -74,7 +74,7 @@
     </div>
 
     <div id="header-content">
-        <div class="container">
+        <div class="container-fluid">
             <% tabs = _.sortBy(tabs, 'rank'); %>
 
             <header class="jumbotron subhead" id="overview" xmlns="http://www.w3.org/1999/html">
@@ -98,7 +98,7 @@
         </div>
     </div>
 
-    <div class="container">
+    <div class="container-fluid">
         <div id="row-content">
             <%- body %>
         </div>

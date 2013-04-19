@@ -9,7 +9,6 @@ en:
   tabs:
     users: Community
     content: Content
-    moderation: Moderation
     pages: Pages
     group: Settings
     modules: Modules
@@ -22,6 +21,7 @@ en:
     members: Members
     editors: Editors
     pending: Pending
+    blacklisted: Blacklisted
     actions:
       addTag: Add tag
       removeTag: Remove tag
@@ -39,14 +39,16 @@ en:
       destroy: Delete
       destroyConfirm: Are you sure you wish to delete this post?
       destroyed: post deleted
-
     header:
       actions: Actions
       filter: Filter
       tags: Tags
+      moderation: Moderation
     tableHead:
       title: Content
+      text: Text
       tags: Tags
+      flags: Flags
       createdAt: Publish date
       popularity: Popularity
       actions: Actions
@@ -59,6 +61,9 @@ en:
     imported: Imported posts
     manageTags: Manage tags
     newblogpost: New blog post
+  moderation:
+    content: Content
+    comments: Comments
   post:
     actions:
       publish: Publish post

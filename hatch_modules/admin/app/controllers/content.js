@@ -29,6 +29,11 @@ module.exports = ContentController;
 function ContentController(init) {
     Application.call(this, init);
     init.before(loadTags);
+    init.before(findContent);
+    init.before(function (c) {
+        this.sectionName = 'content';
+        c.next();
+    });
 }
 
 require('util').inherits(ContentController, Application);
@@ -60,6 +65,76 @@ function renderInputForm(c, next) {
     });
 }
 
+// Load content based on the current filter/critera
+function loadContent(c, callback) {
+    var cond = {
+        groupId: c.req.group.id
+    };
+
+    // filter by tag or content type
+    var filterBy = c.req.query.filterBy || c.req.body.filterBy;
+    if (filterBy) {
+        if (!isNaN(parseInt(filterBy, 10))) {
+            cond = {
+                tags: filterBy
+            }
+        } else {
+            cond.type = filterBy;
+        }
+    }
+    
+    var query = c.req.query;
+    var limit = parseInt(query.iDisplayLength || query.limit || 10, 10);
+    var offset = parseInt(query.iDisplayStart || query.offset || 0, 10);
+    var colNames = ['', 'title', 'tagNames', 'createdAt', 'score', ''];
+    var search = query.sSearch || c.req.body.search;
+    var orderBy = query.iSortCol_0 > 0 ?
+        (colNames[query.iSortCol_0] + ' ' + query.sSortDir_0.toUpperCase()) :
+        null;
+   
+    // count the total number of records so that we can show count before filter
+    c.Content.count({ groupId: c.req.group.id }, function(err, count) {
+        if (err) {
+            return callback(err);
+        }
+
+        c.Content.all({
+            where: cond,
+            order: orderBy,
+            offset: offset,
+            limit: limit,
+            fulltext: search
+        }, function(err, posts) {
+            posts.count = count;
+            callback(err, posts);
+        });
+    });
+}
+
+// finds the content record for this function
+function findContent (c) {
+    var self = this;
+    var id = c.req.params.id || c.req.body.id || c.req.query.id;
+    var type = c.req.params.type || c.req.body.type || c.req.query.type || 'Content';
+
+    if (id) {
+        // find the comment or content item for this action
+        if (type.toLowerCase() === 'comment') {
+            c.Comment.find(id, function (err, post) {
+                this.post = c.locals.post = post;
+                c.next();
+            })
+        } else {
+            c.Content.find(id, function (err, post) {
+                this.post = c.locals.post = post;
+                c.next();
+            });
+        }
+    } else {
+        c.next();
+    }
+}
+
 /**
  * Show the content list for this group.
  * 
@@ -67,8 +142,8 @@ function renderInputForm(c, next) {
  */
 ContentController.prototype.index = function index(c) {
     c.req.session.adminSection = 'content';
-    this.filter = c.req.query.filter || c.req.params.filter;
-    var suffix = 'string' === typeof this.filter ? '-' + this.filter : '';
+    this.filterBy = c.req.query.filterBy || c.req.params.filterBy;
+    var suffix = 'string' === typeof this.filterBy ? '-' + this.filterBy : '';
     this.pageName = 'content' + suffix;
 
     c.respondTo(function(format) {
@@ -76,7 +151,14 @@ ContentController.prototype.index = function index(c) {
             c.render();
         });
         format.json(function() {
-            loadContent(c, function(posts) {
+            loadContent(c, function(err, posts) {
+                if (err) {
+                    return c.send({
+                        status: 'error',
+                        error: err
+                    });
+                }
+
                 c.send({
                     sEcho: c.req.query.sEcho || 1,
                     iTotalRecords: posts.count,
@@ -96,14 +178,14 @@ ContentController.prototype.index = function index(c) {
  * @param  {HttpContext} c - http context
  */
 ContentController.prototype.ids = function ids(c) {
-    this.filter = c.req.query.filter || c.req.params.filter;
-    var suffix = 'string' === typeof this.filter ? '-' + this.filter : '';
+    this.filterBy = c.req.query.filterBy || c.req.params.filterBy;
+    var suffix = 'string' === typeof this.filterBy ? '-' + this.filterBy : '';
     this.pageName = 'content' + suffix;
 
     c.req.query.limit = 1000000;
     c.req.query.offset = 0;
 
-    loadContent(c, function(posts) {
+    loadContent(c, function(err, posts) {
         c.send({
             ids: _.pluck(posts, 'id')
         });
@@ -130,12 +212,8 @@ ContentController.prototype.new = function(c) {
  * @param  {HttpContext} c - http context
  */
 ContentController.prototype.edit = function edit(c) {
-    c.Content.find(c.params.id, function(err, post) {
-        c.locals.post = post;
-        
-        renderInputForm(c, function () {
-            c.render();
-        });
+    renderInputForm(c, function () {
+        c.render();
     });
 };
 
@@ -197,36 +275,35 @@ ContentController.prototype.update = function update(c) {
     var id = c.params.id;
     var group = c.req.group;
     var data = c.body.Content;
+    var post = this.post;
 
     // parse the date format with moment
     data.createdAt = moment(data.createdAt, c.app.get('datetimeformat')).toDate();
     data.updatedAt = new Date();
 
-    Content.find(id, function(err, post) {
-        c.Tag.assignTagsForObject(post, c.req.body.Content_tags, function () {
-            delete data.tags;
+    c.Tag.assignTagsForObject(post, c.req.body.Content_tags, function () {
+        delete data.tags;
 
-            // update the keys manually
-            Object.keys(data).forEach(function(key) {
-                post[key] = data[key];
-            });
+        // update the keys manually
+        Object.keys(data).forEach(function(key) {
+            post[key] = data[key];
+        });
 
-            post.save(function (err, content) {
-                if (err) {
-                    var HelperSet = c.compound.helpers.HelperSet;
-                    var helpers = new HelperSet(c);
-                    c.send({
-                        code: 500,
-                        errors: content.errors || err,
-                        html: helpers.errorMessagesFor(content)
-                    });
-                } else {               
-                    c.send({
-                        code: 200,
-                        html: c.t('post.saved')
-                    });
-                }
-            });
+        post.save(function (err, content) {
+            if (err) {
+                var HelperSet = c.compound.helpers.HelperSet;
+                var helpers = new HelperSet(c);
+                c.send({
+                    code: 500,
+                    errors: content.errors || err,
+                    html: helpers.errorMessagesFor(content)
+                });
+            } else {               
+                c.send({
+                    code: 200,
+                    html: c.t('post.saved')
+                });
+            }
         });
     });
 };
@@ -239,12 +316,10 @@ ContentController.prototype.update = function update(c) {
 ContentController.prototype.destroy = function(c) {
     var group = c.req.group;
 
-    c.Content.find(c.params.id, function(err, content) {
-        content.destroy(function(err) {
-            // finally, update the group tag counts
-            c.Tag.updateCountsForObject(content);
-            c.send('ok');
-        });
+    post.destroy(function(err) {
+        // finally, update the group tag counts
+        c.Tag.updateCountsForObject(post);
+        c.send('ok');
     });
 };
 
@@ -259,87 +334,56 @@ ContentController.prototype.destroyAll = function(c) {
     var selectedContent = c.body.selectedContent || [];
     var count = 0;
 
-    deleteSelectedContent(selectedContent);
+    async.forEach(selectedContent, function(id, next) {
+        Content.find(id, function(err, content) {
+            if (!content) {
+                return next();
+            }
 
-    function deleteSelectedContent(selectedContent) {
-        async.forEach(selectedContent, function(id, next) {
-            Content.find(id, function(err, content) {
-                if (!content) {
-                    return next();
-                }
-
-                content.destroy(function(err) {
-                    count++;
-                    next();
-                });
-            });
-        }, function() {
-            // finally, update the group tag counts
-            c.locals.tags.forEach(function (tag) {
-                tag.updateCount();
-            });
-
-            c.send({
-                message: count + ' posts deleted',
-                status: 'success',
-                icon: 'ok'
+            content.destroy(function(err) {
+                count++;
+                next();
             });
         });
-    }
+    }, function() {
+        // finally, update the group tag counts
+        c.locals.tags.forEach(function (tag) {
+            tag.updateCount();
+        });
+
+        c.send({
+            message: count + ' posts deleted',
+            status: 'success',
+            icon: 'ok'
+        });
+    });
 };
 
-// Load content based on the current filter/critera
-function loadContent(c, cb) {
-    return makeQuery(makeCond(c), cb);
-
-    function makeCond(c) {
-        var cond = {
-            groupId: c.req.group.id
-        };
-
-        var filter = c.req.query.filter || c.req.body.filter;
-
-        if (typeof filter === 'string' && filter.indexOf("[native code]") === -1) {
-            // filter by tag
-            if (!isNaN(parseInt(filter, 10))) {
-                cond = {
-                    tags: filter
-                }
-            }
-            // filter by content type
-            else {
-                cond.type = filter;
-            }
-        }
-        return cond;
-    }
-
-    function makeQuery(cond, cb) {
-        var query = c.req.query;
-        var limit = parseInt(query.iDisplayLength || query.limit || 10, 10);
-        var offset = parseInt(query.iDisplayStart || query.offset || 0, 10);
-        var colNames = ['', 'title', 'tagNames', 'createdAt', 'score', ''];
-        var search = query.sSearch || c.req.body.search;
-        var orderBy = query.iSortCol_0 > 0 ?
-            (colNames[query.iSortCol_0] + ' ' + query.sSortDir_0.toUpperCase()) :
-            null;
-       
-        // count the total number of records so that we can show count before filter
-        c.Content.count(cond, function(err, count) {
-            if (err) {
-                return c.next(err);
-            }
-
-            c.Content.all({
-                where: cond,
-                order: orderBy,
-                offset: offset,
-                limit: limit,
-                fulltext: search
-            }, function(err, posts) {
-                posts.count = count;
-                cb(posts);
-            });
+/**
+ * Remove flags from the specified content.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+ContentController.prototype.removeFlags = function (c) {
+    post.removeFlags(function (err, post) {
+        c.send({
+            message: 'Flags removed',
+            status: 'success',
+            icon: 'ok'
         });
-    }
-}
+    });
+};
+
+/**
+ * Delete a flagged content item and ban it's author.
+ * @param  {HttpContext} c - http context
+ */
+ContentController.prototype.deleteAndBan = function (c) {
+    post.destroyAndBan(function (err, post) {
+        c.send({
+            message: 'Content deleted and user banned',
+            status: 'success',
+            icon: 'ok'
+        });
+    });
+};

@@ -35,7 +35,7 @@ module.exports = function (compound, Content) {
     Content.validatesPresenceOf('createdAt', 'title', 'text');
 
     // register the functions which can be called from the REST api
-    Content.allowedApiActions = ['like', 'vote', 'doesLike', 'doesDislike'];
+    Content.allowedApiActions = ['like', 'postComment', 'flag', 'vote', 'doesLike', 'doesDislike'];
 
 
     /**
@@ -56,6 +56,9 @@ module.exports = function (compound, Content) {
         return moment(this.createdAt || new Date()).fromNow();
     };
 
+    /**
+     * sets the date for this post with high level of flexibility.
+     */
     Content.setter.createdAt = function(value) {
         value = value || '';
         if (value && value.toString().match(/now|immediately/i)) {
@@ -516,7 +519,7 @@ module.exports = function (compound, Content) {
             Comment.all({ where: { contentId: post.id }, limit: Content.CACHEDCOMMENTS }, function (err, comments) {
                 post.commentsTotal = comments.countBeforeLimit;
                 while (post.comments.items.length > 0) {
-                    post.comments.items.remove(post.comments.items[0]);
+                    post.comments.remove(post.comments.items[0]);
                 }
                 comments.forEach (function (comment) {
                     if (comment.id) {
@@ -586,6 +589,30 @@ module.exports = function (compound, Content) {
         }
 
         this.save(callback);
+    };
+
+    /**
+     * Clear all of the flags from this content item.
+     * @param  {Function} callback - callback function
+     */
+    Content.prototype.clearFlags = function (callback) {
+        this.flags.items = [];
+        this.save(callback);
+    };
+
+    /**
+     * Delete this post and blacklist the author from the group it was posted to.
+     * 
+     * @param  {Function} callback - call back function
+     */
+    Content.prototype.destroyAndBan = function (callback) {
+        var post = this;
+
+        User.find(this.authorId, function (err, user) {
+            user.setMembershipState(post.groupId, 'blacklisted', function (err, user) {
+                post.destroy(callback);
+            });
+        })
     };
 };
 

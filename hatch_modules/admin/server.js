@@ -12,12 +12,11 @@ require('js-yaml');
 var app = module.exports = function getServerInstance(parent) {
     app = require('compound').createServer({root: __dirname});
     app.compound.tabs = [
-        { name: 'content',    url: 'content',    rank: 10 },
-        { name: 'moderation', url: 'moderation', rank: 20 },
-        { name: 'users',      url: 'community',  rank: 30 },
-        { name: 'pages',      url: 'pages',      rank: 40 },
-        { name: 'group',      url: 'group',      rank: 50 },
-        { name: 'modules',    url: 'modules',    rank: 60 }
+        { name: 'users',      url: 'community',  rank: 10 },
+        { name: 'content',    url: 'content',    rank: 20 },
+        { name: 'pages',      url: 'pages',      rank: 30 },
+        { name: 'group',      url: 'group',      rank: 40 },
+        { name: 'modules',    url: 'modules',    rank: 50 }
     ];
 
     if (parent) {

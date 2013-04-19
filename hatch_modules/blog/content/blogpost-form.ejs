@@ -8,14 +8,14 @@
 <%- form.begin() %>
 <%- form.input('type', {type: 'hidden'}) %>
 
-<div class="row">
-    <div class="span7">
+<div class="row-fluid">
+    <div class="span8">
         <div class="module">
             <div class="content">
                 <div class="control-group">
                     <%- form.label('title', t('post.title'), {class: 'control-label'}) %>
                     <div class="controls">
-                        <%- form.input('title', {class: 'span7'}) %>
+                        <%- form.input('title', {class: 'span12'}) %>
                     </div>
                 </div>
 
@@ -24,7 +24,7 @@
         </div>
     </div>
 
-    <div class="span3">
+    <div class="span4">
         <div class="module">
             <div class="content">
                 <div class="form-actions">
@@ -65,7 +65,7 @@
                         }) %>
                         -->
 
-                        <select id="tags" name="Content_tags" multiple="multiple" class="span3 chzn-select-create" data-placeholder="<%- t('post.actions.enterTags') %>">
+                        <select id="tags" name="Content_tags" multiple="multiple" class="span12 chzn-select-create" data-placeholder="<%- t('post.actions.enterTags') %>">
                             <% tags.forEach(function (tag) { %>
                                 <option value="<%- tag.id %>"<%- post.tags.find(tag.id, 'id') ? ' selected="selected"':'' %>><%- tag.title %></option>
                             <% }) %>

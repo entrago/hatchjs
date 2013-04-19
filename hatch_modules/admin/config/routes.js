@@ -28,10 +28,12 @@ exports.routes = function (map) {
 
     map.resources('content', {as: 'content', suffix: 'entry'}, function (item) {
         item.collection(function (items) {
-            items.get('filter/:filter.:format?', '#index', {as: 'filteredContent' });
+            items.get('filter/:filterBy.:format?', '#index', {as: 'filteredContent' });
             items.del('destroyAll', {as: 'destroySelectedContent'});
             items.get('new/:type', '#new', {as: 'newContentForm'});
             items.get('ids', '#ids', {as: 'contentIds'});
+            items.get('moderation/load', 'moderation#load', {as: 'loadModeration'})
+            items.get('moderation/:type.:format?', 'moderation#index', {as: 'moderation'})
         });
     });
 

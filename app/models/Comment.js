@@ -100,4 +100,28 @@ module.exports = function (compound, Comment) {
 
         this.save(callback);
     };
+
+    /**
+     * Clear all of the flags from this comment.
+     * @param  {Function} callback - callback function
+     */
+    Comment.prototype.clearFlags = function (callback) {
+        this.flags.items = [];
+        this.save(callback);
+    };
+
+    /**
+     * Delete this post and blacklist the author from the group it was posted to.
+     * 
+     * @param  {Function} callback - call back function
+     */
+    Content.prototype.destroyAndBan = function (callback) {
+        var post = this;
+
+        User.find(this.authorId, function (err, user) {
+            user.setMembershipState(post.groupId, 'blacklisted', function (err, user) {
+                post.destroy(callback);
+            });
+        })
+    };
 };

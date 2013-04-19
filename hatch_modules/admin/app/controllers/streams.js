@@ -17,12 +17,12 @@
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
 
-var Application = require('./application');
+var Content = require('./content');
 
 module.exports = StreamsController;
 
 function StreamsController(init) {
-    Application.call(this, init);
+    Content.call(this, init);
 
     init.before(function setup(c) {
         var importStream = c.compound.hatch.importStream;
@@ -42,18 +42,9 @@ function StreamsController(init) {
             locals.stream = stream;
         });
     }, {only: ['edit', 'update', 'destroy', 'toggle']});
-    init.before(loadTags);
 }
 
-function loadTags(c) {
-    c.Tag.all({ where: { groupIdByType: c.req.group.id + '-Content' }}, function (err, tags) {
-        delete tags.countBeforeLimit;
-        c.locals.tags = tags;
-        c.next();
-    });
-}
-
-require('util').inherits(StreamsController, Application);
+require('util').inherits(StreamsController, Content);
 
 // Show the import streams
 StreamsController.prototype.index = function(c) {

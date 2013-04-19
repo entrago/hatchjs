@@ -1,10 +1,11 @@
 <div class="row-fluid">
 
-    <% include _sidebar %>
+    <% include ../content/_sidebar %>
 
     <div class="span10">
         <div class="module">
             <div class="content content-table-content">
+                
                 <% var caret = ' <span class="caret"></span>'; %>
 
                 <div class="pull-left">
@@ -18,36 +19,6 @@
                                 {rel: 'multiAjaxLink', method: 'DELETE'}) %></li>
                         </ul>
                     </div>
-
-                    <% if (tags.length > 0) { %>
-                        <div class="btn-group pull-left">
-                            <%- buttonTag(t('content.actions.addTag') + caret, {
-                                class: 'btn dropdown-toggle',
-                                'data-toggle': 'dropdown'}) %>
-                            <ul class="dropdown-menu">
-                                <% tags.forEach(function(tag) { %>
-                                    <% if(!tag) return; %>
-                                    <li><%- linkTo(icon('tag') + tag.title,
-                                        pathTo.addToTag('content', tag.id),
-                                        {rel: 'multiAjaxLink'}) %></li>
-                                <% }) %>
-                            </ul>
-                        </div>
-
-                        <div class="btn-group pull-left">
-                            <%- buttonTag(t('content.actions.removeTag') + caret, {
-                                class: 'btn dropdown-toggle',
-                                'data-toggle': 'dropdown'}) %>
-                            <ul class="dropdown-menu">
-                                <% tags.forEach(function(tag) { %>
-                                    <% if (!tag) return; %>
-                                    <li><%- linkTo(icon('tag') + tag.title,
-                                        pathTo.removeFromTag('content', tag.id), 
-                                        {rel: 'multiAjaxLink'}) %></li>
-                                <% }) %>
-                            </ul>
-                        </div>
-                    <% } %>
                 </div>
 
                 <table class="table table-striped" id="content-table">
@@ -58,16 +29,13 @@
                                     id: 'selectAllContent'}) %>
                             </th>
                             <th>
-                                <%= t('content.tableHead.title') %>
-                            </th>
-                            <th width="300">
-                                <%= t('content.tableHead.tags') %>
+                                <%= t('content.tableHead.text') %>
                             </th>
                             <th width="150">
                                 <%= t('content.tableHead.createdAt') %>
                             </th>
                             <th width="90">
-                                <%= t('content.tableHead.popularity') %>
+                                <%= t('content.tableHead.flags') %>
                             </th>
                             <th width="60" align="right">
                                 <%= t('content.tableHead.actions') %>
@@ -102,7 +70,7 @@
                         ids: window.selectedContent,
                         selectedContent: window.selectedContent,
                         unselectedContent: window.unselectedContent,
-                        filterBy: '<%- filterBy %>',
+                        type: '<%- type %>',
                         search: $('#content-table_filter input').val()
                     },
                     success: function(data) {
@@ -149,7 +117,7 @@
                 $("#content-table tbody input[type=checkbox]").attr("checked", true);
 
                 // reset the selected content array with only the "all" value
-                $.ajax('<%- pathTo.contentIds %>?filterBy=<%- filterBy %>&sSearch=' + $('#content-table_filter input').val(), {
+                $.ajax('<%- pathTo.contentIds %>?type=<%- type %>&sSearch=' + $('#content-table_filter input').val(), {
                     success: function (data) {
                         window.selectedContent = data.ids;        
                     }
@@ -171,7 +139,7 @@
         window.table = $('#content-table').dataTable( {
             "bProcessing": true,
             "bServerSide": true,
-            "sAjaxSource": "<%- pathTo.content({format: 'json'}) %>?filterBy=<%- filterBy %>",
+            "sAjaxSource": "<%- pathTo.loadModeration %>?type=<%- type %>",
             "fnDrawCallback": function() {
                 // setup tooltips
                 $('#content-table *[rel=tooltip]').tooltip();
@@ -219,30 +187,14 @@
                         text = text.substring(0, Math.min(32, text.length)) + (text.length > 32 ? '...':'');
                         text = text || '<span class="muted"><%= __('untitled post') %></span>';
 
-                        return '<a href="//' + content.url + '" class="title">' + text + '</a>';
-                    }
-                },
-                { "mDataProp": "tags",
-                    "fnRender": function(obj, val) {
-                        var html = '<ul class="tags">';
-
-                        $(val).each(function(i, tag) {
-                            html += '<li><a href="<%- pathTo.content %>/filter/' + tag.id + '">' + tag.title + '</a></li>';
-                        });
-
-                        html += '</ul>';
-                        return html;
+                        return text;
                     }
                 },
                 { "mDataProp": "timeSince" },
                 { "mDataProp": null,
                     "fnRender" : function(obj, val) {
                         var content = obj.aData;
-                        var score = content.score;
-                        var html = '';
-
-                        for (var i=0; i+.5 < score; i++) html += '<i class="icon-star"></i>';
-                        if(i-score == -.5) html += '<i class="icon-star-half"></i>';
+                        var html = '<i class="icon-flag"></i> x' + content.flags.length;
 
                         return html;
                     }
@@ -252,8 +204,9 @@
                         var content = obj.aData;
                         var html = '<div class="pull-right">';
 
-                        if (content.type == 'blogpost') html += '<a href="<%- pathTo.content %>/' + content.id + '/edit"><%= t('content.actions.edit') %></a>';
-                        html += ' &nbsp; <a href="<%- pathTo.content %>/' + content.id + '" data-remote="true" data-method="DELETE" data-confirm="<%= t('content.actions.destroyConfirm') %>" rel="tooltip" title="<%- t('content.actions.destroy') %>" data-success="<%= t('content.actions.destroyed') %>"><i class="icon-remove"></i></a>';
+                        html += '<a href="<%- pathTo.content %>/' + content.id + '/unflag" rel="tooltip" title="Unflag"><i class="icon-ok"></i></a>';
+                        html += ' &nbsp;<a href="<%- pathTo.content %>/' + content.id + '" data-remote="true" data-method="DELETE" data-confirm="<%= t('content.actions.destroyConfirm') %>" rel="tooltip" title="<%- t('content.actions.destroy') %>" data-success="<%= t('content.actions.destroyed') %>"><i class="icon-remove"></i></a>';
+                        html += ' &nbsp;<a href="<%- pathTo.content %>/' + content.id + '/ban" rel="tooltip" title="Delete and blacklist author"><i class="icon-ban-circle"></i></a>';
 
                         html += '</div>';
 
@@ -267,7 +220,7 @@
                 "sLengthMenu": "_MENU_ <%= t('common.itemsPerPage') %>"
             },
             "aoColumnDefs": [
-                { "bSortable": false, "aTargets": [ 0, 5 ] }
+                { "bSortable": false, "aTargets": [ 0, 4 ] }
             ]
         } );
     } );
