@@ -1,0 +1,210 @@
+<div class="row">
+
+    <% include _sidebar %>
+
+    <div class="span10">
+        <div class="module">
+            <div class="content">
+
+                <%- formTagBegin({ action: pathTo.groupSave, id: 'settingsForm', class: 'form-vertical', method: 'post', enctype: 'multipart/form-data', remote: true }) -%>
+
+                    <% if(tab == 'settings') { %>
+                        <h3><%- __('Group settings') %></h3>
+
+                        <hr/>
+
+                        <div class="control-group">
+                            <label class="control-label" for="name"><%- __('Group title') %></label>
+                            <div class="controls">
+                                <input type="text" class="input-xlarge" id="name" name="name" value="<%- group.name %>">
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label" for="joinPermissions">
+                                <span>
+                                    <%- __('Join permissions') %>
+                                    <i class="icon-info-sign" rel="popover" title="<%- __('Help') %>" data-content="<%- __('Set the permissions for users wishing to join the group') %>"></i>
+                                </span>
+                            </label>
+                            <div class="controls">
+                                <select id="joinPermissions" name="joinPermissions">
+                                    <option value="free" <%- group.joinPermissions == "free" ? 'selected="selected"':'' %>><%- __('Free to join') %></option>
+                                    <option value="request" <%- group.joinPermissions == "request" ? 'selected="selected"':'' %>><%- __('Users may request to join') %></option>
+                                    <option value="closed" <%- group.joinPermissions == "closed" ? 'selected="selected"':'' %>><%- __('Invite only') %></option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr/>
+
+                        <div class="control-group">
+                            <input type="hidden" id="favicon" name="favicon" value="<%- group.favicon %>" />
+                            <label class="control-label" for="favicon"><%- __('Favicon') %></label>
+                            <div class="controls">
+                                <a class="btn" href="#" id="faviconButton"><i class="icon-picture"></i> <%- __('Click to upload a favicon') %></a>
+
+                                <% if(group.favicon) { %>
+                                    <img src="<%- group.favicon %>" id="faviconPreview" width="16" height="16" />
+                                <% } %>
+                            </div>
+
+                            <br/>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label" for="metaDescription">
+                                <span>
+                                    <%- __('Default %s description', '&lt;metatags&gt;') %>
+                                    <i class="icon-info-sign"  rel="popover" title="Help" data-content="<%- __('Set the default meta description for all pages within this group') %>"></i>
+                                </span>
+                            </label>
+                            <div class="controls">
+                                <textarea class="input-xlarge span4" id="metaDescription" name="metaDescription"><%- group.metaDescription %></textarea>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label" for="metaKeywords">
+                                <span>
+                                    <%- __('Default %s keywords', '&lt;metatags&gt;') %>
+                                    <i class="icon-info-sign" rel="popover" title="<%- __('Help') %>" data-content="<%- __('Set the default meta keywords for all pages within this group') %>"></i>
+                                </span>
+                            </label>
+                            <div class="controls">
+                                <input type="text" class="input-xlarge" id="metaKeywords" name="metaKeywords" value="<%- group.metaKeywords %>">
+                            </div>
+                        </div>
+
+                    <% } else if(tab == 'url') { %>
+
+                        <h3><%- __('Change URL') %></h3>
+
+                        <hr/>
+
+                        <div class="control-group">
+                            <label class="control-label" for="url"><%- __('Enter new URL') %></label>
+                            <div class="controls">
+                                <input type="text" class="input-xlarge" id="url" name="url" />
+                            </div>
+                        </div>
+
+                    <% } else if(tab == 'headerfooter') { %>
+
+                        <h3><%- __('Edit header and footer') %></h3>
+
+                        <hr/>
+
+                        <div class="control-group">
+                            <label class="control-label" for="navBarType">
+                                <%- __('Navigation bar type') %>
+                            </label>
+                            <div class="controls">
+                                <select id="navBarType" name="navBarType">
+                                    <option value="default"><%- __('Default') %></option>
+                                    <option value="fixed" <%- group.navBarType === 'fixed' ? 'selected="selected"':'' %>><%- __('Fixed to top') %></option>
+                                    <option value="mouseover" <%- group.navBarType === 'mouseover' ? 'selected="selected"':'' %>><%- __('Show on mouse-over') %></option>
+                                    <option value="click" <%- group.navBarType === 'click' ? 'selected="selected"':'' %>><%- __('Show on mouse-click') %></option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label" for="navBarStyle">
+                                <%- __('Navigation bar style') %>
+                            </label>
+                            <div class="controls">
+                                <select id="navBarStyle" name="navBarStyle">
+                                    <option value="default"><%- __('Default') %></option>
+                                    <option value="inverse" <%- group.navBarStyle === 'inverse' ? 'selected="selected"':'' %>><%- __('Inverse') %></option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr/>
+
+                        <div class="control-group">
+                            <label class="control-label" for="headerHtml">
+                                <span>
+                                    <%- __('Header HTML') %>
+                                    <i class="icon-info-sign" rel="popover" title="<%- __('Help') %>" data-content="<%- __('Default header for all pages in this group. Can be optionally overridden on a per-page basis by replacing the header widget with something else') %>"></i>
+                                </span>
+                            </label>
+                            <div class="controls">
+                                <textarea class="input-xlarge span6 richtext" id="headerHtml" name="headerHtml" rows="10"><%- group.headerHtml %></textarea>
+                            </div>
+                        </div>
+
+                        <hr/>
+
+                        <div class="control-group">
+                            <label class="control-label" for="footerHtml">
+                                <span>
+                                    <%- __('Footer HTML') %>
+                                    <i class="icon-info-sign" rel="popover" title="<%- __('Help') %>" data-content="<%- __('Default footer for all pages in this group') %>"></i>
+                                </span>
+                            </label>
+                            <div class="controls">
+                                <textarea class="input-xlarge span6 richtext" id="footerHtml" name="footerHtml" rows="10"><%- group.footerHtml %></textarea>
+                            </div>
+                        </div>
+
+                    <% } else if(tab == 'analytics') { %>
+
+                        <h3><%- __('Edit analytics settings') %></h3>
+
+                        <hr/>
+
+                        <div class="control-group">
+                            <label class="control-label" for="googleAnalyticsId"><%- __('Google Analytics Tracking ID') %></label>
+                            <div class="controls">
+                                <input type="text" class="input-xlarge" id="googleAnalyticsId" name="googleAnalyticsId" value="<%- group.googleAnalyticsId %>">
+                            </div>
+                            <span class="help-block"><%- __('Your Tracking ID can be found in the \'admin\' section of your Google Analytics account.') %></span>
+                        </div>
+
+                    <% } %>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"><%- __('Save settings') %></button>
+                    </div>
+                <%- formTagEnd() %>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        //bind the form ajax
+        $('#settingsForm').bind('ajax:success', function(e, data) {
+            $.noty({text: '<i class="icon-' + data.icon + '"></i> ' + data.message, type: data.status});
+
+            //refresh the page
+            setTimeout(function() { window.location = window.location; }, 1000);
+        });
+
+        //setup the file uploader
+        <% if(tab == 'settings') { %>
+            var uploader = new qq.FileUploader({
+                params: { _csrf: $('meta[name=csrf-token]').attr('content') },
+                element: $('#faviconButton').get(0),
+                action: '<%- pathFor('upload').add -%>',
+                uploadButtonText: $('#faviconButton').html(),
+                encoding: 'multipart',
+                onComplete: function(id, filename, data) {
+                    $('#favicon').val(data.url);
+                    $('#faviconPreview').attr('src', data.url);
+
+                    $.noty({ text: '<i class="icon-ok"></i> <%- __('Favicon uploaded') %>', type: 'success' });
+                }
+            });
+        <% } %>
+
+        //convert richtexts
+        setupRichtextEditors(null, { fixed: false });
+    });
+</script>
+

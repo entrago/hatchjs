@@ -29,6 +29,50 @@ function PagesController(init) {
     init.before(prepareTree, {only: 'index, new, newSpecial, edit, update, create'});
 }
 
+function findPage(c) {
+    var locals = this;
+    c.Page.find(c.params.id, function (err, page) {
+        if (!page) {
+            return c.next(new Error('404'));
+        }
+        locals.page = page;
+        c.next();
+    });
+}
+
+function prepareTree(c) {
+    var locals = this;
+    this.specials = Object.keys(c.compound.hatch.page.pages).map(function(sp) {
+        return c.compound.hatch.page.pages[sp];
+    });
+    this.templates = [];
+    c.req.group.pages(function (err, pages) {
+        if (!err) {
+            pages.forEach(function (p) {
+                if (p.type === 'template') {
+                    locals.templates.push(p);
+                }
+            });
+            c.req.pagesTree = c.Page.tree(pages);
+        }
+        c.next();
+    });
+}
+
+// Render the page tree to JSON
+function renderPageTree(c) {
+    var Page = c.Page;
+    c.req.group.pages(function (err, pages) {
+        // filter page types to standard page types only
+        pages = pages.filter(function(page) {
+            return [null, '', 'page', 'homepage'].indexOf(page.type) !== -1;
+        });
+
+        if (pages) c.locals.pages = Page.tree(pages);
+        c.render('_table', { layout: false });
+    });
+}
+
 PagesController.prototype.index = function index(c) {
     this.title = 'Manage pages';
     c.req.session.adminSection = 'pages';
@@ -98,28 +142,30 @@ PagesController.prototype.create = function create(c) {
         {type: 'core-widgets/mainmenu', id: 2}
     ];
 
-    Page.createPage(c.body, function (err, page) {
-        if (err) {
-            c.next(err);
-        } else {
-            console.log(c.req.params)
+    c.Tag.assignTagsForObject(c.req.body, c.req.body.tags, function () {
+        Page.createPage(c.body, function (err, page) {
+            if (err) {
+                c.next(err);
+            } else {
+                console.log(c.req.params)
 
-            if (c.req.params.format === 'json' || c.req.body.inline) {
-                //bump all the other pages up one in the hierarchy order
-                if (c.body.order) {
-                    reorderPages(function() { renderPageTree(c); })
-                } else {
-                    renderPageTree(c);
+                if (c.req.params.format === 'json' || c.req.body.inline) {
+                    //bump all the other pages up one in the hierarchy order
+                    if (c.body.order) {
+                        reorderPages(function() { renderPageTree(c); })
+                    } else {
+                        renderPageTree(c);
+                    }
+                }
+                else {
+                    if (page.type && page.type !== 'page') {
+                        c.send({ redirect : c.pathTo.groupSpecialPages(c.req.group) });
+                    } else {
+                        c.send({ redirect : c.pathTo.groupPages(c.req.group) });
+                    }
                 }
             }
-            else {
-                if (page.type && page.type !== 'page') {
-                    c.send({ redirect : c.pathTo.groupSpecialPages(c.req.group) });
-                } else {
-                    c.send({ redirect : c.pathTo.groupPages(c.req.group) });
-                }
-            }
-        }
+        });
     });
 
     function reorderPages(callback) {
@@ -153,16 +199,18 @@ PagesController.prototype.update = function update(c) {
     this.page = page;
     c.body.groupId = c.req.group.id;
 
-    page.update(c.body, function(err, page) {
-        if (err) {
-            return c.next(new Error(err.message));
-        }
+    c.Tag.assignTagsForObject(page, c.req.body.tags, function () {
+        page.update(c.body, function(err, page) {
+            if (err) {
+                return c.next(new Error(err.message));
+            }
 
-        if ([null, '', 'page', 'homepage'].indexOf(c.locals.page.type) != -1) {
-            c.send({ redirect: c.pathTo.groupPages(c.req.group) });
-        } else {
-            c.send({ redirect: c.pathTo.groupSpecialPages(c.req.group) });
-        }
+            if ([null, '', 'page', 'homepage'].indexOf(c.locals.page.type) != -1) {
+                c.send({ redirect: c.pathTo.groupPages(c.req.group) });
+            } else {
+                c.send({ redirect: c.pathTo.groupSpecialPages(c.req.group) });
+            }
+        });
     });
 };
 
@@ -214,48 +262,4 @@ PagesController.prototype.updateOrder = function updateOrder(c) {
             renderPageTree(c);
         }
     }
-}
-
-function findPage(c) {
-    var locals = this;
-    c.Page.find(c.params.id, function (err, page) {
-        if (!page) {
-            return c.next(new Error('404'));
-        }
-        locals.page = page;
-        c.next();
-    });
-}
-
-function prepareTree(c) {
-    var locals = this;
-    this.specials = Object.keys(c.compound.hatch.page.pages).map(function(sp) {
-        return c.compound.hatch.page.pages[sp];
-    });
-    this.templates = [];
-    c.req.group.pages(function (err, pages) {
-        if (!err) {
-            pages.forEach(function (p) {
-                if (p.type === 'template') {
-                    locals.templates.push(p);
-                }
-            });
-            c.req.pagesTree = c.Page.tree(pages);
-        }
-        c.next();
-    });
-}
-
-// Render the page tree to JSON
-function renderPageTree(c) {
-    var Page = c.Page;
-    c.req.group.pages(function (err, pages) {
-        // filter page types to standard page types only
-        pages = pages.filter(function(page) {
-            return [null, '', 'page', 'homepage'].indexOf(page.type) !== -1;
-        });
-
-        if (pages) c.locals.pages = Page.tree(pages);
-        c.render('_table', { layout: false });
-    });
 }

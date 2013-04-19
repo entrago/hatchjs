@@ -4,7 +4,8 @@ exports.routes = function (map) {
     map.root('pages#index');
     
     map.collection(function (group) {
-        group.get('group', 'group#show');
+        group.get('group/:tab?', 'group#show', {as: 'group'});
+        group.post('group/save', 'group#save', {as: 'groupSave'});
     });
 
     map.resources('modules', function (module) {

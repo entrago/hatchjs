@@ -1,0 +1,18 @@
+
+<li class="nav-header"><%- __('Group settings') %></li>
+<%- li('group-settings') %>
+    <%- linkTo(icon('cogs') + t('group.settings'),
+        pathTo.group('settings')) %>
+<%- liEnd %>
+<%- li('group-url') %>
+    <%- linkTo(icon('link') + t('group.url'),
+        pathTo.group('url')) %>
+<%- liEnd %>
+<%- li('group-headerfooter') %>
+    <%- linkTo(icon('align-left') + t('group.headerfooter'),
+        pathTo.group('headerfooter')) %>
+<%- liEnd %>
+<%- li('group-analytics') %>
+    <%- linkTo(icon('bar-chart') + t('group.analytics'),
+        pathTo.group('analytics')) %>
+<%- liEnd %>

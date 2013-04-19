@@ -34,7 +34,7 @@ function UsersController(init) {
 
 require('util').inherits(UsersController, Application);
 
-// Load the user tags for this group to display on the left navigation
+// load the user tags for this group to display on the left navigation
 function loadTags(c) {
     c.Tag.all({ where: { groupIdByType: c.req.group.id + '-User' }}, function (err, tags) {
         delete tags.countBeforeLimit;

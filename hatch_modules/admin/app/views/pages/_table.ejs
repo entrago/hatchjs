@@ -4,9 +4,15 @@
         <td>
             <i class="<%- page.level == 0 ? 'icon-home':'icon-move' %>"></i>
             <span class="page-title"><%= page.title %></span> </td>
-        <td> <%- page.url ? linkTo('/' + page.url.split('/').pop(), '//' + page.url) : '' %> </td>
-        <td> <%- __('Public') %> </td>
-        <td> <%- /true/.test(page.hideFromNavigation) ? 'Hidden' : 'Visible' %> </td>
+        <td> 
+            <%- page.url ? linkTo('/' + page.getUrlName(), '//' + page.url) : '' %> 
+        </td>
+        <td> 
+            <%- __('Public') %> 
+        </td>
+        <td> 
+            <%- /true/.test(page.hideFromNavigation) ? 'Hidden' : 'Visible' %> 
+        </td>
         <td>
             <%- linkTo('Edit', pathTo.editPage(req.group.id, page.id), {class: '' }) %>
             &nbsp;

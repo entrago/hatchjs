@@ -1,0 +1,21 @@
+<li class="nav-header"><%- __('Pages') %></li>
+
+<%- li('index') %>
+    <%- linkTo(icon('sitemap') + t('pages.sitemap'),
+        pathTo.pages) %>
+<%- liEnd %>
+<%- li('specials') %>
+    <%- linkTo(icon('star') + t('pages.specials'),
+        pathTo.specialPages) %>
+<%- liEnd %>
+
+<li class="nav-header"><%- __('Actions') %></li>
+
+<%- li('new') %>
+    <%- linkTo(icon('file-alt') + t('pages.actions.new'),
+        pathTo.newPage) %>
+<%- liEnd %>
+<%- li('newSpecial') %>
+    <%- linkTo(icon('star') + t('pages.actions.newSpecial'),
+        pathTo.newSpecial) %>
+<%- liEnd %>

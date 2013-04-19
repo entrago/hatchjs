@@ -90,3 +90,14 @@ en:
     import: Import streams
     manage: Manage streams
     add: Add new stream
+  pages:
+    sitemap: Sitemap
+    specials: Special pages
+    actions:
+      new: New page
+      newSpecial: New special page
+  group:
+    settings: Settings
+    url: Change URL
+    headerfooter: Header and footer
+    analytics: Analytics

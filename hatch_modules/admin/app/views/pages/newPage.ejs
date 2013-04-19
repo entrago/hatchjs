@@ -10,11 +10,11 @@
 
         <hr/>
 
-        <%- formTagBegin({action: pathTo.groupPages(req.group), remote: true, id: 'page_form', class: 'form-vertical'}) %>
+        <%- formTagBegin({action: pathTo.pages(), remote: true, id: 'page_form', class: 'form-vertical'}) %>
         <% include _pageForm %>
           <div class="form-actions">
             <button type="submit" class="btn btn-primary"><i class="icon-ok icon-white"></i> <%- __('Create page') %></button>
-            <%- linkTo(__('Cancel'), pathTo.groupPages(req.group), {class: 'btn'}) %>
+            <%- linkTo(__('Cancel'), pathTo.pages(), {class: 'btn'}) %>
           </div>
         <%- formTagEnd() %>
 

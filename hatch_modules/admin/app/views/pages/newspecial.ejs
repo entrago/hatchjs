@@ -12,7 +12,7 @@
 
         <%- errorMessagesFor(page) %>
 
-        <%- formTagBegin({action: pathTo.groupPages(req.group), remote: true, method: 'POST', id: 'page_form', class: 'form-vertical'}) %>
+        <%- formTagBegin({action: pathTo.pages(), remote: true, method: 'POST', id: 'page_form', class: 'form-vertical'}) %>
             <input type="hidden" name="parentId" value="<%- req.pagesTree[0].id %>" />
 
             <% if (!page.id) { %>
@@ -44,7 +44,7 @@
 
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary"><i class="icon-ok icon-white"></i> <%- __('Create page') %></button>
-                <%- linkTo(__('Cancel'), pathTo.groupPages(req.group), {class: 'btn'}) %>
+                <%- linkTo(__('Cancel'), pathTo.pages(), {class: 'btn'}) %>
             </div>
         <%- formTagEnd() %>
 
