@@ -58,26 +58,15 @@ ModulesController.prototype.enable = function enable(c) {
     });
 };
 
-ModulesController.prototype.setup = function(c) {
-    var moduleName = c.params.module_id;
-    this.inst = this.group.modules.find(moduleName, 'name');
-
-    console.log(this.group.modules.items);
-
-    if (!this.inst) {
-        return c.next('Module ' + moduleName + ' not found');
-    }
-
-    this.inst.module = c.compound.hatch.modules[c.params.module_id];
-
-    c.render();
-};
-
 ModulesController.prototype.update = function(c) {
     var mod = this.group.modules.find(c.params.id, 'name');
     mod.contract = c.req.body;
     this.group.save(function() {
-        c.redirect(c.pathTo.modules);
+        c.send({
+            status: 'success',
+            icon: 'ok',
+            message: 'Module settings updated'
+        });
     });
 };
 

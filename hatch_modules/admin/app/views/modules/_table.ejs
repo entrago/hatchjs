@@ -8,10 +8,10 @@
             <th width="">
                 <%- __('Description') %>
             </th>
-            <th width="10%">
+            <th width="70">
                 <%- __('Enabled') %>
             </th>
-            <th width="">
+            <th width="70">
                 <%- __('Actions') %>
             </th>
         </tr>
@@ -37,7 +37,7 @@
                             <%- linkTo(
                                 __('Edit'),
                                 pathTo.setupModule(module.info.name)
-                            ) %>
+                            ) %>&nbsp;
                         <% } %>
                         <a rel="tooltip" data-original-title="<%- __('Disable this module') %>" href="<%- pathTo.disableModule(module.info.name) %>">
                             <i class="icon-remove"></i></a>

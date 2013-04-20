@@ -1,7 +1,8 @@
 <li class="nav-header"><%- __('Module settings') %></li>
-<% ([]).forEach(function(inst) { %>
-    <% if(!inst.module || !inst.module.info || !inst.module.info.settings) return; %>
-    <li<%- pageName === 'module-' + inst.module.name ? ' class="active"' : '' %>>
-        <%- linkTo('<i class="' + (inst.module.info.icon || 'icon-cog') + '"></i> ' + __(inst.module.info.name || inst.module.name), pathTo.moduleSettings(inst.module.name)) %>    
-    </li>
+<% modulesEnabled.forEach(function(inst) { %>
+    <% if(!inst.module || !inst.module.info.settings) { return; } %>
+    <%- li('module-' + inst.module.info.name) %>
+        <%- linkTo(icon(inst.module.info.icon) + ' ' + inst.module.info.title, pathTo.setupModule(inst.module.info.name)
+) %>
+    <%- liEnd %>
 <% }) %>

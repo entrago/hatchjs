@@ -16,6 +16,7 @@
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
 
+var _ = require('underscore');
 var Application = require('./application');
 
 module.exports = GroupController;
@@ -26,6 +27,19 @@ function GroupController(init) {
         this.sectionName = 'group';
         c.next();
     });
+    init.before(loadModules);
+}
+
+function loadModules(c) {
+    c.locals.modulesEnabled = [];
+
+    Object.keys(c.req.group.modules.items).forEach(function (m) {
+        var inst = c.req.group.modules.items[m];
+        inst.module = c.compound.hatch.modules[inst.name];
+        c.locals.modulesEnabled.push(inst);
+    });
+
+    c.next();
 }
 
 require('util').inherits(GroupController, Application);
@@ -75,4 +89,20 @@ GroupController.prototype.save = function(c) {
             });
         });
     }
+};
+
+/**
+ * Show the module settings screen.
+ * 
+ * @param  {HttpContext} c - http context
+ * @return {[type]}   [description]
+ */
+GroupController.prototype.setupModule = function(c) {
+    var moduleName = c.params.id;
+    this.pageName = 'module-' + moduleName;
+
+    this.inst = this.group.modules.find(moduleName, 'name');
+    this.inst.module = c.compound.hatch.modules[moduleName];
+
+    c.render();
 };

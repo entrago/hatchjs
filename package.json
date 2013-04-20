@@ -33,7 +33,6 @@
     "co-mailer": "0.0.2-1",
     "connect-redis": "~1.4.5",
     "supertest": "latest",
-    "js-yaml": "latest",
     "csv": "~0.3.0",
     "reds": "~0.2.3",
     "imagemagick": "latest",

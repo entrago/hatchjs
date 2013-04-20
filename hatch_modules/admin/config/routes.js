@@ -6,13 +6,13 @@ exports.routes = function (map) {
     map.collection(function (group) {
         group.get('group/:tab?', 'group#show', {as: 'group'});
         group.post('group/save', 'group#save', {as: 'groupSave'});
+        group.get('group/module/:id/setup', 'group#setupModule', {as: 'setupModule'});
     });
 
     map.resources('modules', function (module) {
         module.collection(function (modules) {
             modules.get('marketplace', {as: 'modulesMarketplace'});
         });
-        module.get('setup');
         module.get('disable');
         module.get('enable');
     });

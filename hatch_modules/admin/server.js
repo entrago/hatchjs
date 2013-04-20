@@ -1,7 +1,5 @@
 //#!/usr/bin/env node
 
-require('js-yaml');
-
 /**
  * Server module exports method which returns new instance of application
  * server
@@ -37,7 +35,7 @@ var app = module.exports = function getServerInstance(parent) {
     }
 
     // register the permissions for this module
-    var permissions = require(__dirname + '/config/permissions.yml').permissions;
+    var permissions = require(__dirname + '/config/permissions.yml')[0].permissions;
     parent.hatch.permissions.register(permissions);
 
     return app;
