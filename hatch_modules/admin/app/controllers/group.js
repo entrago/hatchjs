@@ -95,7 +95,6 @@ GroupController.prototype.save = function(c) {
  * Show the module settings screen.
  * 
  * @param  {HttpContext} c - http context
- * @return {[type]}   [description]
  */
 GroupController.prototype.setupModule = function(c) {
     var moduleName = c.params.id;

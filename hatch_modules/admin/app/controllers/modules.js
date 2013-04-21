@@ -1,5 +1,21 @@
+//
+// Hatch.js is a CMS and social website building framework built in Node.js 
+// Copyright (C) 2013 Inventures Software Ltd
+// 
+// This file is part of Hatch.js
+// 
+// Hatch.js is free software: you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation, version 3
+// 
+// Hatch.js is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// 
+// See the GNU General Public License for more details. You should have received a copy of the GNU
+// General Public License along with Hatch.js. If not, see <http://www.gnu.org/licenses/>.
+// 
+// Authors: Marcus Greenwood, Anatoliy Chakkaev and others
+//
 
-var _ = require('underscore');
 var Application = require('./application');
 
 module.exports = ModulesController;
@@ -11,11 +27,7 @@ function ModulesController(init) {
 
 require('util').inherits(ModulesController, Application);
 
-ModulesController.prototype.index = function (c) {
-    loadModules(this, c.compound.hatch);
-    c.render();
-};
-
+// finds a specific module for the context
 function findModule(c) {
     var locals = this;
     this.group.modules.forEach(function (m, i) {
@@ -31,10 +43,7 @@ function findModule(c) {
     c.next();
 }
 
-ModulesController.prototype.marketplace = function() {
-    this.render('marketplace');
-};
-
+// loads all modules for the application
 function loadModules(locals, hatch) {
     locals.modulesAvailable = Object.keys(hatch.modules).map(function (m) {
         return hatch.modules[m];
@@ -44,6 +53,28 @@ function loadModules(locals, hatch) {
     });
 }
 
+/**
+ * Show the module list where the administrator can enable or disable modules.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+ModulesController.prototype.index = function (c) {
+    loadModules(this, c.compound.hatch);
+    c.render();
+};
+
+/**
+ * Show the module marketplace.
+ */
+ModulesController.prototype.marketplace = function() {
+    this.render('marketplace');
+};
+
+/**
+ * Enable the specified module so that it is available for this group.
+ * 
+ * @param  {HttpContext} c - http context
+ */
 ModulesController.prototype.enable = function enable(c) {
     var locals = this;
     var group = this.group;
@@ -58,6 +89,11 @@ ModulesController.prototype.enable = function enable(c) {
     });
 };
 
+/**
+ * Update the settings of the specified module.
+ * 
+ * @param  {HttpContext} c - http context
+ */
 ModulesController.prototype.update = function(c) {
     var mod = this.group.modules.find(c.params.id, 'name');
     mod.contract = c.req.body;
@@ -70,6 +106,11 @@ ModulesController.prototype.update = function(c) {
     });
 };
 
+/**
+ * Disable the specified module so that it is no longer available for this group.
+ * 
+ * @param  {HttpContext} c - http context
+ */
 ModulesController.prototype.disable = function (c) {
     this.group.modules.remove(this.groupModuleIndex);
     this.group.save(function (err, group) {
