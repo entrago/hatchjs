@@ -5,14 +5,14 @@
     <div class="span10">
         <div class="module">
             <div class="content">
-                <h3><%= t('tag.edit') %></h3>
+                <h3><%= t('tags.headers.edit') %></h3>
                 <hr />
 
                 <%- formTagBegin({action: pathTo.tag(type, tag.id), remote: true, method: 'PUT', id: 'tag-form' }) %>
                     <% include _form %>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary"><%= t('tag.save') %></button>
+                        <button type="submit" class="btn btn-primary"><%= t('tags.actions.save') %></button>
                         <a href="<%- pathTo.tags(type) %>" class="btn"><%= t('common.cancel') %></a>
                     </div>
                 <%- formTagEnd() %>

@@ -124,7 +124,7 @@ var Page = define('Page', function () {
     property('templateId', Number);
     property('parentId', Number, {index: true});
     property('groupId', Number, {index: true});
-    property('tags', [], {index: true});
+    // property('tags', [], {index: true});
 
     set('ignoreNullValues', true);
     set('defaultSort', 'order');

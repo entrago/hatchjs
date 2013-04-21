@@ -81,11 +81,32 @@ en:
     tags: Tags
     excerpt: Excerpt
     previewImage: Preview image
-  tag:
-    new: New tag
-    add: Add new tag
-    edit: Edit tag
-    save: Save tag
+  tags:
+    headers:
+      manageTags: Manage tags
+      new: New tag
+      add: Add new tag
+      name: Tag name
+      sortOrder: Sort order
+      filter: Filter
+      posts: Posts
+      actions: Actions
+      edit: Edit tag
+    labels:
+      name: Tag name
+      sortOrder: Sort order
+      description: Description
+      filter: Enable automatic filter
+      applyFilter: Apply the new filter to existing data
+      permissions: Manage permissions
+    actions:
+      save: Save tag
+      cancel: Cancel
+      new: New tag
+      add: Add new tag
+    help:
+      noTagsDefined: No tags have been defined yet
+      deleteConfirm: 'Are you sure you wish to delete this tag?'
   stream:
     import: Import streams
     manage: Manage streams
@@ -93,11 +114,59 @@ en:
   pages:
     sitemap: Sitemap
     specials: Special pages
+    headers:
+      pages: Pages
+      url: URL
+      privacy: Privacy
+      visibility: Visibility
+      actions: Actions
+      specialPages: Special pages
+      new: New page
+      edit: Edit page
+      newSpecial: New special page
     actions:
       new: New page
       newSpecial: New special page
+      create: Create page
+      cancel: Cancel
+      save: Save page
+    labels:
+      yes: 'Yes'
+      no: 'No'
+      title: Title
+      url: URL
+      leaveAsIs: Leave as-is
+      autoAssign: Auto-assign from title
+      customUrl: Custom URL
+      parentPage: Parent page
+      showInNavigation: 'Show in navigation?'
+      pageTemplate: Page template
+      metaTitle: '% title'
+      metaKeywords: '% keywords'
+      metaDescription: '% description'
+      noTemplate: No template
+      specialPageType: Special page type
+    help:
+      noSpecialPages: No special pages have been defined for this group yet
+      areYouSureDelete: 'Are you sure you wish to delete this page?'
+      overrideTitle: Overrides the title in the browser
+      drag: Drag me onto the sitemap to add a new page
+      enterTitle: 'Type your page title and hit enter ...'
   group:
     settings: Settings
     url: Change URL
     headerfooter: Header and footer
     analytics: Analytics
+  modules:
+    headers:
+      actions: Actions
+      modules: Modules
+      description: Description
+      enabled: Enabled
+      configure: Configure % module
+    actions:
+      save: Save settings
+      enable: Enable
+      edit: Edit
+    help:
+      disable: Disable this module

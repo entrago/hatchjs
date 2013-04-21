@@ -10,19 +10,19 @@
           <thead>
             <tr>
                 <th width="40%">
-                    <%- __('Special pages') %>
+                    <%- t('pages.headers.specialPages') %>
                 </th>
                 <th width="33%">
-                    <%- __('URL') %>
+                    <%- t('pages.headers.url') %>
                 </th>
                 <th width="10%">
-                    <%- __('Privacy') %>
+                    <%- t('pages.headers.privacy') %>
                 </th>
                 <th width="10%">
-                    <%- __('Visibility') %>
+                    <%- t('pages.headers.visibility') %>
                 </th>
                 <th width="7%">
-                    <%- __('Actions') %>
+                    <%- t('pages.headers.actions') %>
                 </th>
             </tr>
           </thead>
@@ -31,7 +31,7 @@
             <%- include _specialsTable %>
             <% } else { %>
                 <tr>
-                    <td colspan="5"><%- __('No special pages have been defined for this group yet') %></td>
+                    <td colspan="5"><%- t('pages.help.noSpecialPages') %></td>
                 </tr>
             <% } %>
           </tbody>
@@ -47,7 +47,7 @@
         //add delete confirmation
         $("a[rel=delete-page]").die().live("click", function() {
             var el = this;
-            if(confirm("<%- __('Are you sure you wish to delete this page?') %>")) {
+            if(confirm("<%- t('pages.help.areYouSureDelete') %>")) {
                 $.ajax(this.href, {
                     success: function() {
                         //reload the page

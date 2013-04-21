@@ -6,33 +6,33 @@
         <div class="module">
             <div class="content">
 
-                <h3>Manage tags</h3>
+                <h3><%- t('tags.headers.manageTags') %></h3>
                 <hr/>
 
                 <table class="table table-striped" id="member-lists-table">
                     <thead>
                         <tr>
                             <th colspan="2" width="">
-                                Tag name
+                                <%- t('tags.headers.name') %>
                             </th>
                             <th width="12%">
-                                Sort order
+                                <%- t('tags.headers.sortOrder') %>
                             </th>
                             <th width="8%">
-                                Filter
+                                <%- t('tags.headers.filter') %>
                             </th>
                             <th width="10%">
-                                Posts
+                                <%- t('tags.headers.posts') %>
                             </th>
                             <th width="7%">
-                                Action
+                                <%- t('tags.headers.actions') %>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                     <% if(tags.length == 0) { %>
                         <tr>
-                            <td colspan="5">No tags have been defined</td>
+                            <td colspan="5"><%- t('tags.help.noTagsDefined') %></td>
                         </tr>
                     <% } %>
                     <% tags.forEach(function(tag) { %>
@@ -59,7 +59,7 @@
                             <td>
                                 <%- linkTo('Edit', pathTo.editTag(type, tag.id.toString())) %>
                                 &nbsp;
-                                <%- linkTo('<i class="icon-remove"></i>', pathTo.tag(type, tag.id.toString()), { remote: true, method: 'DELETE', "data-confirm": "Are you sure you wish to delete this tag?" }) %>
+                                <%- linkTo('<i class="icon-remove"></i>', pathTo.tag(type, tag.id.toString()), { remote: true, method: 'DELETE', "data-confirm": t('tags.help.deleteConfirm') }) %>
                             </td>
                         </tr>
                     <% }) %>

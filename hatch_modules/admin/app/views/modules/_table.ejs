@@ -3,16 +3,16 @@
         <thead>
         <tr>
             <th width="25%" colspan="2">
-                <%- __('Modules') %>
+                <%- t('modules.headers.modules') %>
             </th>
             <th width="">
-                <%- __('Description') %>
+                <%- t('modules.headers.description') %>
             </th>
             <th width="70">
-                <%- __('Enabled') %>
+                <%- t('modules.headers.enabled') %>
             </th>
             <th width="70">
-                <%- __('Actions') %>
+                <%- t('modules.headers.actions') %>
             </th>
         </tr>
         </thead>
@@ -26,24 +26,24 @@
                     <%= module.info.title || module.info.name %>
                 </td>
                 <td>
-                    <%= module.info.description || 'No description' %>
+                    <%= module.info.description || '' %>
                 </td>
                 <td>
-                    <%- moduleEnabled(module.info.name) ? 'Yes' : 'No' %>
+                    <%- moduleEnabled(module.info.name) ? icon('ok') : '' %>
                 </td>
                 <td nowrap="nowrap" align="right">
                     <% if (moduleEnabled(module.info.name)) { %>
                         <% if (module.info.settings) { %>
                             <%- linkTo(
-                                __('Edit'),
+                                t('modules.actions.edit'),
                                 pathTo.setupModule(module.info.name)
                             ) %>&nbsp;
                         <% } %>
-                        <a rel="tooltip" data-original-title="<%- __('Disable this module') %>" href="<%- pathTo.disableModule(module.info.name) %>">
+                        <a rel="tooltip" data-original-title="<%- t('modules.help.disable') %>" href="<%- pathTo.disableModule(module.info.name) %>">
                             <i class="icon-remove"></i></a>
                     <% } else { %>
                         <%- linkTo(
-                            __('Enable'),
+                            t('modules.actions.enable'),
                             pathTo.enableModule(module.info.name)
                         ) %>
                     <% } %>

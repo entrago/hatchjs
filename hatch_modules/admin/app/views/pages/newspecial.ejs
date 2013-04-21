@@ -6,7 +6,7 @@
     <div class="module">
       <div class="content">
 
-        <h3><%- __('Add new special page') %></h3>
+        <h3><%- t('pages.headers.newSpecial') %></h3>
 
         <hr/>
 
@@ -17,7 +17,7 @@
 
             <% if (!page.id) { %>
             <div class="control-group">
-                <label for="type" class="control-label"><%- __('Special page type') %></label>
+                <label for="type" class="control-label"><%- t('pages.labels.specialPageType') %></label>
                 <div class="controls">
                     <select id="type" name="type">
                         <% specials.forEach(function (sp) { %>
@@ -29,22 +29,22 @@
             <% } %>
 
             <div class="control-group">
-                <label for="page_title" class="control-label"><%- __('Page title') %></label>
+                <label for="page_title" class="control-label"><%- t('pages.labels.title') %></label>
                 <div class="controls">
                     <input type="text" name="title" id="page_title" class="input-xlarge" value="<%- page.title || '' %>" />
                 </div>
             </div>
 
             <div class="control-group">
-                <label for="page_url" class="control-label"><%- __('URL') %></label>
+                <label for="page_url" class="control-label"><%- t('pages.labels.url') %></label>
                 <div class="controls">
                     <input type="text" name="url" id="page_url" class='input-xlarge' value="<%- page.url %>" />
                 </div>
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary"><i class="icon-ok icon-white"></i> <%- __('Create page') %></button>
-                <%- linkTo(__('Cancel'), pathTo.pages(), {class: 'btn'}) %>
+                <button type="submit" class="btn btn-primary"><i class="icon-ok icon-white"></i> <%- t('pages.actions.create') %></button>
+                <%- linkTo(t('pages.actions.cancel'), pathTo.pages(), {class: 'btn'}) %>
             </div>
         <%- formTagEnd() %>
 

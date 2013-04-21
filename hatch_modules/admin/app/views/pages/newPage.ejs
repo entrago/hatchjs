@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row-fluid">
 
     <% include _sidebar %>
 
@@ -6,15 +6,15 @@
     <div class="module">
       <div class="content">
 
-        <h3><%- __('Add new page') %></h3>
+        <h3><%- t('pages.headers.new') %></h3>
 
         <hr/>
 
         <%- formTagBegin({action: pathTo.pages(), remote: true, id: 'page_form', class: 'form-vertical'}) %>
         <% include _pageForm %>
           <div class="form-actions">
-            <button type="submit" class="btn btn-primary"><i class="icon-ok icon-white"></i> <%- __('Create page') %></button>
-            <%- linkTo(__('Cancel'), pathTo.pages(), {class: 'btn'}) %>
+            <button type="submit" class="btn btn-primary"><i class="icon-ok icon-white"></i> <%- t('pages.actions.create') %></button>
+            <%- linkTo(t('pages.actions.cancel'), pathTo.pages(), {class: 'btn'}) %>
           </div>
         <%- formTagEnd() %>
 

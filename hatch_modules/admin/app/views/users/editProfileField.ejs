@@ -38,7 +38,7 @@
                     <div class="control-group" id="optionsControl" <%- (field.type || '').indexOf('-list') > -1 ? '':'style="display: none"' %>>
                         <label class="control-label" for="options"><%- __('Options') %></label>
                         <div class="controls">
-                            <select id="options" name="options[]" multiple="multiple" class="span4 chzn-select-create" data-placeholder="Enter some list options">>
+                            <select id="options" name="options[]" multiple="multiple" class="span12 chzn-select-create" data-placeholder="Enter some list options" style="width : 300px;">
                                 <% (field.options || []).forEach(function(option) { %>
                                     <option value="<%- option %>" selected="selected"><%- option %></option>
                                 <% }) %>

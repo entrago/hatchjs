@@ -1,14 +1,14 @@
 
 
                     <div class="control-group">
-                        <label class="control-label" for="title"><%= __('Tag name') %></label>
+                        <label class="control-label" for="title"><%= t('tags.labels.name') %></label>
                         <div class="controls">
                             <input type="text" class="input-xlarge" id="title" name="title" value="<%- tag && tag.title %>">
                         </div>
                     </div>
 
                     <div class="control-group">
-                        <label class="control-label" for="sortOrder"><%= __('Sort order') %></label>
+                        <label class="control-label" for="sortOrder"><%= t('tags.labels.sortOrder') %></label>
                         <div class="controls">
                             <select id="sortOrder" name="sortOrder">
                                 <% sortOrders.forEach(function (order) { %>
@@ -21,7 +21,7 @@
                     </div>
 
                     <div class="control-group">
-                        <label class="control-label" for="description"><%= __('Description') %></label>
+                        <label class="control-label" for="description"><%= t('tags.labels.description') %></label>
                         <div class="controls">
                             <textarea id="description" name="description" class="input-xlarge span6 richtext" rows="5"><%- tag && tag.description %></textarea>
                         </div>
@@ -30,7 +30,7 @@
                     <div class="control-group">
                         <label class="checkbox">
                             <input type="checkbox" class="checkbox" name="filterEnabled" id="filterEnabled" <%- tag && tag.filter ? 'checked="checked"':'' %> />
-                            <%= __('Enable automatic filter') %>
+                            <%= t('tags.labels.filter') %>
                         </label>
 
                         <input type="hidden" name="filter" id="filterValue" value="<%- tag && escape(tag.filter) %>" />
@@ -43,7 +43,7 @@
 
                             <label class="checkbox">
                                 <input type="checkbox" class="checkbox" name="filterExisting" id="filterExisting" />
-                                <%= __('Apply the new filter to content') %>
+                                <%= t('tags.labels.applyFilter') %>
                             </label>
 
                             <div id="filter-count" style="display : none;">
@@ -61,7 +61,7 @@
                                 <div class="accordion-group">
                                     <div class="accordion-heading">
                                         <a class="accordion-toggle" data-toggle="collapse" data-parent="#permissions" href="#list">
-                                            <i class="icon-lock"></i> <%- __('Manage permissions') %>
+                                            <i class="icon-lock"></i> <%- t('tags.labels.permissions') %>
                                         </a>
                                     </div>
                                     <div id="list" class="accordion-body collapse <%- tag.permissions && tag.permissions.length > 0 ? 'in':'' %>">

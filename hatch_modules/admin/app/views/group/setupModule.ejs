@@ -5,7 +5,7 @@
     <div class="span10">
         <div class="module">
             <div class="content">
-                <h3><%- inst.module.info.title || inst.module.info.name %> settings</h3>
+                <h3><%- t('modules.actions.configure', inst.module.info.title || inst.module.info.name) %></h3>
 
                 <% if(inst.module.info.settings.intro) { %>
                     <p>
@@ -31,7 +31,7 @@
                     <% }) %>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary"><%- __('Save settings') %></button>
+                        <button type="submit" class="btn btn-primary"><%- t('modules.actions.save') %></button>
                     </div>
 
                 <% formTagEnd() %>

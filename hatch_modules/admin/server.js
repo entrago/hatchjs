@@ -32,11 +32,11 @@ var app = module.exports = function getServerInstance(parent) {
                 }
             });
         });
-    }
 
-    // register the permissions for this module
-    var permissions = require(__dirname + '/config/permissions.yml')[0].permissions;
-    parent.hatch.permissions.register(permissions);
+        // register the permissions for this module
+        var permissions = require(__dirname + '/config/permissions.yml')[0].permissions;
+        parent.hatch.permissions.register(permissions);
+    }
 
     return app;
 };

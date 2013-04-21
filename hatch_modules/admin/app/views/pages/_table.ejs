@@ -14,9 +14,9 @@
             <%- /true/.test(page.hideFromNavigation) ? 'Hidden' : 'Visible' %> 
         </td>
         <td>
-            <%- linkTo('Edit', pathTo.editPage(req.group.id, page.id), {class: '' }) %>
+            <%- linkTo('Edit', pathTo.editPage(page.id), {class: '' }) %>
             &nbsp;
-            <%- linkTo('<i class="icon-remove"></i>', pathTo.page(page), {remote: true, method: 'delete', rel: 'tooltip', 'data-original-title': __('Delete this page'), rel: 'delete-page'}) %>
+            <%- linkTo('<i class="icon-remove"></i>', pathTo.page(), {remote: true, method: 'delete', rel: 'tooltip', 'data-original-title': __('Delete this page'), rel: 'delete-page'}) %>
         </td>
     </tr>
 <% }); %>
@@ -35,7 +35,7 @@
             <input type="hidden" name="inline" value="true" />
 
             <i class="icon-plus-sign"></i>
-            <input type="text" name="title" class="span6" placeholder="<%- __('Type your page title and hit enter ...') %>" />
+            <input type="text" name="title" class="span6" placeholder="<%- t('pages.help.enterTitle') %>" />
 
             <div class="pull-right">
               <button type="submit" class="btn-link"><%- __('Add') %></button>
@@ -48,6 +48,6 @@
 <tr class="page-item level0 new-page" data-id="new">
     <td colspan="5">
         <i class="icon-move"></i>
-        <span class="page-title drag"><%- __('Drag me onto the sitemap to add a new page') %></span>
+        <span class="page-title drag"><%- t('pages.help.drag') %></span>
     </td>
 </tr>

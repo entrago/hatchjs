@@ -1,4 +1,4 @@
-<li class="nav-header"><%- __('Pages') %></li>
+<li class="nav-header"><%- t('pages.headers.pages') %></li>
 
 <%- li('index') %>
     <%- linkTo(icon('sitemap') + t('pages.sitemap'),
@@ -9,7 +9,7 @@
         pathTo.specialPages) %>
 <%- liEnd %>
 
-<li class="nav-header"><%- __('Actions') %></li>
+<li class="nav-header"><%- t('pages.headers.actions') %></li>
 
 <%- li('new') %>
     <%- linkTo(icon('file-alt') + t('pages.actions.new'),

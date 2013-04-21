@@ -1,5 +1,5 @@
 exports.__ = function (s) {
-    return s;
+    return '<span style="color: red;">' + s + '</span>';
 };
 
 exports.specialPagePath = function () {

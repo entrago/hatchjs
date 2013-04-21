@@ -2,114 +2,116 @@
 <%- errorMessagesFor(page) %>
 
 <div class="control-group">
-  <label for="page_title" class="control-label"><%- __('Page title') %></label>
-  <div class="controls">
-    <input type="text" name="title" id="page_title" class="input-xlarge" value="<%- page.title || '' %>" />
-  </div>
+    <label for="page_title" class="control-label"><%- t('pages.labels.title') %></label>
+    <div class="controls">
+        <input type="text" name="title" id="page_title" class="input-xlarge" value="<%- page.title || '' %>" />
+    </div>
 </div>
 
 <% if(page.parentId || !(page.type == 'home' || page.type == 'page')) { %>
-  <div class="control-group">
-    <label for="page_url" class="control-label"><%- __('URL') %></label>
-    <div class="controls">
-      <select name="customUrl" id="page_customUrl">
-          <option value="true"><%- __('Leave as-is') %></option>
-          <option value="false"><%- __('Auto-assign') %></option>
-          <option value="true" <%- page.customUrl === 'true' ? 'selected="selected"':'' %>><%- __('Choose custom URL') %></option>
-      </select>
-      <input type="text" name="url" id="page_url" class='input span2' value="<%- page.getUrlName() %>" <%- page.customUrl === 'true' ? '':'style="display: none;"' %> />
+    <div class="control-group">
+        <label for="page_url" class="control-label"><%- t('pages.labels.url') %></label>
+        <div class="controls">
+            <select name="customUrl" id="page_customUrl">
+                <option value="true"><%- t('pages.labels.leaveAsIs') %></option>
+                <option value="false"><%- t('pages.labels.autoAssign') %></option>
+                <option value="true" <%- page.customUrl === 'true' ? 'selected="selected"':'' %>><%- t('pages.labels.customUrl') %></option>
+            </select>
+            <input type="text" name="url" id="page_url" class='input span2' value="<%- page.getUrlName() %>" <%- page.customUrl === 'true' ? '':'style="display: none;"' %> />
+        </div>
     </div>
-  </div>
 <% } %>
 
 <% if(!page.id) { %>
     <div class="control-group">
-      <label for="parentId" class="control-label"><%- __('Parent page') %></label>
-      <div class="controls">
-        <select id="parentId" name="parentId">
-          <% req.pagesTree.forEach(function (p) { %>
-            <% if([null, '', 'page', 'home'].indexOf(p.type) == -1) return; %>
-            <option value="<%- p.id %>"<%- page.parentId == p.id ? ' selected="selected"':'' %>>
-                <% for(var i=0; i!=p.level; i++) { %>-<% } %>
-                <%- p.title %>
-            </option>
-          <% }) %>
-        </select>
-      </div>
+        <label for="parentId" class="control-label"><%- t('pages.labels.parentPage') %></label>
+        <div class="controls">
+            <select id="parentId" name="parentId">
+                <% req.pagesTree.forEach(function (p) { %>
+                    <% if([null, '', 'page', 'home'].indexOf(p.type) == -1) return; %>
+                    <option value="<%- p.id %>"<%- page.parentId == p.id ? ' selected="selected"':'' %>>
+                        <% for(var i=0; i!=p.level; i++) { %>-<% } %>
+                        <%- p.title %>
+                    </option>
+                <% }) %>
+            </select>
+        </div>
     </div>
 <% } else { %>
     <input type="hidden" name="parentId" value="<%- page.parentId %>" />
 <% } %>
 
 <% if (!page.id) { %>
-<div class="control-group hidden">
-  <label for="type" class="control-label"><%- __('Page type') %></label>
-  <div class="controls">
-    <select id="type" name="type">
-      <option value="page"><%- __('Regular page') %></option>
-      <% specials.forEach(function (sp) { %>
-      <option> <%- sp.type %> </option>
-      <% }) %>
-    </select>
-  </div>
-</div>
+    <div class="control-group hidden">
+        <label for="type" class="control-label"><%- t('pages.labels.pageType') %></label>
+        <div class="controls">
+            <select id="type" name="type">
+                <option value="page"><%- t('pages.labels.regularPage') %></option>
+                <% specials.forEach(function (sp) { %>
+                <option> <%- sp.type %> </option>
+                <% }) %>
+            </select>
+        </div>
+    </div>
 <% } %>
 
 <% if (!page.type || page.type == 'page' || page.type == 'home') { %>
     <div class="control-group">
-      <label for="hideFromNavigation" class="control-label"><%- __('Show in navigation?') %></label>
-      <div class="controls">
-        <select id="hideFromNavigation" name="hideFromNavigation">
-          <option value="false"><%- __('Yes') %></option>
-          <option value="true"<%- /true/.test(page.hideFromNavigation) ? ' selected="selected"':'' %>><%- __('No') %></option>
-        </select>
-      </div>
+        <label for="hideFromNavigation" class="control-label"><%- t('pages.labels.showInNavigation') %></label>
+        <div class="controls">
+            <select id="hideFromNavigation" name="hideFromNavigation">
+                <option value="false"><%- t('pages.labels.yes') %></option>
+                <option value="true"<%- /true/.test(page.hideFromNavigation) ? ' selected="selected"':'' %>><%- t('pages.labels.no') %></option>
+            </select>
+        </div>
     </div>
 
     <div class="control-group">
-      <label for="templateId" class="control-label"><%- __('Page template') %></label>
-      <div class="controls">
-        <select id="templateId" name="templateId">
-          <option value=""><%- __('No template') %></option>
-          <% templates.forEach(function (t) { %>
-          <option value="<%- t.id %>"<%- page.templateId == t.id ? ' selected="selected"':'' %>><%- t.title %></option>
-          <% }) %>
-        </select>
-      </div>
+        <label for="templateId" class="control-label"><%- t('pages.labels.pageTemplate') %></label>
+        <div class="controls">
+            <select id="templateId" name="templateId">
+                <option value=""><%- t('pages.labels.noTemplate') %></option>
+                <% templates.forEach(function (t) { %>
+                <option value="<%- t.id %>"<%- page.templateId == t.id ? ' selected="selected"':'' %>><%- t.title %></option>
+                <% }) %>
+            </select>
+        </div>
     </div>
 
     <hr/>
 
     <div class="control-group">
-      <label for="page_metaTitle" class="control-label">&lt;Metatags&gt; <%- __('title') %></label>
-      <div class="controls">
-        <input type="text" id="page_metaTitle" name="metaTitle" class='input-xlarge' value="<%- page.metaTitle %>" />
-        <span class="help-inline"><%- __('Override the title that shows in the browser') %></span>
-      </div>
+        <label for="page_metaTitle" class="control-label"><%= t(['pages.labels.metaTitle', '&lt;Metatags&gt;']) %></label>
+        <div class="controls">
+            <input type="text" id="page_metaTitle" name="metaTitle" class='input-xlarge' value="<%- page.metaTitle %>" />
+            <span class="help-inline"><%- t('pages.help.overrideTitle') %></span>
+        </div>
     </div>
 
     <div class="control-group">
-      <label for="page_metaDescription" class="control-label">&lt;Metatags&gt; <%- __('description') %></label>
-      <div class="controls">
-        <textarea name="metaDescription" id="page_metaDescription" class='input-xlarge span4' ><%- page.metaDescription || '' %></textarea>
-      </div>
+        <label for="page_metaDescription" class="control-label"><%= t(['pages.labels.metaDescription', '&lt;Metatags&gt;']) %></label>
+        <div class="controls">
+            <textarea name="metaDescription" id="page_metaDescription" class='input-xlarge span4' ><%- page.metaDescription || '' %></textarea>
+        </div>
     </div>
 
     <div class="control-group">
-      <label for="page_metaKeywords" class="control-label">&lt;Metatags&gt; <%- __('keywords') %></label>
-      <div class="controls">
-        <input type="text" id="page_metaKeywords" name="metaKeywords" class='input-xlarge' value="<%- page.metaKeywords || '' %>" />
-      </div>
+        <label for="page_metaKeywords" class="control-label"><%= t(['pages.labels.metaKeywords', '&lt;Metatags&gt;']) %></label>
+        <div class="controls">
+            <input type="text" id="page_metaKeywords" name="metaKeywords" class='input-xlarge' value="<%- page.metaKeywords || '' %>" />
+        </div>
     </div>
 
+    <!--
     <div class="control-group">
-      <label for="page_tags" class="control-label"><%- __('Search #tags') %></label>
-      <label class="control-label" for="page_tags"></label>
-      <div class="controls">
-        <input type="text" name="tags" id="page_tags" class='input-xlarge' value="<%- page.tags || '' %>" />
-        <span class="help-inline"><%- __('Clicking on the specified #tags will link to this page') %></span>
-      </div>
+        <label for="page_tags" class="control-label"><%- __('Search #tags') %></label>
+        <label class="control-label" for="page_tags"></label>
+        <div class="controls">
+            <input type="text" name="tags" id="page_tags" class='input-xlarge' value="<%- page.tags || '' %>" />
+            <span class="help-inline"><%- __('Clicking on the specified #tags will link to this page') %></span>
+        </div>
     </div>
+    -->
 <% } %>
 
 <script type="text/javascript">

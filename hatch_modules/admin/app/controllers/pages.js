@@ -26,15 +26,12 @@ module.exports = PagesController;
 function PagesController(init) {
     Application.call(this, init);
     init.before(findPage, {only: 'destroy, edit, show, update'});
-    init.before(prepareTree, {only: 'index, new, newSpecial, edit, update, create'});
+    init.before(prepareTree, {only: 'index, new, newSpecial, edit'});
 }
 
 function findPage(c) {
     var locals = this;
-    c.Page.find(c.params.id, function (err, page) {
-        if (!page) {
-            return c.next(new Error('404'));
-        }
+    c.Page.find(c.req.params.id || c.req.body.id, function (err, page) {
         locals.page = page;
         c.next();
     });
@@ -42,7 +39,7 @@ function findPage(c) {
 
 function prepareTree(c) {
     var locals = this;
-    this.specials = Object.keys(c.compound.hatch.page.pages).map(function(sp) {
+    this.specials = Object.keys(c.compound.hatch.page.pages).map(function (sp) {
         return c.compound.hatch.page.pages[sp];
     });
     this.templates = [];
@@ -60,20 +57,28 @@ function prepareTree(c) {
 }
 
 // Render the page tree to JSON
-function renderPageTree(c) {
+function renderPageTree (c) {
     var Page = c.Page;
     c.req.group.pages(function (err, pages) {
         // filter page types to standard page types only
-        pages = pages.filter(function(page) {
+        pages = pages.filter(function (page) {
             return [null, '', 'page', 'homepage'].indexOf(page.type) !== -1;
         });
 
-        if (pages) c.locals.pages = Page.tree(pages);
+        if (pages) {
+            c.locals.pages = Page.tree(pages);
+        }
         c.render('_table', { layout: false });
     });
 }
 
-PagesController.prototype.index = function index(c) {
+/**
+ * Show the page sitemap for this group where the administrator can drag pages
+ * to re-order and adjust the hierarchy.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+PagesController.prototype.index = function(c) {
     this.title = 'Manage pages';
     c.req.session.adminSection = 'pages';
     var Page = c.Page;
@@ -89,11 +94,21 @@ PagesController.prototype.index = function index(c) {
     });
 };
 
-PagesController.prototype.renderPageTree = function tree(c) {
+/**
+ * Render the page tree as a partial.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+PagesController.prototype.renderPageTree = function(c) {
     renderPageTree.call(this, c);
 };
 
-PagesController.prototype.specials = function specials(c) {
+/**
+ * Show the special page list for this group.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+PagesController.prototype.specials = function(c) {
     this.pageName = 'specials';
     var Page = c.Page;
     Page.all({where: {groupId: c.req.group.id}}, function(err, pages) {
@@ -113,20 +128,35 @@ PagesController.prototype.specials = function specials(c) {
     });
 }
 
-PagesController.prototype['new'] = function newPage(c) {
+/**
+ * Show the new page form.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+PagesController.prototype.new = function(c) {
     this.pageName = 'new-page';
     this.page = new c.Page;
     c.render('newPage');
 };
 
-PagesController.prototype.newSpecial = function newSpecial(c) {
+/**
+ * Show the new special page form.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+PagesController.prototype.newSpecial = function(c) {
     this.type = c.req.params.type;
     this.page = new c.Page;
     this.pageName = 'new-special' + (this.type ? '-' + this.type : '');
     c.render();
 };
 
-PagesController.prototype.create = function create(c) {
+/**
+ * Create a new page.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+PagesController.prototype.create = function(c) {
     var locals = this;
 
     // TODO: this should come from some kind of JSON/YML template
@@ -142,7 +172,7 @@ PagesController.prototype.create = function create(c) {
         {type: 'core-widgets/mainmenu', id: 2}
     ];
 
-    c.Tag.assignTagsForObject(c.req.body, c.req.body.tags, function () {
+    //c.Tag.assignTagsForObject(c.req.body, c.req.body.tags, function () {
         Page.createPage(c.body, function (err, page) {
             if (err) {
                 c.next(err);
@@ -159,14 +189,14 @@ PagesController.prototype.create = function create(c) {
                 }
                 else {
                     if (page.type && page.type !== 'page') {
-                        c.send({ redirect : c.pathTo.groupSpecialPages(c.req.group) });
+                        c.send({ redirect : c.pathTo.specialPages(c.req.group) });
                     } else {
-                        c.send({ redirect : c.pathTo.groupPages(c.req.group) });
+                        c.send({ redirect : c.pathTo.pages(c.req.group) });
                     }
                 }
             }
         });
-    });
+    //});
 
     function reorderPages(callback) {
         Page.all({where: {groupId: c.req.group.id}}, function(err, pages) {
@@ -182,47 +212,67 @@ PagesController.prototype.create = function create(c) {
     }
 };
 
-PagesController.prototype.destroy = function destroy(c) {
+/**
+ * Delete a page from this group.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+PagesController.prototype.destroy = function(c) {
     c.page.destroyPage(function() {
         c.redirect(c.pathTo.group_pages(c.req.group));
     });
 };
 
-PagesController.prototype.edit = function edit(c) {
+/**
+ * Show the edit form for the specified page.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+PagesController.prototype.edit = function(c) {
     c.render('editPage');
 };
 
-PagesController.prototype.update = function update(c) {
+/**
+ * Update a page.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+PagesController.prototype.update = function(c) {
     var Page = c.Page;
     var page = this.page;
 
     this.page = page;
     c.body.groupId = c.req.group.id;
 
-    c.Tag.assignTagsForObject(page, c.req.body.tags, function () {
+    console.log('HERE')
+
+    //c.Tag.assignTagsForObject(page, c.req.body.tags, function () {
         page.update(c.body, function(err, page) {
             if (err) {
                 return c.next(new Error(err.message));
             }
 
             if ([null, '', 'page', 'homepage'].indexOf(c.locals.page.type) != -1) {
-                c.send({ redirect: c.pathTo.groupPages(c.req.group) });
+                c.send({ redirect: c.pathTo.pages() });
             } else {
-                c.send({ redirect: c.pathTo.groupSpecialPages(c.req.group) });
+                c.send({ redirect: c.pathTo.specialPages() });
             }
         });
-    });
+    //});
 };
 
-PagesController.prototype.updateOrder = function updateOrder(c) {
-    var Page = c.Page;
-
+/**
+ * Update the order and hierarchy of the pages within this group.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+PagesController.prototype.updateOrder = function(c) {
     // find and update the page that was dragged
-    Page.find(c.params.page_id, function(err, page) {
+    c.Page.find(c.params.page_id, function(err, page) {
         delete c.body.authencity_token;
         page.update(c.body, function(err, page) {
             // update the order of all pages in the group
-            Page.all({where: {groupId: c.req.group.id}}, function(err, pages) {
+            c.Page.all({where: {groupId: c.req.group.id}}, function(err, pages) {
                 if (err || !pages) return;
 
                 // filter page types to standard page types only

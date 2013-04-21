@@ -1,16 +1,22 @@
 <% pages.forEach(function (page) { %>
-<tr class="page-item level<%- page.level || 0 %>" data-id="<%- page.id %>"
-  data-path="<%- page.url %>">
-  <td>
-    <i class="<%- page.icon || 'icon-star' %>"></i>
-    <span class="page-title"><%= page.title %> (<%- page.type %>)</span> </td>
-  <td> <%- linkTo('/' + page.url.replace(req.group.homepage.url, ''), '//' + page.url) %> </td>
-  <td> <%- __('Public') %> </td>
-  <td> <%- __('Visible') %> </td>
-  <td>
-    <%- linkTo(__('Edit'), pathTo.editGroupPage(group, page), {class: '' }) %>
-    &nbsp;
-    <%- linkTo('<i class="icon-remove"></i>', pathTo.groupPage(group, page), {remote: true, rel: 'tooltip', method: 'delete', 'data-original-title': __('Delete this page'), rel: 'delete-page'}) %>
-  </td>
-</tr>
+    <tr class="page-item level<%- page.level || 0 %>" data-id="<%- page.id %>"
+    data-path="<%- page.url %>">
+        <td>
+            <i class="<%- page.icon || 'icon-star' %>"></i>
+            <span class="page-title"><%= page.title %> (<%- page.type %>)</span> </td>
+        <td>
+            <%- linkTo('/' + page.url.replace(req.group.homepage.url, ''), '//' + page.url) %>
+        </td>
+        <td>
+            <%- __('Public') %>
+        </td>
+        <td>
+            <%- __('Visible') %>
+        </td>
+        <td>
+            <%- linkTo(__('Edit'), pathTo.editPage(page), {class: '' }) %>
+            &nbsp;
+            <%- linkTo('<i class="icon-remove"></i>', pathTo.page(page.id), {remote: true, rel: 'tooltip', method: 'delete', 'data-original-title': __('Delete this page'), rel: 'delete-page'}) %>
+        </td>
+    </tr>
 <% }); %>
