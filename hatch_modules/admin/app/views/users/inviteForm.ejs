@@ -5,38 +5,42 @@
     <div class="span10">
         <div class="module">
             <div class="content">
-                <h3>Invite users</h3>
-                <p>Invitations to join the community will be emailed to the specified users</p>
+                <h3>
+                    <%- t('users.headers.inviteUsers') %>
+                </h3>
+                <p>
+                    <%- t('users.help.inviteUsers') %>
+                </p>
 
                 <hr/>
 
                 <%- formTagBegin({ action: pathTo.sendInvites, remote: true, method: 'post', id: 'invite-form' }) %>
                     <div class="control-group">
-                        <label class="control-label"><%- __('Select users to invite') %></label>
+                        <label class="control-label"><%- t('users.labels.selectUsersToInvite') %></label>
                         <div class="controls">
-                            <select id="usernames" name="usernames[]" multiple="multiple" class="span4 chzn-select-create" data-placeholder="<%= __('Enter some usernames and / or email addresses...') %>">
+                            <select id="usernames" name="usernames[]" multiple="multiple" class="span4 chzn-select-create" data-placeholder="<%= t('users.help.enterUsernames') %>">
 
                             </select>
                         </div>
                     </div>
 
                     <div class="control-group">
-                        <label class="control-label" for="subject"><%- __('Invite subject') %></label>
+                        <label class="control-label" for="subject"><%- t('users.labels.inviteSubject') %></label>
                         <div class="controls">
                             <input type="text" id="subject" name="subject" class="span4"/>
                         </div>
                     </div>
 
                     <div class="control-group">
-                        <label class="control-label" for="body"><%- __('Invite text') %></label>
+                        <label class="control-label" for="body"><%- t('users.labels.inviteBody') %></label>
                         <div class="controls">
                             <textarea id="body" name="body" class="input-xxlarge span6 richtext" rows="10"></textarea>
                         </div>
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary"><%- __('Send invites') %></button>
-                        <a href="<%- pathTo.community() %>" class="btn"><%- __('Cancel') %></a>
+                        <button type="submit" class="btn btn-primary"><%- t('users.actions.sendInvites') %></button>
+                        <a href="<%- pathTo.community() %>" class="btn"><%- t('common.cancel') %></a>
                     </div>
                 <%- formTagEnd() %>
             </div>

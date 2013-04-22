@@ -4,6 +4,19 @@ en:
     itemsPerPage: items per page
     bragHatch: 'Built on the Hatch Platform'
     imageUploaded: image uploaded
+    'yes': 'Yes'
+    'no': 'No'
+    public: Public
+    membersOnly: Members only
+    private: Private
+    visible: Visible
+    hidden: Hidden
+    enterTags: 'Enter tags ...'
+    help: Help
+    renderSpeed: Rendered in
+    hatchCredit: 'Built on Hatch.js'
+    text: Text
+    email: Email
   layout:
     manageGroup: Manage group
     toggleEditConsole: Edit console

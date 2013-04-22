@@ -13,15 +13,55 @@ en:
     group: Settings
     modules: Modules
   users:
-    header:
+    headers:
       filter: Filter
       tags: Tags
       actions: Actions
-    all: All users
-    members: Members
-    editors: Editors
-    pending: Pending
-    blacklisted: Blacklisted
+      memberName: Member name
+      tags: Tags
+      membership: Membership
+      since: Since
+      usersPerPage: Users per page
+      all: All users
+      members: Members
+      editors: Editors
+      pending: Pending
+      blacklisted: Blacklisted
+      inviteUsers: Invite users
+      sendMessage: Send message
+      profileFields: Profile fields
+      field: Field
+      type: Field type
+      mandatory: Mandatory
+      privacy: Privacy
+      editProfileField: Edit custom profile field
+      exportMembers: Export members
+    labels:
+      selectUsersToInvite: Select users to invite
+      inviteSubject: Invitation email subject
+      inviteBody: Invitation email body text
+      allMembers: all members
+      selectedMembers: '% selected members'
+      messageSubject: Message subject
+      messageBody: Message body text
+      fullname: Full name
+      name: Name
+      username: Username
+      emailAddress: Email address
+      text: Text
+      'select-list': 'Select list'
+      fieldName: Field name
+      fieldType: Field type
+      textarea: Textarea
+      radioList: Radio list
+      checkList: Check list
+      selectList: Select list
+      options: Options
+      mandatory: Mandatory
+      visibility: Visibility
+      registrationDescription: Description to show on registration form
+      helpText: Help text
+      exportFormat: Select export format
     actions:
       addTag: Add tag
       removeTag: Remove tag
@@ -29,6 +69,20 @@ en:
       sendMessage: Send message
       profileFields: Profile fields
       export: Export data
+      memberActions: Member actions
+      removeMembers: Remove members
+      blacklistMembers: Blacklist members
+      unblacklistMembers: Un-blacklist members
+      sendInvites: Send invites
+      addProfileField: Add new profile field
+      save: Save
+      exportMembers: Export members
+    help:
+      inviteUsers: 'Enter the email addresses and/or usernames of the users you wish to invite to join this group'
+      enterUsernames: 'Enter email addresses and/or usernames'
+      sendMessage: This will send a message to
+      profileFields: Edit the custom profile fields for users within this group 
+      deleteProfileField: 'Are you sure you wish to delete this profile field?'
   content:
     actions:
       common: Actions
@@ -107,10 +161,34 @@ en:
     help:
       noTagsDefined: No tags have been defined yet
       deleteConfirm: 'Are you sure you wish to delete this tag?'
-  stream:
-    import: Import streams
-    manage: Manage streams
-    add: Add new stream
+  streams:
+    headers:
+      import: Import streams
+      manage: Manage streams
+      add: Add new stream
+      stream: Stream
+      query: Query
+      tags: Tags
+      lastRun: Last run
+      actions: Actions
+    actions:
+      manage: Manage streams
+      add: Add new stream
+      save: Save stream
+    labels:
+      title: Stream name
+      source: Source
+      query: Query
+      tags: Tags
+      interval: 'Run how often?'
+      everyMinute: Every minute
+      every5Minutes: Every 5 minutes
+      every10Minutes: Every 10 minutes
+      everyHour: Every hour
+      everyDay: Every day
+    help:
+      tags: Enter tags to be applied to content imported for this stream
+      noStreams: No import streams have been defined
   pages:
     sitemap: Sitemap
     specials: Special pages
@@ -130,6 +208,7 @@ en:
       create: Create page
       cancel: Cancel
       save: Save page
+      edit: Edit
     labels:
       yes: 'Yes'
       no: 'No'
@@ -152,13 +231,48 @@ en:
       overrideTitle: Overrides the title in the browser
       drag: Drag me onto the sitemap to add a new page
       enterTitle: 'Type your page title and hit enter ...'
+      delete: Delete this page
   group:
-    settings: Settings
-    url: Change URL
-    headerfooter: Header and footer
-    analytics: Analytics
+    headers:
+      groupSettings: Group settings
+      moduleSettings: Module settings
+      settings: Settings
+      url: URL
+      headerfooter: Header and footer
+      analytics: Analytics
+      changeUrl: URL
+    labels:
+      title: Title
+      joinPermissions: Join permissions
+      freeToJoin: Free to join
+      requestToJoin: Request to join
+      inviteOnly: Invite only
+      favicon: Favicon
+      metaDescription: Meta description
+      metaKeywords: Meta keywords
+      navbarType: Navigation bar type
+      navbarDefault: Default
+      navbarFixed: Fixed
+      navbarMouseover: Show on mouse-over
+      navbarMouseclick: Show on mouse-click
+      navbarStyle: Navigation bar style
+      navbarInverse: Inverse
+      headerHtml: Header HTML
+      footerHtml: Footer HTML
+      url: Enter a new URL
+      googleAnalytics: Google Analytics ID
+    actions:
+      uploadFavicon: Upload favicon
+      save: Save changes
+    help:
+      joinPermissions: Select how users are able to join this group
+      metaDescription: Enter the default meta description for pages within this group
+      metaKeywords: Enter the default meta keywords for pages within this group
+      faviconUpload: Upload a favicon for this group
+      googleAnalytics: Copy and paste your Google Analytics ID to link up your account
   modules:
     headers:
+      manageModules: Manage modules
       actions: Actions
       modules: Modules
       description: Description
@@ -170,3 +284,5 @@ en:
       edit: Edit
     help:
       disable: Disable this module
+
+

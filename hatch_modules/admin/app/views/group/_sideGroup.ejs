@@ -1,18 +1,18 @@
 
-<li class="nav-header"><%- __('Group settings') %></li>
+<li class="nav-header"><%- t('group.headers.groupSettings') %></li>
 <%- li('group-settings') %>
-    <%- linkTo(icon('cogs') + t('group.settings'),
+    <%- linkTo(icon('cogs') + t('group.headers.settings'),
         pathTo.group('settings')) %>
 <%- liEnd %>
 <%- li('group-url') %>
-    <%- linkTo(icon('link') + t('group.url'),
+    <%- linkTo(icon('link') + t('group.headers.url'),
         pathTo.group('url')) %>
 <%- liEnd %>
 <%- li('group-headerfooter') %>
-    <%- linkTo(icon('align-left') + t('group.headerfooter'),
+    <%- linkTo(icon('align-left') + t('group.headers.headerfooter'),
         pathTo.group('headerfooter')) %>
 <%- liEnd %>
 <%- li('group-analytics') %>
-    <%- linkTo(icon('bar-chart') + t('group.analytics'),
+    <%- linkTo(icon('bar-chart') + t('group.headers.analytics'),
         pathTo.group('analytics')) %>
 <%- liEnd %>

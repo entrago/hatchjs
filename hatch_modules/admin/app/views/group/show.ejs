@@ -9,12 +9,14 @@
                 <%- formTagBegin({ action: pathTo.groupSave, id: 'settingsForm', class: 'form-vertical', method: 'post', enctype: 'multipart/form-data', remote: true }) -%>
 
                     <% if(tab == 'settings') { %>
-                        <h3><%- __('Group settings') %></h3>
+                        <h3>
+                            <%- t('group.headers.settings') %>
+                        </h3>
 
                         <hr/>
 
                         <div class="control-group">
-                            <label class="control-label" for="name"><%- __('Group title') %></label>
+                            <label class="control-label" for="name"><%- t('group.labels.title') %></label>
                             <div class="controls">
                                 <input type="text" class="input-xlarge" id="name" name="name" value="<%- group.name %>">
                             </div>
@@ -23,15 +25,15 @@
                         <div class="control-group">
                             <label class="control-label" for="joinPermissions">
                                 <span>
-                                    <%- __('Join permissions') %>
-                                    <i class="icon-info-sign" rel="popover" title="<%- __('Help') %>" data-content="<%- __('Set the permissions for users wishing to join the group') %>"></i>
+                                    <%- t('group.labels.joinPermissions') %>
+                                    <i class="icon-info-sign" rel="popover" title="<%- t('common.help') %>" data-content="<%- t('group.help.joinPermissions') %>"></i>
                                 </span>
                             </label>
                             <div class="controls">
                                 <select id="joinPermissions" name="joinPermissions">
-                                    <option value="free" <%- group.joinPermissions == "free" ? 'selected="selected"':'' %>><%- __('Free to join') %></option>
-                                    <option value="request" <%- group.joinPermissions == "request" ? 'selected="selected"':'' %>><%- __('Users may request to join') %></option>
-                                    <option value="closed" <%- group.joinPermissions == "closed" ? 'selected="selected"':'' %>><%- __('Invite only') %></option>
+                                    <option value="free" <%- group.joinPermissions == "free" ? 'selected="selected"':'' %>><%- t('group.labels.freeToJoin') %></option>
+                                    <option value="request" <%- group.joinPermissions == "request" ? 'selected="selected"':'' %>><%- t('group.labels.requestToJoin') %></option>
+                                    <option value="closed" <%- group.joinPermissions == "closed" ? 'selected="selected"':'' %>><%- t('group.labels.inviteOnly') %></option>
                                 </select>
                             </div>
                         </div>
@@ -40,9 +42,9 @@
 
                         <div class="control-group">
                             <input type="hidden" id="favicon" name="favicon" value="<%- group.favicon %>" />
-                            <label class="control-label" for="favicon"><%- __('Favicon') %></label>
+                            <label class="control-label" for="favicon"><%- t('group.labels.favicon') %></label>
                             <div class="controls">
-                                <a class="btn" href="#" id="faviconButton"><i class="icon-picture"></i> <%- __('Click to upload a favicon') %></a>
+                                <a class="btn" href="#" id="faviconButton"><i class="icon-picture"></i> <%- t('group.actions.uploadFavicon') %></a>
 
                                 <% if(group.favicon) { %>
                                     <img src="<%- group.favicon %>" id="faviconPreview" width="16" height="16" />
@@ -55,8 +57,8 @@
                         <div class="control-group">
                             <label class="control-label" for="metaDescription">
                                 <span>
-                                    <%- __('Default %s description', '&lt;metatags&gt;') %>
-                                    <i class="icon-info-sign"  rel="popover" title="Help" data-content="<%- __('Set the default meta description for all pages within this group') %>"></i>
+                                    <%- t(['group.labels.metaDescription', '&lt;metatags&gt;']) %>
+                                    <i class="icon-info-sign"  rel="popover" title="<%- t('common.help') %>" data-content="<%- t('group.help.metaDescription') %>"></i>
                                 </span>
                             </label>
                             <div class="controls">
@@ -67,8 +69,8 @@
                         <div class="control-group">
                             <label class="control-label" for="metaKeywords">
                                 <span>
-                                    <%- __('Default %s keywords', '&lt;metatags&gt;') %>
-                                    <i class="icon-info-sign" rel="popover" title="<%- __('Help') %>" data-content="<%- __('Set the default meta keywords for all pages within this group') %>"></i>
+                                    <%- t(['group.labels.metaKeywords', '&lt;metatags&gt;']) %>
+                                    <i class="icon-info-sign" rel="popover" title="<%- t('common.help') %>" data-content="<%- t('group.help.metaKeywords') %>"></i>
                                 </span>
                             </label>
                             <div class="controls">
@@ -78,12 +80,12 @@
 
                     <% } else if(tab == 'url') { %>
 
-                        <h3><%- __('Change URL') %></h3>
+                        <h3><%- t('group.headers.changeUrl') %></h3>
 
                         <hr/>
 
                         <div class="control-group">
-                            <label class="control-label" for="url"><%- __('Enter new URL') %></label>
+                            <label class="control-label" for="url"><%- t('group.labels.url') %></label>
                             <div class="controls">
                                 <input type="text" class="input-xlarge" id="url" name="url" />
                             </div>
@@ -91,32 +93,32 @@
 
                     <% } else if(tab == 'headerfooter') { %>
 
-                        <h3><%- __('Edit header and footer') %></h3>
+                        <h3><%- t('group.headers.headerfooter') %></h3>
 
                         <hr/>
 
                         <div class="control-group">
                             <label class="control-label" for="navBarType">
-                                <%- __('Navigation bar type') %>
+                                <%- t('group.labels.navbarType') %>
                             </label>
                             <div class="controls">
                                 <select id="navBarType" name="navBarType">
-                                    <option value="default"><%- __('Default') %></option>
-                                    <option value="fixed" <%- group.navBarType === 'fixed' ? 'selected="selected"':'' %>><%- __('Fixed to top') %></option>
-                                    <option value="mouseover" <%- group.navBarType === 'mouseover' ? 'selected="selected"':'' %>><%- __('Show on mouse-over') %></option>
-                                    <option value="click" <%- group.navBarType === 'click' ? 'selected="selected"':'' %>><%- __('Show on mouse-click') %></option>
+                                    <option value="default"><%- t('group.labels.navbarDefault') %></option>
+                                    <option value="fixed" <%- group.navBarType === 'fixed' ? 'selected="selected"':'' %>><%- t('group.labels.navbarFixed') %></option>
+                                    <option value="mouseover" <%- group.navBarType === 'mouseover' ? 'selected="selected"':'' %>><%- t('group.labels.navbarMouseover') %></option>
+                                    <option value="click" <%- group.navBarType === 'click' ? 'selected="selected"':'' %>><%- t('group.labels.navbarMouseclick') %></option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="control-group">
                             <label class="control-label" for="navBarStyle">
-                                <%- __('Navigation bar style') %>
+                                <%- t('group.labels.navbarStyle') %>
                             </label>
                             <div class="controls">
                                 <select id="navBarStyle" name="navBarStyle">
-                                    <option value="default"><%- __('Default') %></option>
-                                    <option value="inverse" <%- group.navBarStyle === 'inverse' ? 'selected="selected"':'' %>><%- __('Inverse') %></option>
+                                    <option value="default"><%- t('group.labels.navbarDefault') %></option>
+                                    <option value="inverse" <%- group.navBarStyle === 'inverse' ? 'selected="selected"':'' %>><%- t('group.labels.navbarInverse') %></option>
                                 </select>
                             </div>
                         </div>
@@ -126,8 +128,8 @@
                         <div class="control-group">
                             <label class="control-label" for="headerHtml">
                                 <span>
-                                    <%- __('Header HTML') %>
-                                    <i class="icon-info-sign" rel="popover" title="<%- __('Help') %>" data-content="<%- __('Default header for all pages in this group. Can be optionally overridden on a per-page basis by replacing the header widget with something else') %>"></i>
+                                    <%- t('group.labels.headerHtml') %>
+                                    <i class="icon-info-sign" rel="popover" title="<%- t('common.help') %>" data-content="<%- t('group.help.headerHtml') %>"></i>
                                 </span>
                             </label>
                             <div class="controls">
@@ -140,8 +142,8 @@
                         <div class="control-group">
                             <label class="control-label" for="footerHtml">
                                 <span>
-                                    <%- __('Footer HTML') %>
-                                    <i class="icon-info-sign" rel="popover" title="<%- __('Help') %>" data-content="<%- __('Default footer for all pages in this group') %>"></i>
+                                    <%- t('group.labels.footerHtml') %>
+                                    <i class="icon-info-sign" rel="popover" title="<%- t('common.help') %>" data-content="<%- t('group.help.footerHtml') %>"></i>
                                 </span>
                             </label>
                             <div class="controls">
@@ -151,22 +153,22 @@
 
                     <% } else if(tab == 'analytics') { %>
 
-                        <h3><%- __('Edit analytics settings') %></h3>
+                        <h3><%- t('group.headers.analytics') %></h3>
 
                         <hr/>
 
                         <div class="control-group">
-                            <label class="control-label" for="googleAnalyticsId"><%- __('Google Analytics Tracking ID') %></label>
+                            <label class="control-label" for="googleAnalyticsId"><%- t('group.labels.googleAnalytics') %></label>
                             <div class="controls">
                                 <input type="text" class="input-xlarge" id="googleAnalyticsId" name="googleAnalyticsId" value="<%- group.googleAnalyticsId %>">
                             </div>
-                            <span class="help-block"><%- __('Your Tracking ID can be found in the \'admin\' section of your Google Analytics account.') %></span>
+                            <span class="help-block"><%- t('group.help.googleAnalytics') %></span>
                         </div>
 
                     <% } %>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary"><%- __('Save settings') %></button>
+                        <button type="submit" class="btn btn-primary"><%- t('group.actions.save') %></button>
                     </div>
                 <%- formTagEnd() %>
 
@@ -198,7 +200,7 @@
                     $('#favicon').val(data.url);
                     $('#faviconPreview').attr('src', data.url);
 
-                    $.noty({ text: '<i class="icon-ok"></i> <%- __('Favicon uploaded') %>', type: 'success' });
+                    $.noty({ text: '<i class="icon-ok"></i> <%- t('group.help.faviconUploaded') %>', type: 'success' });
                 }
             });
         <% } %>

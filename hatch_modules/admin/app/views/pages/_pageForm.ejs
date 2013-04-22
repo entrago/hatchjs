@@ -48,7 +48,9 @@
             <select id="type" name="type">
                 <option value="page"><%- t('pages.labels.regularPage') %></option>
                 <% specials.forEach(function (sp) { %>
-                <option> <%- sp.type %> </option>
+                    <option value="<%- sp.type %>"> 
+                        <%- sp.type %> 
+                    </option>
                 <% }) %>
             </select>
         </div>
@@ -60,8 +62,8 @@
         <label for="hideFromNavigation" class="control-label"><%- t('pages.labels.showInNavigation') %></label>
         <div class="controls">
             <select id="hideFromNavigation" name="hideFromNavigation">
-                <option value="false"><%- t('pages.labels.yes') %></option>
-                <option value="true"<%- /true/.test(page.hideFromNavigation) ? ' selected="selected"':'' %>><%- t('pages.labels.no') %></option>
+                <option value="false"><%- t('common.yes') %></option>
+                <option value="true"<%- /true/.test(page.hideFromNavigation) ? ' selected="selected"':'' %>><%- t('common.no') %></option>
             </select>
         </div>
     </div>
@@ -101,17 +103,6 @@
             <input type="text" id="page_metaKeywords" name="metaKeywords" class='input-xlarge' value="<%- page.metaKeywords || '' %>" />
         </div>
     </div>
-
-    <!--
-    <div class="control-group">
-        <label for="page_tags" class="control-label"><%- __('Search #tags') %></label>
-        <label class="control-label" for="page_tags"></label>
-        <div class="controls">
-            <input type="text" name="tags" id="page_tags" class='input-xlarge' value="<%- page.tags || '' %>" />
-            <span class="help-inline"><%- __('Clicking on the specified #tags will link to this page') %></span>
-        </div>
-    </div>
-    -->
 <% } %>
 
 <script type="text/javascript">

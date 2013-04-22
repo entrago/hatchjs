@@ -5,12 +5,15 @@
     <div class="span10">
         <div class="module">
             <div class="content">
-                <h3><%- __('Send message') %></h3>
-                <p><%- __('This message will be sent to') %>
+                <h3>
+                    <%- t('users.headers.sendMessage') %>
+                </h3>
+                <p>
+                    <%- t('users.help.sendMessage') %>
                     <% if(selectedUsers.length > 0) { %>
-                        <strong><%- selectedUsers.length %> <%- __('selected community members') %></strong>
+                        <strong><%- selectedUsers.length %> <%- t('users.labels.selectedMembers') %></strong>
                     <% } else { %>
-                        <strong><%- __('all community members') %></strong>.
+                        <strong><%- t('users.labels.allMembers') %></strong>.
                     <% } %>
                 </p>
 
@@ -20,22 +23,22 @@
                     <input type="hidden" name="selectedUsers" value='<%- JSON.stringify(selectedUsers) %>' />
 
                     <div class="control-group">
-                        <label class="control-label" for="title"><%- __('Message subject') %></label>
+                        <label class="control-label" for="title"><%- t('users.labels.messageSubject') %></label>
                         <div class="controls">
                             <input type="text" class="input-xlarge span4" id="subject" name="subject" value="">
                         </div>
                     </div>
 
                     <div class="control-group">
-                        <label class="control-label" for="description"><%- __('Message body') %></label>
+                        <label class="control-label" for="description"><%- t('users.labels.messageBody') %></label>
                         <div class="controls">
                             <textarea id="body" name="body" class="input-xlarge span6 richtext" rows="10"></textarea>
                         </div>
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary"><%- __('Send message') %></button>
-                        <a href="<%- pathTo.community() %>" class="btn"><%- __('Cancel') %></a>
+                        <button type="submit" class="btn btn-primary"><%- t('users.actions.sendMessage') %></button>
+                        <a href="<%- pathTo.community() %>" class="btn"><%- t('common.cancel') %></a>
                     </div>
                 <%- formTagEnd() %>
 

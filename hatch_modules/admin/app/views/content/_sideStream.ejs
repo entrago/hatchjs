@@ -1,12 +1,12 @@
-<li class="nav-header"><%= t('stream.import') %></li>
+<li class="nav-header"><%= t('streams.headers.import') %></li>
 
 <%- li('manage-streams') %>
-    <%- linkTo(icon('signin') + t('stream.manage'),
+    <%- linkTo(icon('signin') + t('streams.actions.manage'),
         pathTo.streams) %>
 <%- liEnd %>
 
 <%- li('new-stream') %>
-    <%- linkTo(icon('plus') + t('stream.add'),
+    <%- linkTo(icon('plus') + t('streams.actions.add'),
         pathTo.newStream) %>
 <%- liEnd %>
 

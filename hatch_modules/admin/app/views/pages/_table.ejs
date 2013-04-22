@@ -8,15 +8,15 @@
             <%- page.url ? linkTo('/' + page.getUrlName(), '//' + page.url) : '' %> 
         </td>
         <td> 
-            <%- __('Public') %> 
+            <%- t('common.public') %> 
         </td>
         <td> 
-            <%- /true/.test(page.hideFromNavigation) ? 'Hidden' : 'Visible' %> 
+            <%- /true/.test(page.hideFromNavigation) ? t('common.hidden') : t('common.visible') %> 
         </td>
         <td>
             <%- linkTo('Edit', pathTo.editPage(page.id), {class: '' }) %>
             &nbsp;
-            <%- linkTo('<i class="icon-remove"></i>', pathTo.page(), {remote: true, method: 'delete', rel: 'tooltip', 'data-original-title': __('Delete this page'), rel: 'delete-page'}) %>
+            <%- linkTo('<i class="icon-remove"></i>', pathTo.page(), {remote: true, method: 'delete', rel: 'tooltip', 'data-original-title': t('pages.help.delete'), rel: 'delete-page'}) %>
         </td>
     </tr>
 <% }); %>
@@ -38,8 +38,8 @@
             <input type="text" name="title" class="span6" placeholder="<%- t('pages.help.enterTitle') %>" />
 
             <div class="pull-right">
-              <button type="submit" class="btn-link"><%- __('Add') %></button>
-              <button type="button" class="btn-link" id="cancelButton"><%- __('Cancel') %></button>
+              <button type="submit" class="btn-link"><%- t('pages.actions.add') %></button>
+              <button type="button" class="btn-link" id="cancelButton"><%- t('common.cancel') %></button>
             </div>
         <%- formTagEnd() %>
     </td>

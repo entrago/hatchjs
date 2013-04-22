@@ -6,9 +6,9 @@
         <div class="module">
             <div class="content">
 
-                <h3><%- __('Manage profile fields') %></h3>
+                <h3><%- t('users.headers.profileFields') %></h3>
 
-                <p><%- __('Re-order profile fields by dragging them around using the %s symbol', '<i class="icon-move"></i>') %>
+                <p><%- t(['users.help.profileFields', '<i class="icon-move"></i>']) %>
 
                 <hr/>
 
@@ -16,19 +16,19 @@
                     <thead>
                     <tr>
                         <th>
-                            <%- __('Field name') %>
+                            <%- t('users.headers.field') %>
                         </th>
                         <th width="15%">
-                            <%- __('Type') %>
+                            <%- t('users.headers.type') %>
                         </th>
                         <th width="12%">
-                            <%- __('Mandatory') %>
+                            <%- t('users.headers.mandatory') %>
                         </th>
                         <th width="15%">
-                            <%- __('Privacy') %>
+                            <%- t('users.headers.privacy') %>
                         </th>
                         <th width="7%">
-                            <%- __('Actions') %>
+                            <%- t('users.headers.actions') %>
                         </th>
                     </tr>
                     </thead>
@@ -36,16 +36,16 @@
                     <tr class="core">
                         <td>
                             <i class="icon-lock"></i>
-                            <%- __('Full name') %> 
+                            <%- t('users.labels.fullname') %> 
                         </td>
                         <td>
-                            <%- __('name') %>
+                            <%- t('users.labels.name') %>
                         </td>
                         <td>
 
                         </td>
                         <td>
-                            <%- __('public') %>
+                            <%- t('common.public') %>
                         </td>
                         <td>
                             -
@@ -54,16 +54,16 @@
                     <tr class="core">
                         <td>
                             <i class="icon-lock"></i>
-                            <%- __('Username') %>
+                            <%- t('users.labels.username') %>
                         </td>
                         <td>
-                            <%- __('text') %>
+                            <%- t('common.text') %>
                         </td>
                         <td>
                             <i class="icon-ok"></i>
                         </td>
                         <td>
-                            <%- __('public') %>
+                            <%- t('common.public') %>
                         </td>
                         <td>
                             -
@@ -72,16 +72,16 @@
                     <tr class="core">
                         <td>
                             <i class="icon-lock"></i>
-                            <%- __('Email address') %>
+                            <%- t('users.labels.emailAddress') %>
                         </td>
                         <td>
-                            <%- __('email') %>
+                            <%- t('common.email') %>
                         </td>
                         <td>
                             <i class="icon-ok"></i>
                         </td>
                         <td>
-                            <%- __('private') %>
+                            <%- t('common.private') %>
                         </td>
                         <td>
                             -
@@ -95,7 +95,7 @@
                                 <%- field.title %>
                             </td>
                             <td>
-                                <%- __(field.type) %>
+                                <%- t('users.labels.' + field.type) %>
                             </td>
                             <td>
                                 <% if(field.mandatory) { %>
@@ -103,7 +103,7 @@
                                 <% } %>
                             </td>
                             <td>
-                                <%- __(field.privacy) %>
+                                <%- t('common.' + field.privacy) %>
                             </td>
                             <td>
                                 <a href="<%- pathTo.editProfileField(field.id.toString()) %>">Edit</a> &nbsp;
@@ -116,7 +116,7 @@
                 </table>
 
                 <div class="form-actions">
-                    <a href="<%- pathTo.newProfileField() %>" class="btn btn-primary"><i class="icon-plus"></i> <%- __('Add new profile field') %></a>
+                    <a href="<%- pathTo.newProfileField() %>" class="btn btn-primary"><i class="icon-plus"></i> <%- t('users.actions.addProfileField') %></a>
                 </div>
 
             </div>
@@ -160,7 +160,7 @@
 
         $("a[rel=delete-field]").die().live("click", function() {
             var el = this;
-            if(confirm("Are you sure you wish to delete this field?")) {
+            if(confirm("<%- t('users.help.deleteProfileField') %>")) {
                 $.post(this.href, { success: function() {
                     $(el).parents("tr").remove();
                 }});

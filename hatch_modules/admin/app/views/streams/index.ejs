@@ -6,67 +6,68 @@
         <div class="module">
             <div class="content">
 
-                <h3><%- t('stream.manage') %></h3>
+                <h3><%- t('streams.headers.manage') %></h3>
 
                 <hr/>
 
                 <table class="table table-striped content-table-content">
                     <thead>
-                    <tr>
-                        <th colspan="2" width="">
-                            <%- __('Stream') %>
-                        </th>
-                        <th width="">
-                            <%- __('Query') %>
-                        </th>
-                        <th width="200">
-                            <%- __('Tags') %>
-                        </th>
-                        <th width="150">
-                            <%- __('Last run') %>
-                        </th>
-                        <th width="75">
-                            <%- __('Actions') %>
-                        </th>
-                    </tr>
+                        <tr>
+                            <th colspan="2" width="">
+                                <%- t('streams.headers.stream') %>
+                            </th>
+                            <th width="">
+                                <%- t('streams.headers.query') %>
+                            </th>
+                            <th width="200">
+                                <%- t('streams.headers.tags') %>
+                            </th>
+                            <th width="150">
+                                <%- t('streams.headers.lastRun') %>
+                            </th>
+                            <th width="75">
+                                <%- t('streams.headers.actions') %>
+                            </th>
+                        </tr>
                     </thead>
                     <tbody>
-                    <% if(streams.length == 0) { %>
-                    <tr>
-                        <td colspan="6"><%- __('No import streams have been defined') %></td>
-                    </tr>
-                    <% } %>
-                    <% streams.forEach(function(stream) { %>
-                    <% if(!stream) return; %>
-                    <tr>
-                        <td width="2%">
-                            <i class="icon-<%- importers[stream.type].icon %>"></i>
-                        </td>
-                        <td>
-                            <%- stream.title %>
-                        </td>
-                        <td>
-                            <%- stream.query %>
-                        </td>
-                        <td>
-                            <ul class="tags">
-                                <% (stream.tags || []).forEach(function(tag) { %>
-                                    <li><a href="<%- pathTo.content(tag.tagId) %>"><%- tag.name %></a></li>
-                                <% }) %>
-                            </ul>
-                        </td>
-                        <td>
-                            <%- stream.lastRun ? timeSince(stream.lastRun) : 'Never' %>
-                        </td>
-                        <td>
-                            <%- linkToRemote('<i class="icon-' + (stream.enabled ? __('pause'):__('play')) + '"></i>', pathTo.toggleStream(stream.id.toString())) %>
-                            &nbsp;
-                            <%- linkTo(__('Edit'), pathTo.editStream(stream.id.toString())) %>
-                            &nbsp;
-                            <%- linkToRemote('<i class="icon-remove"></i>', pathTo.deleteStream(stream.id.toString()), { "data-confirm": __("Are you sure you wish to delete this import stream?") }) %>
-                        </td>
-                    </tr>
-                    <% }) %>
+                        <% if(streams.length === 0) { %>
+                            <tr>
+                                <td colspan="6">
+                                    <%- t('streams.help.noStreams') %>
+                                </td>
+                            </tr>
+                        <% } %>
+                        <% streams.forEach(function(stream) { %>
+                            <tr>
+                                <td width="2%">
+                                    <i class="icon-<%- importers[stream.type].icon %>"></i>
+                                </td>
+                                <td>
+                                    <%- stream.title %>
+                                </td>
+                                <td>
+                                    <%- stream.query %>
+                                </td>
+                                <td>
+                                    <ul class="tags">
+                                        <% (stream.tags || []).forEach(function(tag) { %>
+                                            <li><a href="<%- pathTo.content(tag.tagId) %>"><%- tag.name %></a></li>
+                                        <% }) %>
+                                    </ul>
+                                </td>
+                                <td>
+                                    <%- stream.lastRun ? timeSince(stream.lastRun) : t('common.never') %>
+                                </td>
+                                <td>
+                                    <%- linkToRemote('<i class="icon-' + (stream.enabled ? __('pause'):__('play')) + '"></i>', pathTo.toggleStream(stream.id.toString())) %>
+                                    &nbsp;
+                                    <%- linkTo(t('streams.actions.edit'), pathTo.editStream(stream.id.toString())) %>
+                                    &nbsp;
+                                    <%- linkToRemote('<i class="icon-remove"></i>', pathTo.deleteStream(stream.id.toString()), { "data-confirm": t('streams.help.deleteConfirm') }) %>
+                                </td>
+                            </tr>
+                        <% }) %>
                     </tbody>
                 </table>
 

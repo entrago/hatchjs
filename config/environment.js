@@ -16,6 +16,7 @@ module.exports = function (compound) {
         app.set('cssDirectory', '/stylesheets/');
         app.set('cssEngine', 'stylus');
         app.set('upload path', app.root + '/public/upload');
+        app.set('fillMissingTranslations', 'yaml');
 
         // date and time formats
         app.set('dateformat', 'DD/MM/YYYY');

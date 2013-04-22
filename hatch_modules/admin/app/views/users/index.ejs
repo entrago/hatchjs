@@ -3,84 +3,84 @@
     <% include _sidebar %>
 
     <div class="span10">
-      <div class="module">
-          <div class="content community-table-content">
-              <div class="pull-left">
-                  <% var caret = ' <span class="caret"></span>'; %>
+        <div class="module">
+            <div class="content community-table-content">
+                <div class="pull-left">
+                    <% var caret = ' <span class="caret"></span>'; %>
 
-                  <div class="btn-group pull-left" style="margin-right : 8px;">
-                      <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><%- __('Member actions') %> <span class="caret"></span></button>
-                      <ul class="dropdown-menu">
-                          <li><%- linkTo('<i class="icon-envelope"></i> ' + __('Send message'), pathTo.sendMessageTo(), { rel: 'multiAjaxLink' }) %></li>
-                          <li><%- linkTo('<i class="icon-remove"></i> ' + __('Remove members'), pathTo.removeMembers(), { rel: 'multiAjaxLink' }) %></li>
-                          <li><%- linkTo('<i class="icon-flag"></i> ' + __('Blacklist members'), pathTo.blacklistMembers(), { rel: 'multiAjaxLink' }) %></li>
-                          <li><%- linkTo('<i class="icon-heart"></i> ' + __('Un-blacklist members'), pathTo.unblacklistMembers(), { rel: 'multiAjaxLink' }) %></li>
-                      </ul>
-                  </div>
+                    <div class="btn-group pull-left" style="margin-right : 8px;">
+                        <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><%- t('users.actions.memberActions') %> <span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <li><%- linkTo('<i class="icon-envelope"></i> ' + t('users.actions.sendMessage'), pathTo.sendMessageTo(), { rel: 'multiAjaxLink' }) %></li>
+                            <li><%- linkTo('<i class="icon-remove"></i> ' + t('users.actions.removeMembers'), pathTo.removeMembers(), { rel: 'multiAjaxLink' }) %></li>
+                            <li><%- linkTo('<i class="icon-flag"></i> ' + t('users.actions.blacklistMembers'), pathTo.blacklistMembers(), { rel: 'multiAjaxLink' }) %></li>
+                            <li><%- linkTo('<i class="icon-heart"></i> ' + t('users.actions.unblacklistMembers'), pathTo.unblacklistMembers(), { rel: 'multiAjaxLink' }) %></li>
+                        </ul>
+                    </div>
 
-                  <% if (tags.length > 0) { %>
-                      <div class="btn-group pull-left">
-                          <%- buttonTag(t('users.actions.addTag') + caret, {
-                              class: 'btn dropdown-toggle',
-                              'data-toggle': 'dropdown'}) %>
-                          <ul class="dropdown-menu">
-                              <% tags.forEach(function(tag) { %>
-                                  <% if(!tag) return; %>
-                                  <li><%- linkTo(icon('tag') + tag.title,
-                                      pathTo.addToTag('users', tag.id),
-                                      {rel: 'multiAjaxLink'}) %></li>
-                              <% }) %>
-                          </ul>
-                      </div>
+                    <% if (tags.length > 0) { %>
+                        <div class="btn-group pull-left">
+                            <%- buttonTag(t('users.actions.addTag') + caret, {
+                                class: 'btn dropdown-toggle',
+                                'data-toggle': 'dropdown'}) %>
+                            <ul class="dropdown-menu">
+                                <% tags.forEach(function(tag) { %>
+                                    <% if(!tag) return; %>
+                                    <li><%- linkTo(icon('tag') + tag.title,
+                                        pathTo.addToTag('users', tag.id),
+                                        {rel: 'multiAjaxLink'}) %></li>
+                                <% }) %>
+                            </ul>
+                        </div>
 
-                      <div class="btn-group pull-left">
-                          <%- buttonTag(t('users.actions.removeTag') + caret, {
-                              class: 'btn dropdown-toggle',
-                              'data-toggle': 'dropdown'}) %>
-                          <ul class="dropdown-menu">
-                              <% tags.forEach(function(tag) { %>
-                                  <% if (!tag) return; %>
-                                  <li><%- linkTo(icon('tag') + tag.title,
-                                      pathTo.removeFromTag('users', tag.id), 
-                                      {rel: 'multiAjaxLink'}) %></li>
-                              <% }) %>
-                          </ul>
-                      </div>
-                  <% } %>
+                        <div class="btn-group pull-left">
+                            <%- buttonTag(t('users.actions.removeTag') + caret, {
+                                class: 'btn dropdown-toggle',
+                                'data-toggle': 'dropdown'}) %>
+                            <ul class="dropdown-menu">
+                                <% tags.forEach(function(tag) { %>
+                                    <% if (!tag) return; %>
+                                    <li><%- linkTo(icon('tag') + tag.title,
+                                        pathTo.removeFromTag('users', tag.id), 
+                                        {rel: 'multiAjaxLink'}) %></li>
+                                <% }) %>
+                            </ul>
+                        </div>
+                    <% } %>
+                </div>
+
+                <table class="table table-striped members-table" id="members-table">
+                    <thead>
+                        <tr>
+                            <th width="3%">
+                                <input type="checkbox" class="checkbox" value="all" id="selectAllUsers" rel="tooltip" title="Select all users" />
+                            </th>
+                            <th>
+                                <%- t('users.headers.memberName') %>
+                            </th>
+                            <th width="300">
+                                <%- t('users.headers.tags') %>
+                            </th>
+                            <th width="110">
+                                <%- t('users.headers.membership') %>
+                            </th>
+                            <th width="130">
+                                <%- t('users.headers.since') %>
+                            </th>
+                            <th width="60">
+                                <%- t('users.headers.actions') %>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="6">
+                                <div class="loading-spacer"><%- t('users.help.loadingMembers') %></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
               </div>
-
-              <table class="table table-striped members-table" id="members-table">
-                  <thead>
-                      <tr>
-                          <th width="3%">
-                              <input type="checkbox" class="checkbox" value="all" id="selectAllUsers" rel="tooltip" title="Select all users" />
-                          </th>
-                          <th>
-                              <%- __('Member name') %>
-                          </th>
-                          <th width="300">
-                              Tags
-                          </th>
-                          <th width="110">
-                              <%- __('Membership') %>
-                          </th>
-                          <th width="130">
-                              <%- __('Since') %>
-                          </th>
-                          <th width="60">
-                              <%- __('Actions') %>
-                          </th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <tr>
-                          <td colspan="6">
-                              <div class="loading-spacer"><%- __('loading members...') %></div>
-                          </td>
-                      </tr>
-                  </tbody>
-              </table>
-            </div>
         </div>
     </div>
 </div>
@@ -116,7 +116,7 @@
                     }
                 });
             }
-            else alert("Please select some users!");
+            else alert("<%- t('users.help.selectSomeUsers') %>");
 
             //hide the menu
             $(this).parents(".btn-group").removeClass("open");
@@ -242,22 +242,22 @@
                         }
                         //requested = show approve
                         else if(user.membership.state == 'pending' && user.membership.requested) {
-                            html += '<a href="<%- pathTo.community %>/' + user.id + '/accept" data-remote="true" rel="tooltip" title="<%= __('approve membership request') %>" data-success="<%= __('membership approved') %>"><i class="icon-ok"></i></a>';
+                            html += '<a href="<%- pathTo.community %>/' + user.id + '/accept" data-remote="true" rel="tooltip" title="<%- t('users.labels.approveMembership') %>" data-success="<%- t('users.help.membershipApproved') %>"><i class="icon-ok"></i></a>';
                         }
                         //pending = show resent invite
                         else if(user.membership.state == 'pending') {
-                            html += '<a href="<%- pathTo.community %>/' + user.id + '/resendinvite" data-remote="true" rel="tooltip" title="<%= __('resend invite email') %>" data-success="<%= __('invite re-sent') %>"><i class="icon-envelope-alt"></i></a>';
+                            html += '<a href="<%- pathTo.community %>/' + user.id + '/resendinvite" data-remote="true" rel="tooltip" title="<%= t('users.labels.resendInvite') %>" data-success="<%= t('users.help.inviteResent') %>"><i class="icon-envelope-alt"></i></a>';
                         }
                         //member = show upgrade to editor
                         else if(user.membership.role == 'member') {
-                            html += '<a href="<%- pathTo.community %>/' + user.id + '/upgrade" data-remote="true" rel="tooltip" title="<%= __('upgrade to editor') %>" data-success="<%= __('member upgraded to editor') %>"><i class="icon-thumbs-up"></i></a>';
+                            html += '<a href="<%- pathTo.community %>/' + user.id + '/upgrade" data-remote="true" rel="tooltip" title="<%= t('users.labels.upgradeToEditor') %>" data-success="<%= t('users.help.memberUpgraded') %>"><i class="icon-thumbs-up"></i></a>';
                         }
                         //editor = show downgrade to member
                         else if(user.membership.role == 'editor') {
-                            html += '<a href="<%- pathTo.community %>/' + user.id + '/downgrade" data-remote="true" rel="tooltip" title="<%= __('downgrade to member') %>" data-success="<%= __('editor downgraded to member') %>"><i class="icon-thumbs-down"></i></a>';
+                            html += '<a href="<%- pathTo.community %>/' + user.id + '/downgrade" data-remote="true" rel="tooltip" title="<%= t('users.labels.downgradeToMember') %>" data-success="<%= t('users.help.editorDowngraded') %>"><i class="icon-thumbs-down"></i></a>';
                         }
 
-                        html += ' &nbsp; <a href="<%- pathTo.community %>/' + user.id + '/remove" data-remote="true" data-confirm="<%= __('Are you sure you wish to remove this member?') %>" rel="tooltip" title="<%= __('remove from community') %>" data-success="<%= __('user removed from community') %>"><i class="icon-remove"></i></a>';
+                        html += ' &nbsp; <a href="<%- pathTo.community %>/' + user.id + '/remove" data-remote="true" data-confirm="<%= t('users.help.removeMember') %>" rel="tooltip" title="<%= t('users.labels.removeMember') %>" data-success="<%= t('users.help.memberRemoved') %>"><i class="icon-remove"></i></a>';
 
                         return html;
                     }
@@ -266,7 +266,7 @@
             "sDom": "<''<'pull-right'f>r>t<''<'pull-left'l><'pull-left'i><'pull-right'p>>",
             "sPaginationType": "bootstrap",
             "oLanguage": {
-                "sLengthMenu": "_MENU_ <%= __('users per page') %>",
+                "sLengthMenu": "_MENU_ <%= t('users.headers.usersPerPage') %>",
                 "oPaginate": {
                     "sNext": "",
                     "sPrevious": ""

@@ -8,15 +8,15 @@
             <%- linkTo('/' + page.url.replace(req.group.homepage.url, ''), '//' + page.url) %>
         </td>
         <td>
-            <%- __('Public') %>
+            <%- t('common.public') %>
         </td>
         <td>
-            <%- __('Visible') %>
+            <%- t('common.visible') %>
         </td>
         <td>
-            <%- linkTo(__('Edit'), pathTo.editPage(page), {class: '' }) %>
+            <%- linkTo(t('pages.actions.edit'), pathTo.editPage(page), {class: '' }) %>
             &nbsp;
-            <%- linkTo('<i class="icon-remove"></i>', pathTo.page(page.id), {remote: true, rel: 'tooltip', method: 'delete', 'data-original-title': __('Delete this page'), rel: 'delete-page'}) %>
+            <%- linkTo('<i class="icon-remove"></i>', pathTo.page(page.id), {remote: true, rel: 'tooltip', method: 'delete', 'data-original-title': t('pages.help.delete'), rel: 'delete-page'}) %>
         </td>
     </tr>
 <% }); %>

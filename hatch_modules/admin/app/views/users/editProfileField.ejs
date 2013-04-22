@@ -6,7 +6,7 @@
         <div class="module">
             <div class="content">
 
-                <h3><%- __('Edit field details') %></h3>
+                <h3><%- t('users.headers.editProfileField') %></h3>
 
                 <hr/>
 
@@ -15,32 +15,34 @@
                     <input type="hidden" name="order" value="<%- field.order %>" />
 
                     <div class="control-group">
-                        <label class="control-label" for="title"><%- __('Field name') %></label>
+                        <label class="control-label" for="title"><%- t('users.labels.fieldName') %></label>
                         <div class="controls">
                             <input type="text" id="title" name="title" value="<%- field.title %>"/>
                         </div>
                     </div>
 
                     <div class="control-group">
-                        <label class="control-label" for="fieldType"><%- __('Field type') %></label>
+                        <label class="control-label" for="fieldType"><%- t('users.labels.fieldType') %></label>
                         <div class="controls">
                             <select id="fieldType" name="type">
-                                <option value="text" <%- field.type == 'text' ? 'selected="selected"':'' %>><%- __('Text') %></option>
-                                <option value="textarea" <%- field.type == 'textarea' ? 'selected="selected"':'' %>><%- __('Textarea') %></option>
-                                <option value="name" <%- field.type == 'name' ? 'selected="selected"':'' %>>Name</option>
-                                <option value="radio-list" <%- field.type == 'radio-list' ? 'selected="selected"':'' %>><%- __('Radio button list') %></option>
-                                <option value="check-list" <%- field.type == 'check-list' ? 'selected="selected"':'' %>><%- __('Check list') %></option>
-                                <option value="select-list" <%- field.type == 'select-list' ? 'selected="selected"':'' %>><%- __('Select list') %></option>
+                                <option value="text" <%- field.type == 'text' ? 'selected="selected"':'' %>><%- t('users.labels.text') %></option>
+                                <option value="textarea" <%- field.type == 'textarea' ? 'selected="selected"':'' %>><%- t('users.labels.textarea') %></option>
+                                <option value="name" <%- field.type == 'name' ? 'selected="selected"':'' %>><%- t('users.labels.name') %></option>
+                                <option value="radio-list" <%- field.type == 'radio-list' ? 'selected="selected"':'' %>><%- t('users.labels.radioList') %></option>
+                                <option value="check-list" <%- field.type == 'check-list' ? 'selected="selected"':'' %>><%- t('users.labels.checkList') %></option>
+                                <option value="select-list" <%- field.type == 'select-list' ? 'selected="selected"':'' %>><%-t('users.labels.selectList') %></option>
                             </select>
                         </div>
                     </div>
 
                     <div class="control-group" id="optionsControl" <%- (field.type || '').indexOf('-list') > -1 ? '':'style="display: none"' %>>
-                        <label class="control-label" for="options"><%- __('Options') %></label>
+                        <label class="control-label" for="options"><%- t('users.labels.options') %></label>
                         <div class="controls">
                             <select id="options" name="options[]" multiple="multiple" class="span12 chzn-select-create" data-placeholder="Enter some list options" style="width : 300px;">
                                 <% (field.options || []).forEach(function(option) { %>
-                                    <option value="<%- option %>" selected="selected"><%- option %></option>
+                                    <option value="<%- option %>" selected="selected">
+                                        <%- option %>
+                                    </option>
                                 <% }) %>
                             </select>
                         </div>
@@ -50,7 +52,7 @@
                         <div class="controls">
                             <label class="checkbox">
                                 <input type="checkbox" class="checkbox" value="true" name="mandatory" <%- field.mandatory ? ' checked="checked"':'' %> />
-                                <%- __('Mandatory field') %>
+                                <%- t('users.labels.mandatory') %>
                             </label>
                         </div>
                     </div>
@@ -58,33 +60,33 @@
                     <hr/>
 
                     <div class="control-group">
-                        <label class="control-label" for="privacy"><%- __('Visibility') %></label>
+                        <label class="control-label" for="privacy"><%- t('users.labels.visibility') %></label>
                         <div class="controls">
                             <select id="privacy" name="privacy">
-                                <option value="public"<%- field.privacy == 'public' ? ' selected="selected"':'' %>><%- __('Public') %></option>
-                                <option value="members-only"<%- field.privacy == 'members-only' ? ' selected="selected"':'' %>><%- __('Members only') %></option>
-                                <option value="private"<%- field.privacy == 'private' ? ' selected="selected"':'' %>><%- __('Private') %></option>
+                                <option value="public"<%- field.privacy == 'public' ? ' selected="selected"':'' %>><%- t('common.public') %></option>
+                                <option value="members-only"<%- field.privacy == 'members-only' ? ' selected="selected"':'' %>><%- t('common.membersOnly') %></option>
+                                <option value="private"<%- field.privacy == 'private' ? ' selected="selected"':'' %>><%- t('common.private') %></option>
                             </select>
                         </div>
                     </div>
 
                     <div class="control-group">
-                        <label class="control-label" for="description"><%- __('Description on registration form') %></label>
+                        <label class="control-label" for="description"><%- t('users.labels.registrationDescription') %></label>
                         <div class="controls">
                             <textarea id="description" class="span6 richtext" rows="6" name="description"><%- field.description %></textarea>
                         </div>
                     </div>
 
                     <div class="control-group">
-                        <label class="control-label" for="helpText"><%- __('Help text (optional)') %></label>
+                        <label class="control-label" for="helpText"><%- t('users.labels.helpText') %></label>
                         <div class="controls">
                             <input type="text" id="helpText" name="helpText" class="span4" value="<%- field.helpText %>"/>
                         </div>
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary"><%- __('Save changes') %></button>
-                        <a href="<%- pathTo.profileFields() %>" class="btn"><%- __('Cancel') %></a>
+                        <button type="submit" class="btn btn-primary"><%- t('users.actions.save') %></button>
+                        <a href="<%- pathTo.profileFields() %>" class="btn"><%- t('common.cancel') %></a>
                     </div>
                 <%- formTagEnd() %>
 

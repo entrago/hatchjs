@@ -1,4 +1,4 @@
-<li class="nav-header"><%- __('Module settings') %></li>
+<li class="nav-header"><%- t('group.headers.moduleSettings') %></li>
 <% modulesEnabled.forEach(function(inst) { %>
     <% if(!inst.module || !inst.module.info.settings) { return; } %>
     <%- li('module-' + inst.module.info.name) %>
