@@ -34,7 +34,12 @@ $(document).ready(function() {
     //validation and default ajax handlers
     //redirect
     $('*[data-remote=true]').live("ajax:success", function(e, data) {
-        if(data.redirect) window.location = data.redirect;
+        if (data.redirect) {
+            console && console.error('Deprecated redirect to ' + data.redirect);
+            setTimeout(function() {
+                window.location = data.redirect;
+            }, 2000);
+        }
     });
     //errors
     $('*[data-remote=true]').live("ajax:error", function(xhr, status, error) {
@@ -53,7 +58,7 @@ $(document).ready(function() {
         }
         else message = data.message;
 
-        if(data.loginRequired) {
+        if (data.loginRequired) {
             //hide existing notys
             $('.noty_cont li').hide();
 
@@ -64,23 +69,6 @@ $(document).ready(function() {
                 timeout: false,
                 dismissQueue: true
             });
-        }
-        else {
-            //show notification with noty
-            $.noty({
-                type: data.status || 'error',
-                text: '<i class="icon-' + (data.icon || 'warning-sign') + '"></i> ' + message
-            });
-
-            //highlight fields with errors
-            if(fields.length > 0) {
-                fields.forEach(function(fieldId, i) {
-                    $('#' + fieldId).parents('.control-group').addClass('error');
-                    $('#' + fieldId).on("focus", function() {
-                        $('#' + fieldId).parents('.control-group').removeClass('error');
-                    });
-                });
-            }
         }
     });
 
@@ -123,6 +111,31 @@ $(document).ready(function() {
     $("textarea[rel*=submitcommandenter]").live("blur", function() {
         $(window).unbind("keydown");
     });
+
+    $('body').on(
+        'server:error', 'form[data-remote=true]',
+        function(ev, error) {
+            var $form = $(this);
+            var data = $form.serializeArray();
+            $.noty({
+                type: 'error',
+                text: '<i class="icon-warning-sign"></i> ' + error.message
+            });
+            if (error.codes) {
+                var $el;
+                for (var i = 0; i < data.length; i++) {
+                    var name = data[i].name;
+                    if (name in error.codes || name.replace(/^.*?\[|\]$/g, '') in error.codes) {
+                        var $el = $form.find('[name="' + name + '"]');
+                        // $el.addClass('validation-error');
+                        $el.parents('.control-group').addClass('error');
+                        $el.one('focus', function() {
+                            $el.parents('.control-group').removeClass('error');
+                        });
+                    }
+                }
+            }
+        });
 });
 
 //main init function
@@ -420,9 +433,12 @@ function setupRichtextEditors(selector, options) {
     //tie up the form events for richtext
     $(selector).each(function(i, el) {
         //get the form
-        var form = $(el)[0].form;
-        $(form).bind("submit", function() {
-            $(el).val($(el).getCode());
+        var form = el.form;
+        var $el = $(el);
+        $(form).bind('submit', function() {
+            if ($el.getCode) {
+                $el.val($el.getCode());
+            }
         });
     });
 }
@@ -432,6 +448,11 @@ function setupRichtextEditor(el, options) {
     //create the redactor modal
     window.$redactorModal = $('#redactor-modal');
     if(window.$redactorModal.length == 0) window.$redactorModal = $('<div class="modal" id="redactor-modal" style="display: none;"></div>').appendTo($('body'));
+
+    if (typeof RLANG === 'undefined') {
+        console && console.error('RLANG is not defined');
+        return;
+    }
 
     RLANG.image = 'Edit image';
 

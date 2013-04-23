@@ -105,7 +105,7 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        $(".content .chzn-select").chosen();
+        // $(".content .chzn-select").chosen();
 
         setupRichtextEditors();
 
@@ -115,27 +115,6 @@
             pick12HourFormat: false
         }).data('datetimepicker');
         picker.setDate(new Date('<%- post.createdAt %>').getTime() - new Date().getTimezoneOffset() * 60000);
-
-        //bind form success
-        $('#content-form').bind('ajax:success', function(e, res) {
-            var type, icon;
-            if (res.code === 200) {
-                type = 'success';
-                icon = '<%- icon("ok") %>';
-                setTimeout(function() {
-                    window.location = '<%- pathTo.content %>';
-                }, 1000);
-            } else {
-                type = 'error';
-                icon = '<%- icon("warning-sign") %>';
-            }
-
-            $.noty({
-                text: icon + res.html,
-                type: type
-            });
-
-        });
 
         var uploader = new qq.FileUploader({
             params: { _csrf: $('meta[name=csrf-token]').attr('content') },

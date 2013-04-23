@@ -20,7 +20,7 @@
     <script type="text/javascript">
         canEdit = <%- (req.member && req.user.canEdit) ? "true":"false" %>;
     </script>
-    <%- javascriptIncludeTag.call({controller: {app: req.app.parent.parent}}, 'jquery', 'redactor/redactor', 'bootstrap', 'bootstrap-typeahead', 'jquery-easyticker', 'jquery-hoverintent', 'jquery-blink', 'jquery-valadd', 'jquery-textarea-autogrow', 'jquery-noty', 'jquery-cookie', 'jquery-pjax', 'jquery-hovercard', 'jquery-highlight', 'uploader', 'rails', 'hatch-search', 'hatch', 'hatch-io', 'jquery-zoom', 'bootstrap-datetimepicker', 'application') %>
+    <%- javascriptIncludeTag.call({controller: {app: req.app.parent.parent}}, 'jquery', 'redactor/redactor', 'bootstrap', 'bootstrap-typeahead', 'jquery-easyticker', 'jquery-hoverintent', 'jquery-blink', 'jquery-valadd', 'jquery-textarea-autogrow', 'jquery-noty', 'jquery-cookie', 'jquery-pjax', 'jquery-hovercard', 'jquery-highlight', 'uploader', 'rails', 'forms', 'hatch-search', 'hatch', 'hatch-io', 'jquery-zoom', 'bootstrap-datetimepicker', 'application') %>
     <%- javascriptIncludeTag.call({controller: {app: req.app.parent.parent}}, 'jquery-ui.min', 'chosen.jquery', 'jquery-rule', 'jquery-datatables', 'jquery-selectrange', 'jquery-blockui', 'jquery-spectrum', 'jquery-colorscheme', 'hatch-dragdrop', 'hatch-css-properties', 'hatch-styleeditor', 'hatch-inline-edit', 'hatch-management') %>        
 </head>
 <body class="navbar-fixed-not">
@@ -98,6 +98,17 @@
     <div class="container-fluid">
         <div id="row-content">
             <%- body %>
+            <script>
+                <% var flash = request.flash('info'); if (flash) flash.forEach(function(m, i) { %>
+                    setTimeout(function() {
+                        $.noty({
+                            type: 'success',
+                            text: '<i class="icon-info-sign"></i> <%= m %>'
+                        });
+                    }, 100 * <%= i %>);
+                <% }) %>
+            </script>
+
         </div>
 
         <hr />

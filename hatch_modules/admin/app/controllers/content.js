@@ -246,20 +246,11 @@ ContentController.prototype.create = function create(c) {
     c.Tag.assignTagsForObject(data, c.req.body.Content_tags, function () {
         c.Content.create(data, function(err, content) {
             if (err) {
-                var HelperSet = c.compound.helpers.HelperSet;
-                var helpers = new HelperSet(c);
-
-                c.send({
-                    code: 500,
-                    errors: content.errors,
-                    html: helpers.errorMessagesFor(content)
-                });
+                c.sendError(err);
             } else {
                 group.recalculateTagContentCounts(c);
-                c.send({
-                    code: 200,
-                    html: c.t('models.Content.messages.saved')
-                });
+                c.flash('info', c.t('models.Content.messages.saved'));
+                return c.redirect(c.pathTo.content);
             }
         });
     });

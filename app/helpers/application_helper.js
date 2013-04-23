@@ -37,7 +37,7 @@ var javascripts = {
         'jquery-hoverintent', 'jquery-blink', 'jquery-valadd',
         'jquery-textarea-autogrow', 'jquery-noty', 'jquery-cookie',
         'jquery-pjax', 'jquery-hovercard', 'jquery-highlight', 'uploader',
-        'rails', 'hatch-search', 'hatch', 'hatch-io', 'jquery-zoom',
+        'rails', 'forms', 'hatch-search', 'hatch', 'hatch-io', 'jquery-zoom',
         'application'
     ],
     privileged: [
