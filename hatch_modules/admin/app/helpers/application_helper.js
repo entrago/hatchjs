@@ -2,6 +2,18 @@ exports.__ = function (s) {
     return '<span style="color: red;">' + s + '</span>';
 };
 
+exports.renderPartial = function (view) {
+    var result = '';
+    this.res.render(view, this.viewContext, function (err, html) {
+        if(err) {
+            result = err;
+        } else {
+            result = html;
+        }
+    });
+    return result;
+};
+
 exports.specialPagePath = function () {
     return '';
 };
