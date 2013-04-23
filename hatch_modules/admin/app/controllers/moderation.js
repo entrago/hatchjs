@@ -114,6 +114,11 @@ ModerationController.prototype.index = function (c) {
     c.render();
 };
 
+/**
+ * Load the content or comments to display in the moderation table.
+ * 
+ * @param  {HttpContext} c - http context
+ */
 ModerationController.prototype.load = function (c) {
     c.type = c.req.query.type;
 

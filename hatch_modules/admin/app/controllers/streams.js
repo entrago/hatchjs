@@ -71,10 +71,11 @@ StreamsController.prototype.edit = function(c) {
 };
 
 StreamsController.prototype.create = function(c) {
-    var ImportStream = c.ImportStream;
-    var stream = new ImportStream(c.body);
+    var stream = new c.ImportStream(c.body);
+    
     stream.groupId = c.req.group.id;
     stream.enabled = true;
+
     stream.save(function(err, stream) {
         c.send(err ? {
             message: 'Please enter a title and a query',

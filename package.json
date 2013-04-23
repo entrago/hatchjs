@@ -10,6 +10,7 @@
     "font-awesome": "https://github.com/kersten/Font-Awesome/tarball/master",
     "ejs": "*",
     "ejs-ext": "latest",
+    "vash": "latest",
     "express": "~3.x",
     "compound": ">= 1.1.0",
     "jugglingdb": ">= 0.1.0",

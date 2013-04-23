@@ -270,6 +270,7 @@ en:
       metaKeywords: Enter the default meta keywords for pages within this group
       faviconUpload: Upload a favicon for this group
       googleAnalytics: Copy and paste your Google Analytics ID to link up your account
+      faviconUploaded: Favicon uploaded
   modules:
     headers:
       manageModules: Manage modules

@@ -1,11 +1,11 @@
 
 <li class="nav-header"><%= t('users.headers.actions') %></li>
 
-<%- li('invite') %>
+<%- li('inviteForm') %>
     <%- linkTo(icon('plus-sign') + t('users.actions.invite'),
         pathTo.inviteForm) %>
 <%- liEnd %>
-<%- li('sendMessage') %>
+<%- li('sendMessageForm') %>
     <%- linkTo(icon('envelope') + t('users.actions.sendMessage'),
         pathTo.sendMessageForm) %>
 <%- liEnd %>
