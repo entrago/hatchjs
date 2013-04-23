@@ -1,0 +1,72 @@
+<div class="row-fluid">
+
+    @html.raw(model.renderPartial('tags/_sidebar.ejs'))
+
+    <div class="span10">
+        <div class="module">
+            <div class="content">
+
+                <h3>@model.t('tags.headers.manageTags')</h3>
+                <hr/>
+
+                <table class="table table-striped" id="member-lists-table">
+                    <thead>
+                        <tr>
+                            <th colspan="2" width="">
+                                @model.t('tags.headers.name')
+                            </th>
+                            <th width="12%">
+                                @model.t('tags.headers.sortOrder')
+                            </th>
+                            <th width="8%">
+                                @model.t('tags.headers.filter')
+                            </th>
+                            <th width="10%">
+                                @model.t('tags.headers.posts')
+                            </th>
+                            <th width="7%">
+                                @model.t('tags.headers.actions')
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @if(model.tags.length == 0) { 
+                        <tr>
+                            <td colspan="5">@model.t('tags.help.noTagsDefined')</td>
+                        </tr>
+                    }
+                    @model.tags.forEach(function(tag) {
+                        <tr>
+                            <td width="2%">
+                                <i class="icon-tag"></i>
+                            </td>
+                            <td>
+                                @html.raw(model.linkTo(tag.title, 'filter/' + tag.id))
+                            </td>
+                            <td>
+                                @tag.sortOrder
+                            </td>
+                            <td>
+                                @if(tag.filter) {
+                                    <i class="icon-ok"></i>
+                                } else {
+                                    <span>-</span>
+                                }
+                            </td>
+                            <td>
+                                @model.formatNumber(tag.count)
+                            </td>
+                            <td>
+                                @html.raw(model.linkTo('Edit', model.pathTo.editTag(model.type, tag.id.toString())))
+                                &nbsp;
+                                @html.raw(model.linkTo('<i class="icon-remove"></i>', model.pathTo.tag(model.type, tag.id.toString()), { remote: true, method: 'DELETE', "data-confirm": model.t('tags.help.deleteConfirm') }))
+                            </td>
+                        </tr>
+                    })
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
