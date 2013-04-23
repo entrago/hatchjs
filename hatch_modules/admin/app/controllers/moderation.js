@@ -106,6 +106,7 @@ function loadContentOrComments (c, callback) {
  * that have been flagged for moderation by users.
  * 
  * @param  {HttpContext} c - http context
+ *                       c.type - type: content or comments
  */
 ModerationController.prototype.index = function (c) {
     this.pageName = 'moderation-' + c.req.params.type;
@@ -118,6 +119,7 @@ ModerationController.prototype.index = function (c) {
  * Load the content or comments to display in the moderation table.
  * 
  * @param  {HttpContext} c - http context
+ *                       c.type - type: content or comments
  */
 ModerationController.prototype.load = function (c) {
     c.type = c.req.query.type;
@@ -138,12 +140,9 @@ ModerationController.prototype.load = function (c) {
  * than just the ids of the content on the current page of results.
  * 
  * @param  {HttpContext} c - http context
+ *                       c.type - type: content or comments
  */
 ModerationController.prototype.ids = function ids(c) {
-    this.filterBy = c.req.query.filterBy || c.req.params.filterBy;
-    var suffix = 'string' === typeof this.filterBy ? '-' + this.filterBy : '';
-    this.pageName = 'content' + suffix;
-
     c.req.query.limit = 1000000;
     c.req.query.offset = 0;
 

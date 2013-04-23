@@ -139,6 +139,9 @@ function findContent (c) {
  * Show the content list for this group.
  * 
  * @param  {HttpContext} c - http context
+ *                       c.limit  - limit to n records
+ *                       c.offset - offset to nth record
+ *                       c.search - search filter
  */
 ContentController.prototype.index = function index(c) {
     c.req.session.adminSection = 'content';
@@ -176,12 +179,10 @@ ContentController.prototype.index = function index(c) {
  * than just the ids of the content on the current page of results.
  * 
  * @param  {HttpContext} c - http context
+ *                       c.filterBy - filter by type or tag
+ *                       c.search   - search filter
  */
 ContentController.prototype.ids = function ids(c) {
-    this.filterBy = c.req.query.filterBy || c.req.params.filterBy;
-    var suffix = 'string' === typeof this.filterBy ? '-' + this.filterBy : '';
-    this.pageName = 'content' + suffix;
-
     c.req.query.limit = 1000000;
     c.req.query.offset = 0;
 
@@ -196,6 +197,7 @@ ContentController.prototype.ids = function ids(c) {
  * Show the new content input form.
  * 
  * @param  {HttpContext} c - http context
+ *                       c.type - content type
  */
 ContentController.prototype.new = function(c) {
     this.post = new c.Content();
@@ -210,6 +212,7 @@ ContentController.prototype.new = function(c) {
  * Show the edit content input form.
  * 
  * @param  {HttpContext} c - http context
+ *                       c.id - content item id
  */
 ContentController.prototype.edit = function edit(c) {
     renderInputForm(c, function () {
@@ -221,6 +224,7 @@ ContentController.prototype.edit = function edit(c) {
  * Create a new content record with the data from the form body.
  * 
  * @param  {HttpContext} c - http context
+ *                       c.Content - content params
  */
 ContentController.prototype.create = function create(c) {
     var group = this.group;
@@ -260,6 +264,7 @@ ContentController.prototype.create = function create(c) {
  * Update an existing content record with the data from the form body.
  * 
  * @param  {HttpContext} c - http context
+ *                       c.Content - content params
  */
 ContentController.prototype.update = function update(c) {
     var Content = c.Content;
@@ -303,6 +308,7 @@ ContentController.prototype.update = function update(c) {
  * Delete a single content record.
  * 
  * @param  {HttpContext} c - http context
+ *                       c.id - content item id
  */
 ContentController.prototype.destroy = function(c) {
     var group = c.req.group;
@@ -318,6 +324,7 @@ ContentController.prototype.destroy = function(c) {
  * Delete multiple content records.
  * 
  * @param  {HttpContext} c - http context
+ *                       c.selectedContent - ids of the content items to delete
  */
 ContentController.prototype.destroyAll = function(c) {
     var Content = c.Content;
@@ -376,6 +383,7 @@ ContentController.prototype.destroyAll = function(c) {
  * Remove flags from the specified content.
  * 
  * @param  {HttpContext} c - http context
+ *                       c.id - content item id to unflag
  */
 ContentController.prototype.clearFlags = function (c) {
     post.clearFlags(function (err, post) {
@@ -389,7 +397,9 @@ ContentController.prototype.clearFlags = function (c) {
 
 /**
  * Delete a flagged content item and ban it's author.
+ * 
  * @param  {HttpContext} c - http context
+ *                       c.id - content item id to delete and ban author
  */
 ContentController.prototype.deleteAndBan = function (c) {
     post.destroyAndBan(function (err, post) {

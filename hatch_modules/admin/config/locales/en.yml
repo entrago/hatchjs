@@ -175,6 +175,7 @@ en:
       manage: Manage streams
       add: Add new stream
       save: Save stream
+      edit: Edit
     labels:
       title: Stream name
       source: Source
@@ -285,5 +286,24 @@ en:
       edit: Edit
     help:
       disable: Disable this module
-
+  editconsole:
+    headers:
+      editconsole: Edit console
+      widgets: Widgets
+      layout: Layout
+      design: Design
+      columns: Columns
+      custom: Custom
+      templates: Templates
+      html: HTML
+      themes: Themes
+      fonts: Fonts
+      style: Style
+      css: CSS
+    actions:
+      createTemplete: Create a new template
+    help:
+      widgets: Click to add a widget to the page
+      custom: Enter your custom layout HTML here
+      noTemplates: No page templates have been defined
 

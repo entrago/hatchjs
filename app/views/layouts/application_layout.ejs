@@ -41,7 +41,8 @@
     <div id="all">
     <% } else { %>
     <!-- pjax title -->
-    <title><%= pageTitle() %></title>
+        <title><%= pageTitle() %></title>
+        <%- metaTag('pageId', req.page.id || req.page.url) %>
     <% } %>
 
     <div class="navbar navbar-top <%- req.group.navBarType && req.group.navBarType !== 'default' ? 'navbar-fixed-top':'' %> navbar-type-<%- req.group.navBarType %> navbar-<%- req.group.navBarStyle %>">

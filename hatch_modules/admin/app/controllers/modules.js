@@ -64,16 +64,10 @@ ModulesController.prototype.index = function (c) {
 };
 
 /**
- * Show the module marketplace.
- */
-ModulesController.prototype.marketplace = function() {
-    this.render('marketplace');
-};
-
-/**
  * Enable the specified module so that it is available for this group.
  * 
  * @param  {HttpContext} c - http context
+ *                       c.module_id - name of the module to enable
  */
 ModulesController.prototype.enable = function enable(c) {
     var locals = this;
@@ -93,6 +87,7 @@ ModulesController.prototype.enable = function enable(c) {
  * Update the settings of the specified module.
  * 
  * @param  {HttpContext} c - http context
+ *                       c.body - module settings to update
  */
 ModulesController.prototype.update = function(c) {
     var mod = this.group.modules.find(c.params.id, 'name');
@@ -110,6 +105,7 @@ ModulesController.prototype.update = function(c) {
  * Disable the specified module so that it is no longer available for this group.
  * 
  * @param  {HttpContext} c - http context
+ *                       c.module_id - name of module to disable
  */
 ModulesController.prototype.disable = function (c) {
     this.group.modules.remove(this.groupModuleIndex);

@@ -8,8 +8,9 @@
                 <hr/>
 
                 <%- formTagBegin({
-                    action: pathTo.groupStream(group, stream),
+                    action: pathTo.streams(stream),
                     method: 'PUT',
+                    remote: true,
                     id: 'stream-form'
                 }) %>
                     <% include _form %>

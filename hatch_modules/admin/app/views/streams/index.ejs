@@ -54,11 +54,11 @@
                                     <%- stream.lastRun ? timeSince(stream.lastRun) : t('common.never') %>
                                 </td>
                                 <td>
-                                    <%- linkToRemote('<i class="icon-' + (stream.enabled ? __('pause'):__('play')) + '"></i>', pathTo.toggleStream(stream.id.toString())) %>
+                                    <%- linkTo('<i class="icon-' + (stream.enabled ? 'pause':'play') + '"></i>', pathTo.toggleStream(stream.id.toString()), {remote: true}) %>
                                     &nbsp;
                                     <%- linkTo(t('streams.actions.edit'), pathTo.editStream(stream.id.toString())) %>
                                     &nbsp;
-                                    <%- linkToRemote('<i class="icon-remove"></i>', pathTo.deleteStream(stream.id.toString()), { "data-confirm": t('streams.help.deleteConfirm') }) %>
+                                    <%- linkTo('<i class="icon-remove"></i>', pathTo.streams(stream.id.toString()), { method: 'delete', remote: true, "data-confirm": t('streams.help.deleteConfirm') }) %>
                                 </td>
                             </tr>
                         <% }) %>

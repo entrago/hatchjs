@@ -30,6 +30,7 @@ function GroupController(init) {
     init.before(loadModules);
 }
 
+// loads the modules that are enabled for this group to display in the sidebar
 function loadModules(c) {
     c.locals.modulesEnabled = [];
 
@@ -48,6 +49,7 @@ require('util').inherits(GroupController, Application);
  * Show the group settings form.
  * 
  * @param  {HttpContext} c - http context
+ *                       c.tab - settings tab to show
  */
 GroupController.prototype.show = function (c) {
     c.locals.tab = c.req.params.tab || 'settings';
@@ -60,6 +62,7 @@ GroupController.prototype.show = function (c) {
  * Save group settings for this group.
  * 
  * @param  {HttpContext} c - http context
+ *                       c.body - group settings/attributes to update
  */
 GroupController.prototype.save = function(c) {
     var group = c.req.group;
@@ -95,6 +98,7 @@ GroupController.prototype.save = function(c) {
  * Show the module settings screen.
  * 
  * @param  {HttpContext} c - http context
+ *                       c.id - module name
  */
 GroupController.prototype.setupModule = function(c) {
     var moduleName = c.params.id;

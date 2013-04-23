@@ -47,7 +47,7 @@
                                 @tag.sortOrder
                             </td>
                             <td>
-                                @if(tag.filter) {
+                                @if (tag.filter) {
                                     <i class="icon-ok"></i>
                                 } else {
                                     <span>-</span>

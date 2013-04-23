@@ -28,6 +28,7 @@ function TagController(init) {
     init.before(findTag, {only: 'new,edit,update,destroy,add,remove'});
 }
 
+// gets the name of the active model
 function getModelName(path) {
     var hash = {
         users: 'User',
@@ -36,6 +37,7 @@ function getModelName(path) {
     return hash[path];
 }
 
+// loads the tags for the active model
 function loadTags(c) {
     this.type = this.sectionName = c.params.section;
     this.modelName = getModelName(this.sectionName);
@@ -55,6 +57,7 @@ function loadTags(c) {
     });
 }
 
+// find the tag to edit
 function findTag (c) {
     var self = this;
     var id = c.req.params.id || c.req.query.id || c.req.body.id;
@@ -70,6 +73,7 @@ function findTag (c) {
     }
 }
 
+// gets the sort orders for the active model
 function getSortOrders (type) {
     switch(type) {
         case 'content':
