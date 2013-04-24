@@ -29,6 +29,7 @@ function PagesController(init) {
     init.before(prepareTree, {only: 'index, new, newSpecial, edit'});
 }
 
+// find the page by its id
 function findPage(c) {
     var locals = this;
     c.Page.find(c.req.params.id || c.req.body.id, function (err, page) {
@@ -37,6 +38,7 @@ function findPage(c) {
     });
 }
 
+// prepare the page tree for display
 function prepareTree(c) {
     var locals = this;
     this.specials = Object.keys(c.compound.hatch.page.pages).map(function (sp) {

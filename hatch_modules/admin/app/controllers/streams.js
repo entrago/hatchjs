@@ -30,39 +30,55 @@ function StreamsController(init) {
         c.next();
     });
 
-    init.before(function loadStream(c) {
-        var locals = this;
-        c.ImportStream.find(c.params.id, function(err, stream) {
-            if (err) {
-                return c.next(err);
-            }
-            if (!stream) {
-                return c.next(new Error('404'));
-            }
-            locals.stream = stream;
-        });
-    }, {only: ['edit', 'update', 'destroy', 'toggle']});
+    init.before(findStream, {only: ['edit', 'update', 'destroy', 'toggle']});
+}
+
+// finds the stream for the action
+function findStream (c) {
+    var self = this;
+    c.ImportStream.find(c.params.id, function(err, stream) {
+        if (!stream) {
+            return c.next(new Error('404'));
+        }
+        self.stream = c.locals.stream = stream;
+        c.next();
+    });
 }
 
 require('util').inherits(StreamsController, Content);
 
-// Show the import streams
+/**
+ * Show the import streams defined for this group.
+ * 
+ * @param  {HttpContext} c - http context
+ */
 StreamsController.prototype.index = function(c) {
     var ImportStream = c.ImportStream;
     this.pageName = 'manage-streams';
 
     ImportStream.all({ where: { groupId: c.req.group.id }}, function(err, streams) {
-        this.streams = streams;
+        c.locals.streams = streams;
         c.render();
-    }.bind(this));
+    });
 };
 
+/**
+ * Show the new import stream form.
+ * 
+ * @param  {HttpContext} c - http context
+ */
 StreamsController.prototype.new = function(c) {
     this.pageName = 'new-stream';
     this.stream = new c.ImportStream;
     c.render();
 };
 
+/**
+ * Edit an existing import stream.
+ * 
+ * @param  {HttpContext} c - http context
+ *                       c.id - import stream id
+ */
 StreamsController.prototype.edit = function(c) {
     var importStream = c.compound.hatch.importStream;
     this.pageName = 'manage-streams';
@@ -70,6 +86,12 @@ StreamsController.prototype.edit = function(c) {
     c.render();
 };
 
+/**
+ * Create a new import stream.
+ * 
+ * @param  {HttpContext} c - http context
+ *                       c.body - import stream body
+ */
 StreamsController.prototype.create = function(c) {
     var stream = new c.ImportStream(c.body);
     
@@ -89,6 +111,12 @@ StreamsController.prototype.create = function(c) {
     });
 };
 
+/**
+ * Update an existing import stream.
+ * 
+ * @param  {HttpContext} c - http context
+ *                       c.body - import stream body
+ */
 StreamsController.prototype.update = function(c) {
     var ImportStream = c.ImportStream;
 
@@ -123,17 +151,31 @@ StreamsController.prototype.update = function(c) {
     });
 };
 
-// Delete a stream from the group
+/**
+ * Delete an import stream.
+ * 
+ * @param  {HttpContext} c - http context
+ *                       c.id - import stream id to delete
+ */
 StreamsController.prototype.destroy = function(c) {
     this.stream.destroy(function() {
-        c.send({ redirect: c.pathTo.groupContentStreams(c.req.group) });
+        c.send({ 
+            redirect: c.pathTo.streams
+        });
     });
 };
 
-// Pause or unpause a stream
+/**
+ * Pause or restart an import stream.
+ * 
+ * @param  {HttpContext} c - http context
+ *                       c.id - import stream id to toggle
+ */
 StreamsController.prototype.toggle = function(c) {
     this.stream.enabled = !this.stream.enabled;
     this.stream.save(function() {
-        c.send({ redirect: c.pathTo.groupContentStreams(c.req.group) });
+        c.send({ 
+            redirect: c.pathTo.streams
+        });
     });
 };

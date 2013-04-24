@@ -5,7 +5,7 @@ $(function () {
 
     csrfToken = $('meta[name=csrf-token]').attr('content');
     csrfParam = $('meta[name=csrf-param]').attr('content');
-    pageId = $('meta[name=pageId]').attr('content');
+    pageId = $('meta[name=pageId]:last').attr('content');
     groupId = $('meta[name=groupId]').attr('content');
 
     $('.new-widgets-list a').live('click', function (e) {
@@ -86,6 +86,8 @@ function send(action, data, response, done) {
         response = null;
     }
     data[csrfParam] = csrfToken;
+
+    pageId = $('meta[name=pageId]:last').attr('content');
 
     var path = '/do/admin/' + action + (pageId ? '?pageId=' + pageId : '');
 

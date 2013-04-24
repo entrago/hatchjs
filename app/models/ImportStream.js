@@ -27,7 +27,7 @@ module.exports = function (compound, ImportStream) {
 
 
     ImportStream.beforeCreate = function (next) {
-        this.hash = calcSha(this.url + '-' + new Date().getTime());
+        this.hash = compound.hatch.crypto.calcSha(this.url + '-' + new Date().getTime());
         next();
     };
 
@@ -50,7 +50,7 @@ module.exports = function (compound, ImportStream) {
         var stream = this;
 
         Group.find(stream.groupId, function(err, group) {
-            api.importStream.runImport(stream, createContent);
+            compound.hatch.importStream.runImport(stream, createContent);
 
             function createContent(err, posts) {
                 if(err) {
@@ -98,17 +98,4 @@ module.exports = function (compound, ImportStream) {
     ImportStream.prototype.shouldRun = function() {
         return new Date().getTime() - (this.lastRun || 0) > this.interval;
     };
-
-
-    /**
-     * calculates a sha1 of the specified string
-     * 
-     * @param  {[String]} payload 
-     * @return {[String]}         
-     */
-    function calcSha(payload) {
-        if (!payload) return '';
-        if (payload.length == 64) return payload;
-        return crypto.createHash('sha256').update(payload).update(api.app.config.passwordSalt || '').digest('hex');
-    }
 };

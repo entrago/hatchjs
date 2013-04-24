@@ -17,6 +17,8 @@ en:
     hatchCredit: 'Built on Hatch.js'
     text: Text
     email: Email
+    pause: Pause
+    play: Play
   layout:
     manageGroup: Manage group
     toggleEditConsole: Edit console
