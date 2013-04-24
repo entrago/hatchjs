@@ -21,3 +21,4 @@ public/upload
 coverage
 deps
 public/javascripts/cache*
+public/javascripts/i18n.js

@@ -38,7 +38,7 @@ var javascripts = {
         'jquery-textarea-autogrow', 'jquery-noty', 'jquery-cookie',
         'jquery-pjax', 'jquery-hovercard', 'jquery-highlight', 'uploader',
         'rails', 'forms', 'hatch-search', 'hatch', 'hatch-io', 'jquery-zoom',
-        'application'
+        'application', 'i18n'
     ],
     privileged: [
         'jquery-ui.min', 'chosen.jquery', 'jquery-rule', 'jquery-datatables',
