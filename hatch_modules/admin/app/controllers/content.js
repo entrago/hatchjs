@@ -294,11 +294,9 @@ ContentController.prototype.update = function update(c) {
                     errors: content.errors || err,
                     html: helpers.errorMessagesFor(content)
                 });
-            } else {               
-                c.send({
-                    code: 200,
-                    html: c.t('post.saved')
-                });
+            } else {
+                c.flash('info', c.t('post.saved'));
+                c.redirect(c.pathTo.content);
             }
         });
     });
