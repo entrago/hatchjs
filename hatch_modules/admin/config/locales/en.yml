@@ -190,6 +190,7 @@ en:
     help:
       tags: Enter tags to be applied to content imported for this stream
       noStreams: No import streams have been defined
+      deleteConfirm: Are you sure you wish to delete this stream?
   pages:
     sitemap: Sitemap
     specials: Special pages

@@ -26,15 +26,20 @@ describe('Content', function() {
         });
     });
 
-    it('should like a comment', function (done) {
+    it.only('should like a post', function (done) {
         Content.create({
             createdAt: new Date,
             title: 'Hello',
             text: 'World'
-        }, function(err, content) {
-            content.like({ username: 'test_user', id: 1 }, function (err, content) {
-                content.likes.length.should.equal(1);
-                content.doesLike({ id: 1 }).should.be.ok;
+        }, function(err, post) {
+            if (err) {
+                throw err;
+            }
+
+            post.like({ username: 'test_user', id: 1 }, function (err, post) {
+                post.likesTotal.should.equal(1);
+                post.likes.length.should.equal(1);
+                post.doesLike({ id: 1 }).should.be.ok;
                 done();
             });
         });

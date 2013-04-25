@@ -246,7 +246,7 @@ PagesController.prototype.update = function(c) {
     this.page = page;
     c.body.groupId = c.req.group.id;
 
-    console.log('HERE')
+    c.flash('info', c.t('models.Page.messages.saved'));
 
     //c.Tag.assignTagsForObject(page, c.req.body.tags, function () {
         page.update(c.body, function(err, page) {

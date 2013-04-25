@@ -45,8 +45,8 @@
                                 </td>
                                 <td>
                                     <ul class="tags">
-                                        <% (stream.tags || []).forEach(function(tag) { %>
-                                            <li><a href="<%- pathTo.content(tag.tagId) %>"><%- tag.name %></a></li>
+                                        <% stream.tags.forEach(function(tag) { %>
+                                            <li><a href="<%- pathTo.filteredContent(tag.id) %>"><%- tag.title %></a></li>
                                         <% }) %>
                                     </ul>
                                 </td>
@@ -54,11 +54,11 @@
                                     <%- stream.lastRun ? timeSince(stream.lastRun) : t('common.never') %>
                                 </td>
                                 <td>
-                                    <%- linkTo('<i class="icon-' + (stream.enabled ? 'pause':'play') + '"></i>', pathTo.toggleStream(stream.id.toString()), {remote: true}) %>
+                                    <%- linkTo('<i class="icon-' + (stream.enabled ? 'pause':'play') + '"></i>', pathTo.toggleStream(stream.id), {remote: true}) %>
                                     &nbsp;
-                                    <%- linkTo(t('streams.actions.edit'), pathTo.editStream(stream.id.toString())) %>
+                                    <%- linkTo(t('streams.actions.edit'), pathTo.editStream(stream.id)) %>
                                     &nbsp;
-                                    <%- linkTo('<i class="icon-remove"></i>', pathTo.streams(stream.id.toString()), { method: 'delete', remote: true, "data-confirm": t('streams.help.deleteConfirm') }) %>
+                                    <%- linkTo('<i class="icon-remove"></i>', pathTo.stream(stream.id), { method: 'delete', remote: true, "data-confirm": t('streams.help.deleteConfirm') }) %>
                                 </td>
                             </tr>
                         <% }) %>

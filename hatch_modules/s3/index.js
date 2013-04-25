@@ -17,9 +17,8 @@
 //
 
 module.exports = function(compound) {
-    compound.hatch.hooks.subscribe(
-        'controllers.upload.index.uploadFiles',
-        this.name,
-        require('./hooks/uploader.js').upload
-    );
+    compound.on('ready', function () {
+        var media = require('./app/models/Media');
+        media(compound, compound.models.Media);
+    });
 };

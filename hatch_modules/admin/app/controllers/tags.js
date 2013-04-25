@@ -64,11 +64,11 @@ function findTag (c) {
 
     if (id) {
         c.Tag.find(id, function (err, tag) {
-            self.tag = c.locals.tag = tag;
+            self.theTag = c.locals.theTag = tag;
             c.next();
         });
     } else {
-        self.tag = c.locals.tag = {};
+        self.theTag = c.locals.theTag = {};
         c.next();
     }
 }
@@ -123,12 +123,13 @@ TagController.prototype.tagCounts = function (c) {
  * @param  {HttpContext} c - http context
  */
 TagController.prototype.edit = TagController.prototype.new = function (c) {
+    var self = this;
     this.defaultFilter = 'filter = function(content) {\n\treturn false; ' +
         '//add your filter criteria here\n};';
 
     // create the recursive renderPermissions function
     c.locals.renderPermissions = function(permission) {
-        var tag = c.locals.tag;
+        var tag = self.theTag;
         var html = '<li><label class="checkbox"><input type="checkbox" name="permission-' + 
             permission.name + '" ' + 
             (tag.permissions && tag.permissions.find(permission.name, 'id') ? 'checked="checked"':'') + 
@@ -162,8 +163,7 @@ TagController.prototype.update = TagController.prototype.create = function (c) {
     c.body.groupId = c.req.group.id;
     c.body.type = this.modelName;
     c.body.filter = c.body.filterEnabled && c.body.filter;
-    c.body.count = c.body.count || 0;
-
+    
     // fix the permissions in req.body
     c.body.permissions = [];
 
@@ -173,29 +173,23 @@ TagController.prototype.update = TagController.prototype.create = function (c) {
         }
     });
 
-    if (self.tag && self.tag.id) {
-        self.tag.updateAttributes(c.req.body, done);
+    if (self.theTag && self.theTag.id) {
+        self.theTag.updateAttributes(c.req.body, done);
     } else {
         c.Tag.create(c.req.body, done);
     }
 
     function done (err, tag) {
         if (err) {
-            return c.send({
-                status: 'error',
-                error: err,
-                message: err.message
-            });
+            return c.sendError(err);
         }
 
         if (c.body.filterExisting) {
-
+            // TODO: filter existing objects
         }
 
-        c.send({
-            status: 'success',
-            message: 'Tag saved'
-        });
+        c.flash('info', c.t('models.Tag.messages.saved'));
+        c.redirect(c.pathTo.tags(self.sectionName));
     }
 };
 
@@ -205,7 +199,8 @@ TagController.prototype.update = TagController.prototype.create = function (c) {
  * @param  {HttpContext} c - http context
  */
 TagController.prototype.destroy = function (c) {
-    this.tag.destroy(function (err) {
+    this.theTag.destroy(function (err) {
+        c.flash('info', c.t('models.Tag.messages.deleted'));
         c.send({
             status: 'success',
             redirect: c.pathTo.tags(c.locals.type)
@@ -224,8 +219,7 @@ TagController.prototype.add = function (c) {
 
     c.req.body.ids.forEach(function (id) {
         model.find(id, function (err, obj) {
-            self.tag.add(obj, function (err) {
-                console.log(obj)
+            self.theTag.add(obj, function (err) {
                 obj.save();
             });
         });
@@ -233,7 +227,7 @@ TagController.prototype.add = function (c) {
 
     c.send({
         status: 'success',
-        message: 'Tag added'
+        message: c.t('models.Tag.messages.added')
     });
 };
 
@@ -248,7 +242,7 @@ TagController.prototype.remove = function (c) {
 
     c.req.body.ids.forEach(function (id) {
         model.find(id, function (err, obj) {
-            self.tag.remove(obj, function (err) {
+            self.theTag.remove(obj, function (err) {
                 obj.save();
             });
         });
@@ -256,6 +250,6 @@ TagController.prototype.remove = function (c) {
 
     c.send({
         status: 'success',
-        message: 'Tag removed'
+        message: c.t('models.Tag.messages.removed')
     });
 };

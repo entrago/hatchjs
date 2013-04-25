@@ -31,8 +31,7 @@
     <div class="controls">
         <select id="tags" name="tags[]" multiple="multiple" class="span3 chzn-select-create" data-placeholder="<%= t('common.enterTags') %>">
             <% (tags || []).forEach(function(tag) { %>
-            <% if(!tag) return; %>
-            <option<%- _.find(stream.tags && stream.tags.items || [], function(t) { return t.tagId == tag.id }) ? ' selected="selected"':'' %>><%- tag.title %></option>
+            <option value="<%- tag.id %>" <%- _.find(stream.tags.items, function(t) { return t.id == tag.id }) ? ' selected="selected"':'' %>><%- tag.title %></option>
             <% }) %>
         </select>
     </div>
@@ -59,15 +58,5 @@
 <script type="text/javascript">
     $(function() {
         $(".content .chzn-select").chosen();
-
-        //bind the form ajax
-        $('#stream-form').bind('ajax:success', function(e, data) {
-            $.noty({text: '<i class="icon-' + data.icon + '"></i> ' + data.message, type: data.status});
-
-            if(data.status == "success") {
-                //refresh the page
-                setTimeout(function() { window.location = '<%- pathTo.streams() %>'; }, 1000);
-            }
-        });
     });
 </script>

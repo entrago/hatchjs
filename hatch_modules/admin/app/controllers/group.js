@@ -51,7 +51,7 @@ require('util').inherits(GroupController, Application);
  * @param  {HttpContext} c - http context
  *                       c.tab - settings tab to show
  */
-GroupController.prototype.show = function (c) {
+GroupController.prototype.settings = function (c) {
     c.locals.tab = c.req.params.tab || 'settings';
     c.locals.pageName = 'group-'  + c.locals.tab;
     c.locals.group = c.req.group;

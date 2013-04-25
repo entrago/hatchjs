@@ -30,39 +30,39 @@
                         </tr>
                     </thead>
                     <tbody>
-                    @if(model.tags.length == 0) { 
-                        <tr>
-                            <td colspan="5">@model.t('tags.help.noTagsDefined')</td>
-                        </tr>
-                    }
-                    @model.tags.forEach(function(tag) {
-                        <tr>
-                            <td width="2%">
-                                <i class="icon-tag"></i>
-                            </td>
-                            <td>
-                                @html.raw(model.linkTo(tag.title, 'filter/' + tag.id))
-                            </td>
-                            <td>
-                                @tag.sortOrder
-                            </td>
-                            <td>
-                                @if (tag.filter) {
-                                    <i class="icon-ok"></i>
-                                } else {
-                                    <span>-</span>
-                                }
-                            </td>
-                            <td>
-                                @model.formatNumber(tag.count)
-                            </td>
-                            <td>
-                                @html.raw(model.linkTo('Edit', model.pathTo.editTag(model.type, tag.id.toString())))
-                                &nbsp;
-                                @html.raw(model.linkTo('<i class="icon-remove"></i>', model.pathTo.tag(model.type, tag.id.toString()), { remote: true, method: 'DELETE', "data-confirm": model.t('tags.help.deleteConfirm') }))
-                            </td>
-                        </tr>
-                    })
+                        @if(model.tags.length == 0) { 
+                            <tr>
+                                <td colspan="5">@model.t('tags.help.noTagsDefined')</td>
+                            </tr>
+                        }
+                        @model.tags.forEach(function(tag) {
+                            <tr>
+                                <td width="2%">
+                                    <i class="icon-tag"></i>
+                                </td>
+                                <td>
+                                    @model.linkTo(tag.title, 'filter/' + tag.id)
+                                </td>
+                                <td>
+                                    @tag.sortOrder
+                                </td>
+                                <td>
+                                    @if (tag.filter) {
+                                        <i class="icon-ok"></i>
+                                    } else {
+                                        <span>-</span>
+                                    }
+                                </td>
+                                <td>
+                                    @model.formatNumber(tag.count)
+                                </td>
+                                <td>
+                                    @model.linkTo('Edit', model.pathTo.editTag(model.type, tag.id.toString()))
+                                    &nbsp;
+                                    @model.linkTo('<i class="icon-remove"></i>', model.pathTo.tag(model.type, tag.id.toString()), { remote: true, method: 'DELETE', "data-confirm": model.t('tags.help.deleteConfirm') })
+                                </td>
+                            </tr>
+                        })
                     </tbody>
                 </table>
 

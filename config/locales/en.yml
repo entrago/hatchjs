@@ -60,6 +60,20 @@ en:
         priority:
           label: Priority
           description: "Priority combined with publish date determines the position on the page that this post will show"
+    Page:
+      messages: 
+        saved: Page saved
+    ImportStream:
+      messages:
+        saved: Import stream saved
+        deleted: Import stream deleted
+        toggled: Import stream toggled
+    Tag:
+      messages:
+        added: Tag added
+        removed: Tag removed
+        deleted: Tag deleted
+        saved: Tag saved
   widget:
     settings:
       title: Edit widget settings
