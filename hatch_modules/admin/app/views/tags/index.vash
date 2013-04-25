@@ -1,6 +1,6 @@
 <div class="row-fluid">
 
-    @html.raw(model.renderPartial('tags/_sidebar.ejs'))
+    @model.renderPartial('tags/_sidebar.ejs')
 
     <div class="span10">
         <div class="module">

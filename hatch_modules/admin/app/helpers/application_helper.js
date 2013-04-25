@@ -11,7 +11,11 @@ exports.renderPartial = function (view) {
             result = html;
         }
     });
-    return result;
+    var res = new String(result);
+    res.toHtmlString = function() {
+        return result;
+    };
+    return res;
 };
 
 exports.specialPagePath = function () {
