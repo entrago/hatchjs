@@ -558,8 +558,8 @@ module.exports = function (compound, Content) {
      */
     Content.prototype.getLike = function (user, callback) {
         var userId = user.id || user;
-        Like.findOne({ userId: userId, contentId: this.id }, function (err, like) {
-            callback(err, like);
+        Like.all({ where: { userId: userId, contentId: this.id }}, function (err, likes) {
+            callback(err, likes[0]);
         });
     };
 
@@ -571,7 +571,7 @@ module.exports = function (compound, Content) {
      */
     Content.prototype.like = function (user, callback) {
         var self = this;
-        
+
         self.getLike(user, function (err, like) {
             if (like) {
                 like.destroy(done);
