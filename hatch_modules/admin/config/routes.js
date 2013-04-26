@@ -4,8 +4,8 @@ exports.routes = function (map) {
     map.root('pages#index');
     
     map.collection(function (group) {
-        group.get('group/:tab?', 'group#show', {as: 'group'});
-        group.post('group/save', 'group#save', {as: 'groupSave'});
+        group.get('group/:tab?', 'group#settings', {as: 'group'});
+        group.post('group/save/.:format?', 'group#save', {as: 'groupSave'});
         group.get('group/module/:id/setup', 'group#setupModule', {as: 'setupModule'});
     });
 
@@ -45,7 +45,7 @@ exports.routes = function (map) {
     });
 
     map.resources('streams', function (stream) {
-        stream.get('toggle');
+        stream.post('toggle', 'streams#toggle', {as: 'toggleStream'});
     });
 
     map.resources('users', {as: 'community', suffix: 'member'}, function (user) {

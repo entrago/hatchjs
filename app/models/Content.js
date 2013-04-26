@@ -17,10 +17,13 @@
 //
 
 module.exports = function (compound, Content) {
+    'use strict';
+
     var api = compound.hatch.api;
     var User = compound.models.User;
     var Page = compound.models.Page;
     var Comment = compound.models.Comment;
+    var Like = compound.models.Like;
 
     var Group = compound.models.Group;
     var redis = Content.schema.adapter;
@@ -29,8 +32,9 @@ module.exports = function (compound, Content) {
     var chrono = require('chrono-node');
     var async = require('async');
 
-    // determines the number of comments which are cached with each content item
+    // determines the number of comments/likes which are cached with each content item
     Content.CACHEDCOMMENTS = 3;
+    Content.CACHEDLIKES = 3;
 
     Content.validatesPresenceOf('createdAt', 'title', 'text');
 
@@ -129,72 +133,56 @@ module.exports = function (compound, Content) {
      * 
      * @param  {Function} done [continuation function]
      */
-    Content.beforeCreate = Content.beforeSave = function (done) {
-        var content = this;
-
-        if (!this.createdAt) {
-            this.createdAt = new Date();
+    Content.beforeSave = function (done, data) {
+        if (!data.createdAt) {
+            data.createdAt = new Date();
         }
 
-        this.updatedAt = new Date();
+        data.updatedAt = new Date();
 
         //get the group and check all tag filters
-        Group.find(content.groupId, function(err, group) {
-            if(!group) return done();
-            
-            var tags = group.getTagsForContent(content);
-            if(!content.tags) content.tags = [];
-
-            //add the tags that are not already present
-            tags.forEach(function(tag) {
-                if(!_.find(content.tags, function(t) { return t.tagId == tag.id; })) {
-                    content.tags.push({
-                        tagId: tag.id,
-                        name: tag.name,
-                        createdAt: new Date(),
-                        score: 0
-                    });
-                }
-            });
+        Group.find(data.groupId, function(err, group) {
+            if(!group) {
+                return done();
+            }
 
             //generate url
-            content.generateUrl(group, done);
+            Content.generateUrl(data, group, done);
         });
     };
 
     /**
      * creates the url for this content if it is not already set
-     * 
+     *
+     * @param  {Object}   data
      * @param  {[Group]}  group
      * @param  {Function} done  [continuation function]
      */
-    Content.prototype.generateUrl = function(group, done) {
-        var content = this;
-
-        if (!content.url) {
-            var slug = slugify(content.title || (content.createdAt || new Date(0)).getTime().toString());
-            content.url = (group.homepage.url + '/' + slug).replace('//', '/');
+    Content.generateUrl = function(data, group, done) {
+        if (!data.url) {
+            var slug = slugify(data.title || (data.createdAt || new Date(0)).getTime().toString());
+            data.url = (group.homepage.url + '/' + slug).replace('//', '/');
 
             //check for duplicate pages and content in parallel
             async.parallel([
                 function(callback) {
-                    Content.all({where: { url: content.url}}, function(err, posts) {
+                    Content.all({where: { url: data.url}}, function(err, posts) {
                         callback(null, posts);
                     });
                 },
                 function(callback) {
-                    Page.all({where: { url: content.url}}, function(err, pages) {
+                    Page.all({where: { url: data.url}}, function(err, pages) {
                         callback(null, pages);
                     });
                 }
             ], function(err, results) {
                 if (results[0].length > 0 || results[1].length > 0) {
-                    content.url += '-' + (content.createdAt || new Date(0)).getTime();
+                    data.url += '-' + (data.createdAt || new Date(0)).getTime();
                 }
 
-                console.log("Content URL set to: " + content.url);
+                console.log("Content URL set to: " + data.url);
 
-                done();
+                return done();
             })
         }
         else done();
@@ -518,16 +506,59 @@ module.exports = function (compound, Content) {
         Content.find(contentId, function (err, post) {
             Comment.all({ where: { contentId: post.id }, limit: Content.CACHEDCOMMENTS }, function (err, comments) {
                 post.commentsTotal = comments.countBeforeLimit;
-                while (post.comments.items.length > 0) {
-                    post.comments.remove(post.comments.items[0]);
-                }
+                post.comments.items = [];
+
+                // reverse the comments so we can show latest at the end
+                comments.reverse();
+
                 comments.forEach (function (comment) {
-                    if (comment.id) {
-                        post.comments.push(comment.toObject());
-                    }
+                    post.comments.push(comment.toObject());
                 });
+
                 post.save(callback);
             });
+        });
+    };
+
+    /**
+     * Update the likes cached on a content record and record the total like
+     * count.
+     * 
+     * @param  {Number}   contentId - id of the content
+     * @param  {Function} callback  - callback function
+     */
+    Content.updateLikes = function (contentId, callback) {
+        Content.find(contentId, function (err, post) {
+            if (!post) {
+                throw new Error('Could not find content.id == ' + contentId);
+            }
+
+            Like.all({ where: { contentId: contentId }, limit: Content.CACHEDLIKES }, function (err, likes) {
+                post.likesTotal = likes.countBeforeLimit;
+                post.likes.items = [];
+
+                // reverse the likes so we can show latest at the end
+                likes.reverse();
+
+                likes.forEach (function (like) {
+                    post.likes.push(like.toObject());
+                });
+
+                post.save(callback);
+            });
+        });
+    };
+
+    /**
+     * Get a like if a user likes this content item.
+     * 
+     * @param  {User}     user     - user or userId
+     * @param  {Function} callback - callback function
+     */
+    Content.prototype.getLike = function (user, callback) {
+        var userId = user.id || user;
+        Like.all({ where: { userId: userId, contentId: this.id }}, function (err, likes) {
+            callback(err, likes[0]);
         });
     };
 
@@ -538,17 +569,28 @@ module.exports = function (compound, Content) {
      * @param  {Function} callback - callback function
      */
     Content.prototype.like = function (user, callback) {
-        if (this.likes.find(user.id, 'userId')) {
-            this.likes.remove(this.likes.find(user.id, 'userId'));
-        } else {
-            this.likes.push({
-                userId: user.id,
-                username: user.username,
-                createdAt: new Date()
-            });
-        }
+        var self = this;
 
-        this.save(callback);
+        self.getLike(user, function (err, like) {
+            if (like) {
+                like.destroy(done);
+            } else {
+                Like.create({
+                    userId: user.id,
+                    contentId: self.id,
+                    groupId: self.groupId
+                }, done);
+            }
+        });
+
+        // in the callback, make sure the content is reloaded from the database
+        function done(err) {
+            if (callback) {
+                Content.find(self.id, function (err, content) {
+                    callback(err, content);
+                });
+            }
+        }
     };
 
     /**

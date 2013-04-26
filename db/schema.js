@@ -183,6 +183,15 @@ var Comment = define('Comment', function () {
     set('defaultSort', 'createdAt');
 });
 
+var Like = define('Like', function () {
+    property('createdAt', Date);
+    property('userId', Number, {index: true});
+    property('contentId', Number, {index: true});
+    property('groupId', Number, {index: true});
+
+    set('defaultSort', 'createdAt');
+});
+
 Content.schema.adapter.defineFulltextIndex('Content', 'fulltext');
 
 var ContentFeedItem = define('ContentFeedItem', function () {

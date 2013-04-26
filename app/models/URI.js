@@ -1,3 +1,21 @@
+//
+// Hatch.js is a CMS and social website building framework built in Node.js 
+// Copyright (C) 2013 Inventures Software Ltd
+// 
+// This file is part of Hatch.js
+// 
+// Hatch.js is free software: you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation, version 3
+// 
+// Hatch.js is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// 
+// See the GNU General Public License for more details. You should have received a copy of the GNU
+// General Public License along with Hatch.js. If not, see <http://www.gnu.org/licenses/>.
+// 
+// Authors: Marcus Greenwood, Anatoliy Chakkaev and others
+//
+
 'use strict';
 
 /**
@@ -22,24 +40,24 @@ module.exports = function (compound) {
 
             //generate the uri value whenever an object is saved
             var beforeSave = model.beforeSave;
-            model.beforeSave = function (done) {
-                var obj = this;
+            model.beforeSave = function (done, obj) {
+                var self = this;
 
                 if (obj.uri) {
                     next();
-                } else if (obj.id) {
-                    obj.uri = generateUri(obj.id);
+                } else if (self.id) {
+                    self.uri = obj.uri = generateUri(self.id);
                     next();
                 } else {
                     redis.get('id:' + hq.modelName(modelName), function (err, id) {
-                        obj.uri = generateUri(parseInt(id || 0, 10) + 1);
+                        self.uri = obj.uri = generateUri(parseInt(id || 0, 10) + 1);
                         next();
                     });
                 }
 
                 function next() {
                     if (beforeSave) {
-                        beforeSave.call(obj, done);
+                        beforeSave.call(self, done, obj);
                     } else {
                         done();
                     }

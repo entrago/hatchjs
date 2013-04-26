@@ -25,7 +25,6 @@ module.exports = function (compound, Media) {
     var path = require('path');
     var fs = require('fs');
     var fsTools = require('fs-tools');
-    var knox = require('knox');
     var mime = require('mime');
     var _ = require('underscore');
 
@@ -234,60 +233,5 @@ module.exports = function (compound, Media) {
         return this.url;
     };
 
-    /**
-     * Upload the files for this media object to S3. Replace the Media.uploadToCDN
-     * function with this to turn on uploading to S3 for CDN. You also need to
-     * set the Media.s3 settings object with your AWS credentials and S3 bucket.
-     * See below for required parameters.
-     * 
-     * @param  {Object}   data     - media creation data
-     * @param  {Function} callback - callback function
-     */
-    Media.uploadToS3 = function (data, callback) {
-        var settings = Media.s3;
-        var filename = data.filename.split('/').slice(-1)[0];
-
-        var client = knox.createClient({
-            key: settings.key, 
-            secret: settings.secret, 
-            bucket: settings.bucket, 
-            region: settings.region || 'eu-west-1'
-        });
-
-        var params = { 
-            'x-amz-acl': 'public-read', 
-            'cache-control': 'public,max-age=31536000', 
-            'Content-Type': mime.lookup(data.filename) 
-        };
-
-        var files = data.resized.map(function (resize) {
-            return data.filename.split('/').slice(0, -1).join('/') + '/' + resize.filename;
-        });
-        files.push(data.filename);
-
-        async.forEach(files, function (filename, done) {
-            client.putFile(filename, (settings.path && ((settings.path.split('/')[0] + '/') || '/')) + filename.split('/').slice(-1)[0], params, function(err, res) {
-                if (err) {
-                    return callback(err);
-                }
-
-                // delete the original file
-                fs.unlink(filename);
-                done();
-            });
-        }, function (err) {
-            if (err) {
-                return callback(err);
-            }
-
-            // work out the new url - either a mapped domain or sub-subdomain of amazonaws.com
-            if (settings.bucket.split('.').length > 1) {
-                data.url = '//' + settings.bucket + '/' + filename;
-            } else {
-                data.url = bucket + '.s3.amazonaws.com/' + filename;
-            }
-
-            return callback(err, data);
-        });
-    };
+    
 };

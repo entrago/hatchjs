@@ -49,6 +49,10 @@ module.exports = function (compound, Tag) {
             this.name = (this.groupId ? (this.groupId + '-') : '') + slugify(this.title);
         }
 
+        if (!this.count) {
+            this.count = 0;
+        }
+
         next();
     };
 
@@ -102,12 +106,16 @@ module.exports = function (compound, Tag) {
 
         // add the existing tags to the update collection
         obj.tags.forEach(function (tag) {
-            updateTags.push(tag.id);
+            if (tag.id) {
+                updateTags.push(tag.id);
+            }
         });
 
         // remove all of the existing tags from the object
-        while (obj.tags.length > 0) {
-            obj.tags.remove(obj.tags.items[0]);
+        if (obj.tags.items) {
+            obj.tags.items = [];
+        } else {
+            obj.tags = [];
         }
 
         // assign the tags from the body data
@@ -118,7 +126,7 @@ module.exports = function (compound, Tag) {
                     var tag = {
                         title: tagId,
                         groupId: obj.groupId,
-                        type: obj.constructor.modelName,
+                        type: obj.tagModelName || obj.constructor.modelName,
                         sortOrder: 'id DESC'
                     };
 

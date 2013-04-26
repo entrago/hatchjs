@@ -34,11 +34,12 @@ $(document).ready(function() {
     //validation and default ajax handlers
     //redirect
     $('*[data-remote=true]').live("ajax:success", function(e, data) {
+        var timeout = data.message && 2000 || 0;
         if (data.redirect) {
             console && console.error('Deprecated redirect to ' + data.redirect);
             setTimeout(function() {
                 window.location = data.redirect;
-            }, 2000);
+            }, timeout);
         }
     });
     //errors

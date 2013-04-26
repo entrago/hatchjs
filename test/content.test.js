@@ -8,6 +8,23 @@ describe('Content', function() {
         compound.on('ready', function () {
             Content = compound.models.Content;
             Content.destroyAll(done);
+            Group = compound.models.Group;
+        });
+    });
+
+    it('should create content with a URI and a URL', function (done) {
+        Group.all({ limit: 1}, function (err, groups) {
+            Content.create({
+                createdAt: new Date,
+                title: 'Hello',
+                text: 'World',
+                likes: Array(4),
+                groupId: groups[0].id
+            }, function(err, content) {
+                content.uri.indexOf('/do/api/content').should.be.equal(0);
+                content.url.indexOf('example.com/').should.be.equal(0);
+                done();
+            });
         });
     });
 
@@ -19,22 +36,26 @@ describe('Content', function() {
             likes: Array(4)
         }, function(err, content) {
             Content.all(function(err, c) {
-                c.length.should.equal(1);
                 c[0].score.should.equal(2);
                 done();
             });
         });
     });
 
-    it('should like a comment', function (done) {
+    it('should like a post', function (done) {
         Content.create({
             createdAt: new Date,
             title: 'Hello',
             text: 'World'
-        }, function(err, content) {
-            content.like({ username: 'test_user', id: 1 }, function (err, content) {
-                content.likes.length.should.equal(1);
-                content.doesLike({ id: 1 }).should.be.ok;
+        }, function(err, post) {
+            if (err) {
+                throw err;
+            }
+
+            post.like({ username: 'test_user', id: 1 }, function (err, post) {
+                post.likesTotal.should.equal(1);
+                post.likes.length.should.equal(1);
+                post.doesLike({ id: 1 }).should.be.ok;
                 done();
             });
         });

@@ -250,9 +250,9 @@ ContentController.prototype.create = function create(c) {
     c.Tag.assignTagsForObject(data, c.req.body.Content_tags, function () {
         c.Content.create(data, function(err, content) {
             if (err) {
+                err.message = 'One or more fields have errors'
                 c.sendError(err);
             } else {
-                group.recalculateTagContentCounts(c);
                 c.flash('info', c.t('models.Content.messages.saved'));
                 return c.redirect(c.pathTo.content);
             }

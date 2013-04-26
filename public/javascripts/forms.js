@@ -16,7 +16,6 @@
         $('body').on(
             'ajax:success', 'form[data-remote=true],a[data-remote=true]',
             function (ev, data) {
-
                 handle(data, $(this));
             }
         );
@@ -30,6 +29,7 @@
         switch (res.code) {
 
             case 304:
+            case 302:
             window.location = res.location;
             break;
 

@@ -36,10 +36,7 @@ function StreamsController(init) {
 // finds the stream for the action
 function findStream (c) {
     var self = this;
-    c.ImportStream.find(c.params.id, function(err, stream) {
-        if (!stream) {
-            return c.next(new Error('404'));
-        }
+    c.ImportStream.find(c.params.id || c.params.stream_id, function(err, stream) {
         self.stream = c.locals.stream = stream;
         c.next();
     });
@@ -82,7 +79,6 @@ StreamsController.prototype.new = function(c) {
 StreamsController.prototype.edit = function(c) {
     var importStream = c.compound.hatch.importStream;
     this.pageName = 'manage-streams';
-
     c.render();
 };
 
@@ -97,16 +93,16 @@ StreamsController.prototype.create = function(c) {
     
     stream.groupId = c.req.group.id;
     stream.enabled = true;
+    stream.tagModelName = 'Content';
 
-    stream.save(function(err, stream) {
-        c.send(err ? {
-            message: 'Please enter a title and a query',
-            status: 'error',
-            icon: 'warning-sign'
-        } : {
-            message: 'Import stream saved successfully',
-            status: 'success',
-            icon: 'ok'
+    c.Tag.assignTagsForObject(stream, stream.tags, function () {
+        stream.save(function(err, stream) {
+            if(err) {
+                c.sendError(err);
+            } else {
+                c.flash('info', c.t('models.ImportStream.messages.saved'));
+                c.redirect(c.pathTo.streams);
+            }
         });
     });
 };
@@ -118,35 +114,20 @@ StreamsController.prototype.create = function(c) {
  *                       c.body - import stream body
  */
 StreamsController.prototype.update = function(c) {
-    var ImportStream = c.ImportStream;
+    var self = this;
+    var data = c.req.body;
 
-    // update stream
-    stream.id = c.body.id;
-    stream.groupId = c.req.group.id;
-    stream.type = c.body.type;
-    stream.title = c.body.title;
-    stream.query = c.body.query;
-    stream.interval = c.body.interval;
-    stream.tags = [];
+    data.groupId = c.req.group.id;
+    data.tagModelName = 'Content';
 
-    (c.body.tags || []).forEach(function(tag) {
-        stream.tags.push({
-            tagId: c.req.group.getTag(tag).id,
-            name: tag,
-            createdAt: new Date(),
-            score: 0
-        });
-    });
-
-    this.stream.updateAttributes(stream, function (err) {
-        c.send(err ? {
-            message: 'Please enter a title and a query',
-            status: 'error',
-            icon: 'warning-sign'
-        } : {
-            message: 'Import stream saved successfully',
-            status: 'success',
-            icon: 'ok'
+    c.Tag.assignTagsForObject(data, data.tags, function () {
+        self.stream.updateAttributes(data, function (err) {
+            if(err) {
+                c.sendError(err);
+            } else {
+                c.flash('info', c.t('models.ImportStream.messages.saved'));
+                c.redirect(c.pathTo.streams);
+            }
         });
     });
 };
@@ -159,8 +140,9 @@ StreamsController.prototype.update = function(c) {
  */
 StreamsController.prototype.destroy = function(c) {
     this.stream.destroy(function() {
+        c.flash('info', c.t('models.ImportStream.messages.deleted'));
         c.send({ 
-            redirect: c.pathTo.streams
+            redirect: c.pathTo.streams()
         });
     });
 };
@@ -174,8 +156,9 @@ StreamsController.prototype.destroy = function(c) {
 StreamsController.prototype.toggle = function(c) {
     this.stream.enabled = !this.stream.enabled;
     this.stream.save(function() {
+        c.flash('info', c.t('models.ImportStream.messages.toggled'));
         c.send({ 
-            redirect: c.pathTo.streams
+            redirect: c.pathTo.streams()
         });
     });
 };
