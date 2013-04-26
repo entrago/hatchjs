@@ -81,8 +81,8 @@ PageController.prototype.editconsole = function editConsole(c) {
 
     Page.all({ where: { groupId: c.req.group.id, type: 'template' }}, function (err, templates) {
         c.templates = templates;
-        // c.locals.themes = c.api.themes.getThemes();
-        c.render('editconsole' + tab, { layout : false, req: c.req, templates: templates, themes: [] });
+        c.locals.themes = c.compound.hatch.themes.getThemes();
+        c.render('editconsole' + tab, { layout : false });
     });
 
 };
@@ -102,7 +102,8 @@ PageController.prototype.updateGrid = function(c) {
         col.size = false;
     });
 
-    // if we are modifying a page which doesn't yet exist in the database (default special page), use the createPage function instead of save
+    // if we are modifying a page which doesn't yet exist in the database 
+    // (default special page), use the createPage function instead of save
     if (!page.id) {
         page.save = function(done) {
             c.Page.createPage(page, done);
