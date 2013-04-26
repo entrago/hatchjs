@@ -17,6 +17,8 @@
 //
 
 var _ = require('underscore');
+var googleImages = require('google-images');
+var google = require('google');
 
 var Application = require('./application');
 
@@ -24,21 +26,24 @@ module.exports = PageController;
 
 function PageController(init) {
     Application.call(this, init);
+    init.before(findPage);
+}
 
-    init.before(function loadPage(c) {
-        var Page = c.Page;
-        if (c.req.page) return c.next();
-        Page.find(c.req.query.pageId, function (err, page) {
-            c.req.page = page;
-            page.grid = page.grid || '02-two-columns';
-            c.next();
-        });
+// finds the page that we are performing the action on
+function findPage (c) {
+    c.req.group.definePage(c.req.pagePath, c, function (err, page) {
+        c.req.page = page;
+        c.next();
     });
 }
 
 require('util').inherits(PageController, Application);
 
-//shows the edit console
+/**
+ * Show the edit console for this page.
+ * 
+ * @param  {HttpContext} c - http context
+ */
 PageController.prototype.editconsole = function editConsole(c) {
     c.req.widgets = [];
     var groupModulesIndex = {};
@@ -79,17 +84,21 @@ PageController.prototype.editconsole = function editConsole(c) {
 
 };
 
-//updates the widgets in the grid
-PageController.prototype.updateGrid = function updateGrid(c) {
+/**
+ * Update the grid for this page.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+PageController.prototype.updateGrid = function(c) {
     var Page = c.Page;
-    var page = this.req.page;
+    var page = c.req.page;
     var ctx = this;
     var oldTemplateId = page.templateId;
 
-    page.templateId = this.body.grid == null ? this.body.templateId : 0;
-    page.grid = this.body.grid;
+    page.templateId = c.body.grid == null ? c.body.templateId : 0;
+    page.grid = c.body.grid;
 
-    var grid = this.api.layout.getLayoutGrid(this.body.grid || '02-two-columns');
+    var grid = c.compound.hatch.layout.getLayoutGrid(c.body.grid || '02-two-columns');
 
     if (typeof page.columns === 'string') {
         page.columns = JSON.parse(page.columns);
@@ -100,7 +109,7 @@ PageController.prototype.updateGrid = function updateGrid(c) {
     });
 
     //if we are modifying a page which doesn't yet exist in the database (default special page), use the createPage function instead of save
-    if(!page.id) {
+    if (!page.id) {
         page.save = function(done) {
             Page.createPage(page, done);
         }
@@ -155,44 +164,55 @@ PageController.prototype.updateGrid = function updateGrid(c) {
 };
 
 /**
- * Update the column widths
+ * Update the column widths for this page.
+ * 
+ * @param  {HttpContext} c - http context
  */
-PageController.prototype.updateColumns = function updateColumns(c) {
-    var page = c.req.page;
-    page.columns = JSON.parse(c.body.widgets);
-    console.log(page.columns);
-    page.save(function (err) {
+PageController.prototype.updateColumns = function(c) {
+    c.req.page.columns = JSON.parse(c.body.widgets);
+    c.req.page.save(function (err) {
         c.send('ok');
     });
 };
 
-//shows the richtext insert image modal dialog
-exports.image = function(c) {
-    //load this user's media
-    var Media = c.model('Media');
-
-    Media.all({where: { userId: c.req.user.id, type: 'image'}, order: 'createdAt DESC'}, function(err, images) {
+/**
+ * Show the richtext insert image dialog.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+PageController.prototype.image = function(c) {
+    c.Media.all({ where: { userId: c.req.user.id, type: 'image'}}, function(err, images) {
         c.locals.images = images;
-        c.render('page/image', { layout: false });
+        c.render('image', { layout: false });
     });
 };
 
-//searches for images on google
-exports.imageSearch = function(c) {
-    var googleImages = require('google-images');
+/**
+ * Search for images on google to add to the media library.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+PageController.prototype.imageSearch = function(c) {
     googleImages.search(c.req.body.query, function(err, images) {
         c.send(images);
     });
 };
 
-//shows the richtext link modal dialog
-exports.link = function(c) {
-    c.render('page/link', { layout: false });
+/**
+ * Show the richtext insert link dialog.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+PageController.prototype.link = function(c) {
+    c.render('link', { layout: false });
 };
 
-//searches for links on google
-exports.linkSearch = function(c) {
-    var google = require('google');
+/**
+ * Search google for links to insert.
+ * 
+ * @param  {HttpContext} c 
+ */
+PageController.prototype.linkSearch = function(c) {
     google(c.req.body.query, function(err, next, links) {
         c.send(links);
     });

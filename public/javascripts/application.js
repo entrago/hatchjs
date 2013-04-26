@@ -89,7 +89,9 @@ function send(action, data, response, done) {
 
     pageId = $('meta[name=pageId]:last').attr('content');
 
-    var path = '/do/admin/' + action + (pageId ? '?pageId=' + pageId : '');
+    var pathname = window.location.pathname;
+    if (pathname === '/') pathname = '';
+    var path = pathname + '/do/admin/' + action;
 
     $.post(path, data, function (data) {
         if (typeof done === 'function') {

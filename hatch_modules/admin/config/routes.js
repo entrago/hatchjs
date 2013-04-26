@@ -88,10 +88,11 @@ exports.routes = function (map) {
     });
 
     map.post('/page/columns', 'page#updateColumns');
+    map.post('/page/grid', 'page#updateGrid');
 
     map.get('/:controller/:action');
 
     map.resources('widgets', {path: 'widget'});
     map.post('/widget', 'widgets#create');
-    map.all('/widget/:pageId/:widgetId/:action', 'widgets');
+    map.all('/widget/:widgetId/:action', 'widgets');
 };

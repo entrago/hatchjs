@@ -39,7 +39,9 @@
     "imagemagick": "latest",
     "fs-tools": "latest",
     "knox": "latest",
-    "mime": "latest"
+    "mime": "latest",
+    "google": "latest",
+    "google-images": "latest"
   },
   "devDependencies": {
     "mocha": "1.8.1",
