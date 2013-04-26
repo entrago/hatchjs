@@ -95,4 +95,5 @@ exports.routes = function (map) {
     map.resources('widgets', {path: 'widget'});
     map.post('/widget', 'widgets#create');
     map.all('/widget/:widgetId/:action', 'widgets');
+    map.all('/widget/:pageId/:widgetId/:action', 'widgets');
 };
