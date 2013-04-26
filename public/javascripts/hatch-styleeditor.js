@@ -436,11 +436,11 @@ function StyleEditorController() {
             color: '#fff' 
         } }); 
          
-        $.ajax(pathTo('admin/stylesheet/theme/' + theme), {
-            complete: function() {
+        $.ajax(pathTo('admin/stylesheet/theme?name=' + theme), {
+            type: 'POST',
+            success: function(res) {
                 //reload the stylesheet
-                var href = $("#main-stylesheet").attr("href");
-                setStylesheetHref(href);
+                setStylesheetHref(res.url);
 
                 c.els.themeSaveButtons.addClass("hidden");
 

@@ -67,8 +67,6 @@ module.exports = function (compound, Stylesheet) {
             //add the custom less onto the end
             str += '\n' + stylesheet.less.custom;
 
-            console.log(str);
-
             new(less.Parser)({
                 paths: [require('path').dirname(path)],
                 optimization: 1
@@ -158,6 +156,8 @@ module.exports = function (compound, Stylesheet) {
             var path = __dirname + '/../../public' + compound.app.get('cssDirectory') + "theme-template.less";
             var theme = compound.hatch.themes.getTheme(name);
 
+            console.log(theme)
+
             //if no theme found, use the default theme settings
             if (!theme) {
                 throw new Error('Theme "' + name + '" not defined!');
@@ -186,7 +186,7 @@ module.exports = function (compound, Stylesheet) {
                 if(err) throw new Error(err);
 
                 //save to cache
-                Stylesheet.cache[c.params.name] = {
+                Stylesheet.cache[name] = {
                     variables: variables,
                     bootswatch: bootswatch
                 };
@@ -196,7 +196,7 @@ module.exports = function (compound, Stylesheet) {
         }
         else {
             //call the response function
-            var theme = Stylesheet.cache[c.params.name];
+            var theme = Stylesheet.cache[name];
 
             variables = theme.variables;
             bootswatch = theme.bootswatch;
@@ -211,6 +211,7 @@ module.exports = function (compound, Stylesheet) {
             stylesheet.less.bootswatch = bootswatch;
             stylesheet.less.custom = '/* put your custom css here */';
 
+            // compile the stylesheet to a file
             stylesheet.compile(c, function(err) {
                 if(err) {
                     console.log(err);
@@ -220,10 +221,13 @@ module.exports = function (compound, Stylesheet) {
                 stylesheet.version ++;
                 stylesheet.lastUpdate = new Date();
 
-                stylesheet.save(function() {
+                stylesheet.save(function(err) {
                     group.cssVersion = stylesheet.version + '-' + new Date().getTime();
-                    group.save(function() {
-                        callback();
+                    group.save(function(err) {
+                        callback(err, {
+                            version: group.cssVersion,
+                            url: group.cssUrl
+                        });
                     });
                 });
             });
