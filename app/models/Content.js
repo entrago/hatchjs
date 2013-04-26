@@ -133,8 +133,8 @@ module.exports = function (compound, Content) {
      * 
      * @param  {Function} done [continuation function]
      */
-    Content.beforeCreate = Content.beforeSave = function (done) {
-        var content = this;
+    Content.beforeSave = function (done) {
+        var self = this;
 
         if (!this.createdAt) {
             this.createdAt = new Date();
@@ -143,11 +143,13 @@ module.exports = function (compound, Content) {
         this.updatedAt = new Date();
 
         //get the group and check all tag filters
-        Group.find(content.groupId, function(err, group) {
-            if(!group) return done();
-            
+        Group.find(this.groupId, function(err, group) {
+            if(!group) {
+                return done();
+            }
+
             //generate url
-            content.generateUrl(group, done);
+            self.generateUrl(group, done);
         });
     };
 

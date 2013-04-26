@@ -8,6 +8,23 @@ describe('Content', function() {
         compound.on('ready', function () {
             Content = compound.models.Content;
             Content.destroyAll(done);
+            Group = compound.models.Group;
+        });
+    });
+
+    it.only('should create content with a URI', function (done) {
+        Group.all({ limit: 1}, function (err, groups) {
+            Content.create({
+                createdAt: new Date,
+                title: 'Hello',
+                text: 'World',
+                likes: Array(4),
+                groupId: groups[0].id
+            }, function(err, content) {
+                content.uri.indexOf('/do/api/content').should.be.equal(0);
+                content.url.indexOf('example.com/').should.be.equal(0);
+                done();
+            });
         });
     });
 
@@ -26,7 +43,7 @@ describe('Content', function() {
         });
     });
 
-    it.only('should like a post', function (done) {
+    it('should like a post', function (done) {
         Content.create({
             createdAt: new Date,
             title: 'Hello',
