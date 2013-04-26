@@ -12,7 +12,7 @@ describe('Content', function() {
         });
     });
 
-    it.only('should create content with a URI', function (done) {
+    it('should create content with a URI and a URL', function (done) {
         Group.all({ limit: 1}, function (err, groups) {
             Content.create({
                 createdAt: new Date,
@@ -36,7 +36,6 @@ describe('Content', function() {
             likes: Array(4)
         }, function(err, content) {
             Content.all(function(err, c) {
-                c.length.should.equal(1);
                 c[0].score.should.equal(2);
                 done();
             });

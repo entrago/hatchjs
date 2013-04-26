@@ -133,57 +133,54 @@ module.exports = function (compound, Content) {
      * 
      * @param  {Function} done [continuation function]
      */
-    Content.beforeSave = function (done) {
-        var self = this;
-
-        if (!this.createdAt) {
-            this.createdAt = new Date();
+    Content.beforeSave = function (done, data) {
+        if (!data.createdAt) {
+            data.createdAt = new Date();
         }
 
-        this.updatedAt = new Date();
+        data.updatedAt = new Date();
 
         //get the group and check all tag filters
-        Group.find(this.groupId, function(err, group) {
+        Group.find(data.groupId, function(err, group) {
             if(!group) {
                 return done();
             }
 
             //generate url
-            self.generateUrl(group, done);
+            Content.generateUrl(data, group, done);
         });
     };
 
     /**
      * creates the url for this content if it is not already set
-     * 
+     *
+     * @param  {Object}   data
      * @param  {[Group]}  group
      * @param  {Function} done  [continuation function]
      */
-    Content.prototype.generateUrl = function(group, done) {
-        var content = this;
-
-        if (!content.url) {
-            var slug = slugify(content.title || (content.createdAt || new Date(0)).getTime().toString());
-            content.url = (group.homepage.url + '/' + slug).replace('//', '/');
+    Content.generateUrl = function(data, group, done) {
+        if (!data.url) {
+            var slug = slugify(data.title || (data.createdAt || new Date(0)).getTime().toString());
+            data.url = (group.homepage.url + '/' + slug).replace('//', '/');
 
             //check for duplicate pages and content in parallel
             async.parallel([
                 function(callback) {
-                    Content.all({where: { url: content.url}}, function(err, posts) {
+                    Content.all({where: { url: data.url}}, function(err, posts) {
                         callback(null, posts);
                     });
                 },
                 function(callback) {
-                    Page.all({where: { url: content.url}}, function(err, pages) {
+                    Page.all({where: { url: data.url}}, function(err, pages) {
                         callback(null, pages);
                     });
                 }
             ], function(err, results) {
                 if (results[0].length > 0 || results[1].length > 0) {
-                    content.url += '-' + (content.createdAt || new Date(0)).getTime();
+                    data.url += '-' + (data.createdAt || new Date(0)).getTime();
                 }
 
-                console.log("Content URL set to: " + content.url);
+                console.log("Content URL set to: " + data.url);
 
                 return done();
             })

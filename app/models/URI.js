@@ -40,24 +40,24 @@ module.exports = function (compound) {
 
             //generate the uri value whenever an object is saved
             var beforeSave = model.beforeSave;
-            model.beforeSave = function (done) {
-                var obj = this;
+            model.beforeSave = function (done, obj) {
+                var self = this;
 
                 if (obj.uri) {
                     next();
-                } else if (obj.id) {
-                    obj.uri = generateUri(obj.id);
+                } else if (self.id) {
+                    self.uri = obj.uri = generateUri(self.id);
                     next();
                 } else {
                     redis.get('id:' + hq.modelName(modelName), function (err, id) {
-                        obj.uri = generateUri(parseInt(id || 0, 10) + 1);
+                        self.uri = obj.uri = generateUri(parseInt(id || 0, 10) + 1);
                         next();
                     });
                 }
 
                 function next() {
                     if (beforeSave) {
-                        beforeSave.call(obj, done);
+                        beforeSave.call(self, done, obj);
                     } else {
                         done();
                     }
