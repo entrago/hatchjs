@@ -5,9 +5,6 @@
     <li<%- req.page.grid.indexOf('<') == -1 ? '':' class="active"' %>>
         <a href="#custom-layouts" data-toggle="tab"><%- __('Custom') %></a>
     </li>
-    <li<%- !req.page.templateId ? '':' class="active"' %>>
-        <a href="#templates-layouts" data-toggle="tab"><%- __('Templates') %></a>
-    </li>
 </ul>
 
 <div class="tab-content layout-tab">
@@ -32,30 +29,6 @@
                 <button type="reset" class="btn" id="theme-undo-button"><%- __('Reset') %></button>
             </div>
         </form>
-    </div>
-
-    <div id="templates-layouts" class="tab-pane <%- !req.page.templateId ? '':'active' %>">
-        <% if(templates.length == 0) { %>
-            <p>
-                <%- __('No page templates have been defined for this group') %>
-            </p>
-
-            <div>
-                <a href="<%- pathTo.newSpecial('template') %>"><i class="icon-plus"></i> <%- __('Create a new template') %></a>
-            </div>
-        <% } else { %>
-            <p>
-                <%- __('Select a template for this page:') %>
-            </p>
-            <form>
-                <% templates.forEach(function(template) { %>
-                    <label class="radio">
-                        <input type="radio" name="templateId" value="<%- template.id %>" onclick="selectPageTemplate(this.value);" <%- req.page.templateId == template.id ? 'checked="checked"':'' %> />
-                        <%- template.title %>
-                    </label>
-                <% }) %>
-            </form>
-        <% } %>
     </div>
 </div>
 
