@@ -94,6 +94,8 @@ exports.routes = function (map) {
 
     map.resources('widgets', {path: 'widget'});
     map.post('/widget', 'widgets#create');
+
+    // catch all other widget actions
     map.all('/widget/:widgetId/:action', 'widgets');
     map.all('/widget/:pageId/:widgetId/:action', 'widgets');
 };

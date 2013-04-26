@@ -49,10 +49,12 @@ PageController.prototype.editconsole = function editConsole(c) {
     var groupModulesIndex = {};
     var tab = c.req.query.tab || '';
 
+    // get the modules that are loaded for this group
     c.req.group.modules.forEach(function (m) {
         if (m) groupModulesIndex[m.name] = m;
     });
 
+    // load the widgets to show on the edit console
     c.compound.hatch.widget.getWidgets().forEach(function (w) {
         if (groupModulesIndex[w.module]) {
             c.req.widgets.push({
@@ -63,6 +65,7 @@ PageController.prototype.editconsole = function editConsole(c) {
         }
     });
 
+    // load the grids to show on the edit console
     c.req.grids = [];
     var hatch = c.app.parent.parent.compound.hatch;
     Object.keys(hatch.grids).forEach(function (name) {
@@ -90,81 +93,35 @@ PageController.prototype.editconsole = function editConsole(c) {
  * @param  {HttpContext} c - http context
  */
 PageController.prototype.updateGrid = function(c) {
-    var Page = c.Page;
+    var hatch = c.app.parent.parent.compound.hatch;
     var page = c.req.page;
-    var ctx = this;
-    var oldTemplateId = page.templateId;
-
-    page.templateId = c.body.grid == null ? c.body.templateId : 0;
     page.grid = c.body.grid;
 
-    var grid = c.compound.hatch.layout.getLayoutGrid(c.body.grid || '02-two-columns');
-
-    if (typeof page.columns === 'string') {
-        page.columns = JSON.parse(page.columns);
-    }
-
+    // reset all of the column sizes - they won't fit the new grid anyway
     page.columns.forEach(function (col) {
         col.size = false;
     });
 
-    //if we are modifying a page which doesn't yet exist in the database (default special page), use the createPage function instead of save
+    // if we are modifying a page which doesn't yet exist in the database (default special page), use the createPage function instead of save
     if (!page.id) {
         page.save = function(done) {
-            Page.createPage(page, done);
+            c.Page.createPage(page, done);
         }
     }
 
-    //save the page and re-render the column contents
-    page.save(function (err, newPage) {
-        if(err) throw err;
-        page = newPage;
-
-        if(page.templateId) {
-            Page.find(page.templateId, function(err, template) {
-                page.mergeTemplate(template);
-                render();
-            });
-        }
-        else if(oldTemplateId) {
-            //if we're switching from a template to no template, copy the widgets from the template header onto the page
-            Page.find(oldTemplateId, function(err, template) {
-                page.reload(function(err, reloadedPage) {
-                    page = reloadedPage;
-
-                    var header = template.columns[0];
-                    delete page.columns[0].fromTemplate;
-
-                    if(_.filter(page.widgets, function(widget) { return widget && page.columns[0].widgets.indexOf(widget.id) > -1; })) {
-                        template.widgets.forEach(function(widget) {
-                            if(header.widgets.indexOf(widget.id) == -1) return;
-
-                            widget.id = page.widgets.length;
-                            page.widgets.push(widget);
-                            page.columns[0].widgets.push(widget.id);
-                        });
-                    }
-
-                    page.save(function(err) {
-                        render();
-                    });
-                });
-            });
-        }
-        else render();
-    });
-
-    function render() {
-        Page.find(page.id, function(err, page) {
-            page.render(grid.html, ctx, function (html) {
-                ctx.send({html: html});
+    // save the page and re-render the column contents
+    page.save(function (err) {
+        // reload the page to get the latest changes from db
+        c.Page.find(page.id, function(err, page) {
+            page.renderHtml(c.req, function (err, html) {
+                c.send({html: html});
             });        
         });
-    }
+    });
 };
 
 /**
- * Update the column widths for this page.
+ * Update the column widths or the widget positions for this page.
  * 
  * @param  {HttpContext} c - http context
  */
