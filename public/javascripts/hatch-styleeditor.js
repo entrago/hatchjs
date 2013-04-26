@@ -466,11 +466,13 @@ function StyleEditorController() {
     //saves CSS changes from the text area
     function saveCss() {
         var cssText = $("#style-css-textarea").val();
-        $.ajax(pathTo('admin/stylesheet/save'), {
+        $.ajax(pathTo('admin/stylesheet/setless'), {
             data: {
-                custom: c.els.textareaCustom.val(),
-                variables: c.els.textareaVariables.val(),
-                bootswatch: c.els.textareaBootswatch.val()
+                less: {
+                    custom: c.els.textareaCustom.val(),
+                    variables: c.els.textareaVariables.val(),
+                    bootswatch: c.els.textareaBootswatch.val()
+                }
             },
             type: "POST",
             complete: function() {

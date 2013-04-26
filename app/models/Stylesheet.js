@@ -26,6 +26,40 @@ var csso = require('csso');
 
 module.exports = function (compound, Stylesheet) {
 
+    // define the stylesheet cache
+    Stylesheet.cache = {};
+
+    /**
+     * Save and compile the stylesheet with any changes applied.
+     * 
+     * @param  {HttpContext}   c   - http context
+     * @param  {Function} callback - callback function
+     */
+    Stylesheet.prototype.saveAndCompile = function (c, callback) {
+        var self = this;
+        var group = c.req.group;
+
+        self.compile(c, function(err) {
+            if(err) {
+                console.log(err);
+                throw err;
+            }
+
+            self.version ++;
+            self.lastUpdate = new Date();
+
+            self.save(function(err) {
+                group.cssVersion = self.version + '-' + new Date().getTime();
+                group.save(function(err) {
+                    callback(err, {
+                        version: group.cssVersion,
+                        url: group.cssUrl
+                    });
+                });
+            });
+        });
+    };
+
     /**
      * compiles the css from this less stylesheet
      *
@@ -117,7 +151,7 @@ module.exports = function (compound, Stylesheet) {
      * 
      * @param {[json]} rules [the rules that are being set]
      */
-    Stylesheet.prototype.setRules = function(rules) {
+    Stylesheet.prototype.setRules = function(c, rules, callback) {
         var css = '';
 
         for(var selector in rules) {
@@ -134,13 +168,22 @@ module.exports = function (compound, Stylesheet) {
         }
 
         this.less.custom += '\n' + css;
-    }
-
-    //define the stylesheet cache
-    Stylesheet.cache = {};
+        this.saveAndCompile(c, callback);
+    };
 
     /**
-     * Set the theme for this stylesheet
+     * Set the LESS For this stylesheet.
+     * 
+     * @param {HttpContext}   c    - http context
+     * @param {Object}        less - less object
+     */
+    Stylesheet.prototype.setLess = function (c, less, callback) {
+        this.less = less;
+        this.saveAndCompile(c, callback);
+    };
+
+    /**
+     * Set the theme for this stylesheet.
      * 
      * @param {ActionContext} c - current action context.
      * @param {String} name - theme to load.
@@ -212,25 +255,7 @@ module.exports = function (compound, Stylesheet) {
             stylesheet.less.custom = '/* put your custom css here */';
 
             // compile the stylesheet to a file
-            stylesheet.compile(c, function(err) {
-                if(err) {
-                    console.log(err);
-                    throw err;
-                }
-
-                stylesheet.version ++;
-                stylesheet.lastUpdate = new Date();
-
-                stylesheet.save(function(err) {
-                    group.cssVersion = stylesheet.version + '-' + new Date().getTime();
-                    group.save(function(err) {
-                        callback(err, {
-                            version: group.cssVersion,
-                            url: group.cssUrl
-                        });
-                    });
-                });
-            });
+            stylesheet.saveAndCompile(c, callback);
         }
     }
 };

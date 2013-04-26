@@ -91,13 +91,15 @@ exports.routes = function (map) {
     map.post('/page/grid', 'page#updateGrid');
 
     map.post('/stylesheet/theme', 'stylesheet#setTheme');
+    map.post('/stylesheet/setrules', 'stylesheet#setRules');
+    map.post('/stylesheet/setless', 'stylesheet#setLess');
 
     map.get('/:controller/:action');
 
     map.resources('widgets', {path: 'widget'});
     map.post('/widget', 'widgets#create');
 
-    // catch all other widget actions
+    // wildcard to catch all other widget actions
     map.all('/widget/:widgetId/:action', 'widgets');
     map.all('/widget/:pageId/:widgetId/:action', 'widgets');
 };
