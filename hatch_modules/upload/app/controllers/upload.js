@@ -30,7 +30,7 @@ function UploadController(init) {
 }
 
 /**
- * Upload a file and return it's URL.
+ * Upload a file and return it's URL and media object.
  * 
  * @param  {HttpContext} c - http context
  */
