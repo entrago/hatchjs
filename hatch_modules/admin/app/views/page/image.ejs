@@ -186,7 +186,7 @@
     var uploader = new qq.FileUploader({
         params: { _csrf: $('meta[name=csrf-token]').attr('content') },
         element: $('#upload-drop').get(0),
-        action: '<%- pathFor('upload')('add') -%>?add=true&type=image',
+        action: '<%- pathFor('upload').add -%>?add=true&type=image',
         uploadButtonText: $('#modal-upload-button').html(),
         encoding: 'multipart',
         onComplete: function(id, filename, data) {
