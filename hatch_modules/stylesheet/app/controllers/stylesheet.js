@@ -35,52 +35,37 @@ function StylesheetController() {
  * @param  {context} c - http context
  */
 StylesheetController.prototype.css = function (c) {
-    var Stylesheet = c.Stylesheet;
     var cssVersion = c.req.params.version;
     var css = null;
     
     // get the stylesheet object
-    Stylesheet.all({ where: { groupId: c.req.group.id }}, function (err, stylesheets) {
+    c.Stylesheet.all({ where: { groupId: c.req.group.id }}, function (err, stylesheets) {
         // load the default stylesheet if none is found
         if (stylesheets.length === 0) {
             var stylesheet = new Stylesheet();
             stylesheet.groupId = c.req.group.id;
             stylesheet.version = 0;
-            stylesheet.setTheme(c, 'default', function () {
+            stylesheet.setTheme('default', function () {
                 output(stylesheet.css);
             });
         } else {
             var stylesheet = stylesheets[0];
 
-            if (stylesheet.less && (stylesheet.lastUpdate < Stylesheet.lastUpdate || typeof stylesheet.lastUpdate === 'undefined')) {
+            if (stylesheet.less && (stylesheet.lastUpdate < c.Stylesheet.lastUpdate || typeof stylesheet.lastUpdate === 'undefined')) {
                 console.log("Stylesheet: out of date stylesheet - recompiling");
 
-                stylesheet.compile(c, function () {
+                stylesheet.compile(function () {
                     stylesheet.save(function () {
                         output(stylesheet.css);    
                     });
                 });
             } else {
                 css = stylesheet.css;
-                if (typeof css == "object" && css) css = css[0];
-
-                if (!css) {
-                    // TODO: this should load from some kind of config file and be cached
-                    var cssFile = '/stylesheets/theme-cerulean.css';
-                    var cssFileName = '/theme-cerulean.css';
-                    var path = c.api.app.config.paths.stylesheets + cssFile;
-                    if (fs.existsSync(path)) {
-                        css = fs.readFileSync(path, "utf-8");
-                    } else {
-                        return c.redirect(cssFile);
-                    }
-                }
-
                 output(css);
             }            
         }
 
-        //sends the css output to the browser
+        // sends the css output to the browser
         function output(css) {
             c.res.writeHead(200, {
                 'Cache-Control': 'public, max-age=' + (31557600000),
@@ -103,26 +88,25 @@ StylesheetController.prototype.css = function (c) {
  * @param  {context} c - http context
  */
 StylesheetController.prototype.theme = function (c) {
-    var Stylesheet = c.Stylesheet;
     var cssVersion = c.req.params.version;
     var css = null;
 
-    Stylesheet.all({ where: {name: c.req.params.name}}, function(err, stylesheets) {
+    c.Stylesheet.all({ where: {name: c.req.params.name}}, function(err, stylesheets) {
         if(stylesheets.length === 0) {
             var stylesheet = new Stylesheet();
             stylesheet.name = c.req.params.name;
             stylesheet.version = 0;
 
-            stylesheet.setTheme(c, c.req.params.name, function() {
+            stylesheet.setTheme(c.req.params.name, function() {
                 output(stylesheet.css);
             });
         }
         else {
             var stylesheet = stylesheets[0];
             
-            if(stylesheet.less && (stylesheet.lastUpdate < Stylesheet.lastUpdate || typeof stylesheet.lastUpdate == 'undefined')) {
+            if(stylesheet.less && (stylesheet.lastUpdate < c.Stylesheet.lastUpdate || typeof stylesheet.lastUpdate == 'undefined')) {
                 console.log("Stylesheet: out of date stylesheet - recompiling");
-                stylesheet.setTheme(c, stylesheet.name, function () {
+                stylesheet.setTheme(stylesheet.name, function () {
                     stylesheet.save(function() {
                         output(stylesheet.css);    
                     });
@@ -153,6 +137,9 @@ StylesheetController.prototype.theme = function (c) {
 /**
  * Display a font-awesome font. This routes requests via express.static through
  * to the FontAwesome directory within node_modules.
+ *
+ * TODO: think of a better way to allow this via standard /public without
+ * modifying the font-awesome core.
  * 
  * @param  {context} c - http context
  */
