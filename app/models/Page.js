@@ -360,19 +360,21 @@ module.exports = function (compound, Page) {
         }
 
         var querystring = qs.stringify(req.query);
-        if(querystring) querystring = '?' + querystring;
+        if (querystring) querystring = '?' + querystring;
 
         var apiDomain = this.url.match(/^[^\/]+/)[0];
         apiDomain = 'localhost:3000';
-        var url = 'http://' + apiDomain + '/do/' +
-            widget.type.replace('/', '/widgets/') + '/' + action +
-            querystring;
+        var url = [
+            'http://' + apiDomain,
+            req.pagePath.replace(/^\/|\/$/g, ''),
+            'do',
+            widget.type.replace('/', '/widgets/'),
+            action + querystring].filter(Boolean).join('/');
 
         var data = {
             userId: 1,
             data: params,
             widgetId: widgetId,
-            pageUrl: this.pathname(req),
             groupId: this.groupId,
             templateWidget: !!widget.templateWidget
         };
@@ -383,7 +385,7 @@ module.exports = function (compound, Page) {
                 data: JSON.stringify(data)
             }},
             function (err, res) {
-                cb(err, res.body);
+                cb(err, res && res.body);
             }
         );
     };

@@ -6,9 +6,9 @@ exports.__ = function (s) {
 exports._ = require('underscore');
 
 exports.widgetAction = function (s, type) {
-    return '/do/' + (type || this.locals.widget.type).replace('/', '/widgets/') + '/' + s;
+    return this.req.pagePage + '/do/' + (type || this.locals.widget.type).replace('/', '/widgets/') + '/' + s;
 };
 
 exports.widgetCoreAction = function (s) {
-    return ['/do/admin/widget', this.locals.page.id || 'NOPID', this.locals.widget.id || 'NOWID', s].join('/');
+    return [this.req.pagePath, 'do/admin/widget', this.locals.widget.id || 'NOWID', s].join('/');
 };

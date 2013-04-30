@@ -32,7 +32,8 @@ function findPageAndWidget (c) {
         self.page = c.req.page = page;
         c.canEdit = c.req.user.canEdit;
         if (widgetId) {
-            self.widget = c.widget = page.widgets[widgetId];
+            self.widget = page.widgets[widgetId];
+            if (!self.widget.settings) self.widget.settings = {};
         }
         c.next();
     });
@@ -147,7 +148,7 @@ WidgetController.prototype.settings = function(c) {
         });
     } else {
         this.inlineEditAllowed = this.widget.inlineEditAllowed;
-        c.render();
+        c.render({layout:false});
     }
 };
 

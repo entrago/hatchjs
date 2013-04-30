@@ -11,7 +11,7 @@ before('init env', function (c) {
     locals.inlineEditAllowed = true;
     locals.canEdit = true;
 
-    locals.group.definePage(req.data.pageUrl, c, gotPage);
+    locals.group.definePage(req.pagePath, c, gotPage);
 
     function gotPage(err, page) {
         if (err || !page) {

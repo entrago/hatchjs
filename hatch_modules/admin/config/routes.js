@@ -98,6 +98,8 @@ exports.routes = function (map) {
     map.post('/widget', 'widgets#create');
 
     // catch all other widget actions
-    map.all('/widget/:widgetId/:action', 'widgets');
-    map.all('/widget/:pageId/:widgetId/:action', 'widgets');
+    map.post('/widget/:widgetId/:action', 'widgets');
+    map.post('/widget/:widgetId/:action', 'widgets');
+    map.get('/widget/:widgetId/:action', 'widgets');
+    map.get('/widget/:widgetId/:action', 'widgets');
 };

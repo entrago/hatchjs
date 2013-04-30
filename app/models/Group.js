@@ -32,6 +32,10 @@ module.exports = function (compound, Group) {
         return this._url.replace(/[^\/]+/, '');
     };
 
+    Group.prototype.profileFields = function() {
+        return [];
+    };
+
     Group.prototype.match = function (path) {
         if (this.subgroups) {
             var l = this.subgroups.length, i;

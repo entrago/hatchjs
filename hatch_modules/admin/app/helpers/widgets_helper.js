@@ -111,3 +111,7 @@ exports.buildForm = function buildForm(form, data) {
         return html;
     }
 }
+
+exports.widgetCoreAction = function (s) {
+    return [this.req.pagePath, 'do/admin/widget', this.locals.widget.id || 'NOWID', s].join('/');
+};
