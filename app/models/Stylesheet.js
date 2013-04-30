@@ -25,17 +25,50 @@ var _ = require('underscore');
 var csso = require('csso');
 
 module.exports = function (compound, Stylesheet) {
+    
+    var Group = compound.models.Group;
+
+    // define the stylesheet cache
+    Stylesheet.cache = {};
 
     /**
-     * compiles the css from this less stylesheet
-     *
-     * @param  {Context}  c        [http context]
-     * @param  {Function} callback [continuation function]
+     * Save and compile the stylesheet with any changes applied.
+     * 
+     * @param  {Function} callback - callback function
      */
-    Stylesheet.prototype.compile = function (c, callback) {
-        var stylesheet = this;
-        var Group = c.Group;
+    Stylesheet.prototype.saveAndCompile = function (callback) {
+        var self = this;
+        
+        self.compile(function(err) {
+            if(err) {
+                console.log(err);
+                throw err;
+            }
 
+            self.version ++;
+            self.lastUpdate = new Date();
+
+            self.save(function(err) {
+                Group.find(self.groupId, function (err, group) {
+                    group.cssVersion = self.version + '-' + new Date().getTime();
+                    group.save(function(err) {
+                        callback(err, {
+                            version: group.cssVersion,
+                            url: group.cssUrl
+                        });
+                    });
+                });
+            });
+        });
+    };
+
+    /**
+     * Compile the CSS from this less stylesheet from the stored LESS.
+     *
+     * @param  {Function} callback - callback function
+     */
+    Stylesheet.prototype.compile = function (callback) {
+        var self = this;
         var tree, css;
         var path = __dirname + '/../../public' + compound.app.get('cssDirectory') + "theme-template.less";
 
@@ -44,8 +77,8 @@ module.exports = function (compound, Stylesheet) {
 
             var moduleCss = '';
 
+            // TODO: get the module and widget stylesheets
             /*
-            //get the module and widget stylesheets
             compound.hatch.module.getModuleInstancesList().forEach(function(instance) {
                 var path = instance.module.root;
 
@@ -60,12 +93,12 @@ module.exports = function (compound, Stylesheet) {
             */
 
             //replace the variables, bootswatch and the module Css
-            str = str.replace("@import \"theme-template-variables.less\";", stylesheet.less.variables);
-            str = str.replace("@import \"theme-template-bootswatch.less\";", stylesheet.less.bootswatch);
+            str = str.replace("@import \"theme-template-variables.less\";", self.less.variables);
+            str = str.replace("@import \"theme-template-bootswatch.less\";", self.less.bootswatch);
             str = str.replace("@import \"theme-template-modules.less\";", moduleCss);
 
             //add the custom less onto the end
-            str += '\n' + stylesheet.less.custom;
+            str += '\n' + self.less.custom;
 
             new(less.Parser)({
                 paths: [require('path').dirname(path)],
@@ -83,19 +116,21 @@ module.exports = function (compound, Stylesheet) {
                         if(typeof css == "object") css = css[0];
 
                         //store in the stylesheet
-                        stylesheet.css = css;
-                        stylesheet.version ++;
-                        stylesheet.lastUpdate = new Date();
+                        self.css = css;
+                        self.version ++;
+                        self.lastUpdate = new Date();
 
-                        if(stylesheet.groupId) {
-                            Group.find(stylesheet.groupId, function (err, group) {
+                        if(self.groupId) {
+                            Group.find(self.groupId, function (err, group) {
                                 var path = compound.app.get('upload path') + '/' + group.cssVersion + '.css';
 
                                 //save the file
                                 fs.writeFile(path, css, function (err) {
                                     group.cssUrl = '/upload/' + group.cssVersion + '.css';
                                     group.save(function (err) {
-                                        callback(null);
+                                        if (callback) {
+                                            callback(null, group.cssUrl);
+                                        }
                                     });
                                 });
                             });
@@ -103,8 +138,7 @@ module.exports = function (compound, Stylesheet) {
                             //success - callback!
                             callback(null);
                         }
-                    }
-                    catch (err) {
+                    } catch (err) {
                         callback(err);
                     }
                 }
@@ -113,11 +147,11 @@ module.exports = function (compound, Stylesheet) {
     };
 
     /**
-     * sets some custom rules on this stylesheet
+     * Set some custom rules on this stylesheet.
      * 
-     * @param {[json]} rules [the rules that are being set]
+     * @param {Object} rules - the rules to be set
      */
-    Stylesheet.prototype.setRules = function(rules) {
+    Stylesheet.prototype.setRules = function(rules, callback) {
         var css = '';
 
         for(var selector in rules) {
@@ -134,21 +168,27 @@ module.exports = function (compound, Stylesheet) {
         }
 
         this.less.custom += '\n' + css;
-    }
-
-    //define the stylesheet cache
-    Stylesheet.cache = {};
+        this.saveAndCompile(callback);
+    };
 
     /**
-     * Set the theme for this stylesheet
+     * Set the LESS directly for this stylesheet.
      * 
-     * @param {ActionContext} c - current action context.
+     * @param {Object} less - less object
+     */
+    Stylesheet.prototype.setLess = function (less, callback) {
+        this.less = less;
+        this.saveAndCompile(callback);
+    };
+
+    /**
+     * Set the theme for this stylesheet.
+     *
      * @param {String} name - theme to load.
      * @param {Function} callback - continuation function.
      */
-    Stylesheet.prototype.setTheme = function (c, name, callback) {
-        var group = c.req.group;
-        var stylesheet = this;
+    Stylesheet.prototype.setTheme = function (name, callback) {
+        var self = this;
 
         //get the cached version
         if (!Stylesheet.cache[name]) {
@@ -156,14 +196,10 @@ module.exports = function (compound, Stylesheet) {
             var path = __dirname + '/../../public' + compound.app.get('cssDirectory') + "theme-template.less";
             var theme = compound.hatch.themes.getTheme(name);
 
-            console.log(theme)
-
             //if no theme found, use the default theme settings
             if (!theme) {
-                throw new Error('Theme "' + name + '" not defined!');
+                return callback(new Error('Theme "' + name + '" not defined!'));
             }
-
-            console.log('Stylesheet: setting theme: ' + theme.name);
 
             var variables = "";
             var bootswatch = "";
@@ -204,33 +240,15 @@ module.exports = function (compound, Stylesheet) {
             done();
         }
 
-        //when everything is done, compile the stylesheet and save
+        // when everything is done, compile the stylesheet and save
         function done() {
-            stylesheet.less = {};
-            stylesheet.less.variables = variables;
-            stylesheet.less.bootswatch = bootswatch;
-            stylesheet.less.custom = '/* put your custom css here */';
+            self.less = {};
+            self.less.variables = variables;
+            self.less.bootswatch = bootswatch;
+            self.less.custom = '/* put your custom css here */';
 
             // compile the stylesheet to a file
-            stylesheet.compile(c, function(err) {
-                if(err) {
-                    console.log(err);
-                    throw err;
-                }
-
-                stylesheet.version ++;
-                stylesheet.lastUpdate = new Date();
-
-                stylesheet.save(function(err) {
-                    group.cssVersion = stylesheet.version + '-' + new Date().getTime();
-                    group.save(function(err) {
-                        callback(err, {
-                            version: group.cssVersion,
-                            url: group.cssUrl
-                        });
-                    });
-                });
-            });
+            self.saveAndCompile(callback);
         }
     }
 };

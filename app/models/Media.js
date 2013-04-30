@@ -55,13 +55,13 @@ module.exports = function (compound, Media) {
     Media.createWithFiles = function (files, params, callback) {
         var uploadPath = compound.app.get('upload path');
         var file = files[Object.keys(files)[0]];
-        var filename = file.path;
-        var filePath = filename.split('/').slice(0, -1).join('/');
+        var filename = file.name;
+        var filePath = file.path.split('/').slice(0, -1).join('/');
 
         // move the file to the upload path if it's not already there
         if (uploadPath.indexOf(filePath) === -1) {
             var newFilename = path.join(uploadPath, new Date().getTime() + '-' + filename.split('/').slice(-1)[0]);
-            fsTools.move(filename, newFilename, function (err) {
+            fsTools.move(file.path, newFilename, function (err) {
                 Media.createWithFilename(newFilename, params, callback);
             });
         } else {

@@ -93,7 +93,7 @@
                                     <%= user.displayName || user.username || user.email %>
                                     <b class="caret"></b>
                                 </a>
-                                <ul class="dropdown-menu">
+                                <ul class="dropdown-menu pull-right">
                                     <li><%- linkTo(icon('user') + t('layout.viewProfile'),
                                         specialPagePath('profile', { username: req.user.username })) %></li>
                                     <li><%- linkTo(icon('cogs') + t('layout.editProfile'),
