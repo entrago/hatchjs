@@ -40,8 +40,8 @@
     "fs-tools": "latest",
     "knox": "latest",
     "mime": "latest",
-    "google": "latest",
-    "google-images": "latest"
+    "google": "~0.3.0",
+    "google-images": "~0.1.0"
   },
   "devDependencies": {
     "mocha": "1.8.1",

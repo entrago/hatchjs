@@ -118,9 +118,16 @@ $(document).ready(function() {
         function(ev, error) {
             var $form = $(this);
             var data = $form.serializeArray();
+            var text;
+            if (error.context) {
+                text = t('errors.' + context + '.' + error.code);
+            }
+            if (!text) {
+                text = t('errors.default.' + error.code, error.message);
+            }
             $.noty({
                 type: 'error',
-                text: '<i class="icon-warning-sign"></i> ' + error.message
+                text: '<i class="icon-warning-sign"></i> ' + text
             });
             if (error.codes) {
                 var $el;
