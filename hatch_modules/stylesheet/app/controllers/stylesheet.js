@@ -93,7 +93,7 @@ StylesheetController.prototype.theme = function (c) {
 
     c.Stylesheet.all({ where: {name: c.req.params.name}}, function(err, stylesheets) {
         if(stylesheets.length === 0) {
-            var stylesheet = new Stylesheet();
+            var stylesheet = new c.Stylesheet();
             stylesheet.name = c.req.params.name;
             stylesheet.version = 0;
 
