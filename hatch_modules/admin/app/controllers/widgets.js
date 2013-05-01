@@ -25,7 +25,7 @@ function WidgetController(init) {
 }
 
 // finds the page that we are performing the action on
-function findPageAndWidget (c) {
+function findPageAndWidget(c) {
     var self = this;
     var widgetId = c.req.query.widgetId || c.req.params.widgetId;
     c.req.group.definePage(c.req.pagePath, c, function (err, page) {
@@ -47,19 +47,23 @@ function findPageAndWidget (c) {
 WidgetController.prototype.create = function(c) {
     var page = this.page;
     var type = c.body.addWidget;
-    var widget = {type: type, settings: {}};
-    var w = page.widgets.push(widget);
-    w.save(function () {
-        page.renderWidget(w, c.req, function (err, html) {
+    
+    var widget = page.widgets.push({
+        type: type, 
+        settings: {}
+    });
+
+    // save the new widget, render and add to the page
+    widget.save(function () {
+        page.renderWidget(widget, c.req, function (err, html) {
             c.send({
                 code: err ? 500 : 200,
                 html: html,
-                widget: w,
+                widget: widget,
                 error: err
             });
         });
     });
-
 };
 
 /**
@@ -141,10 +145,10 @@ WidgetController.prototype.settings = function(c) {
         ];
     this.privacy.selected = _.find(this.privacy, function(p) { return p.value == (widget.settings && widget.settings.privacy || 'public') });
 
-    var s = this.widgetCore.info.settings;
-    if (s && s.custom) {
-        this.page.widgetAction(this.widget.id, 'settings', null, c.req, function (e, s) {
-            c.send(s);
+    var settings = this.widgetCore.info.settings;
+    if (settings && settings.custom) {
+        this.page.widgetAction(this.widget.id, 'settings', null, c.req, function (e, settings) {
+            c.send(settings);
         });
     } else {
         this.inlineEditAllowed = this.widget.inlineEditAllowed;

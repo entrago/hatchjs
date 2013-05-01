@@ -32,6 +32,10 @@ function findStylesheet (c) {
 
 // sends a response to the browser based on the stylesheet model response
 function sendResponse (c, err, params) {
+    if (err) {
+        return c.sendError(err);
+    }
+
     var static = c.app.enabled('static css');
     var url = static ? params.url : c.pathFor('stylesheet').css(params.version);
     
