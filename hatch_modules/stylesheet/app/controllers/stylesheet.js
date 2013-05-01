@@ -42,7 +42,7 @@ StylesheetController.prototype.css = function (c) {
     c.Stylesheet.all({ where: { groupId: c.req.group.id }}, function (err, stylesheets) {
         // load the default stylesheet if none is found
         if (stylesheets.length === 0) {
-            var stylesheet = new Stylesheet();
+            var stylesheet = new c.Stylesheet();
             stylesheet.groupId = c.req.group.id;
             stylesheet.version = 0;
             stylesheet.setTheme('default', function () {
