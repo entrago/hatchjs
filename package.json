@@ -43,7 +43,8 @@
     "google": "~0.3.0",
     "google-images": "~0.1.0",
     "yaml-js": ">0",
-    "ntwitter": ">0"
+    "ntwitter": ">0",
+    "oauth": ">0"
   },
   "devDependencies": {
     "mocha": "1.8.1",
