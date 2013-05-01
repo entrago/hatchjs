@@ -53,9 +53,9 @@ exports.routes = function (map) {
             users.get('filter/:filterBy.:format?', '#index', {as: 'filteredUsers' });
             users.post('sendmessageto', '#sendMessageTo', {as: 'sendMessageTo'});
             users.get('sendmessage', '#sendMessageForm', {as: 'sendMessageForm'});
-            users.post('sendmessage', '#sendMessage', {as: 'sendMessage'});
+            users.post('sendmessage.:format?', '#sendMessage', {as: 'sendMessage'});
             users.get('invite', '#inviteForm', {as: 'inviteForm'});
-            users.post('invite', '#sendInvites', {as: 'sendInvites'});
+            users.post('invite.:format?', '#sendInvites', {as: 'sendInvites'});
             users.post('removeMembers', '#removeMembers', {as: 'removeMembers'});
             users.post('blacklistMembers', '#blacklistMembers', {as: 'blacklistMembers'});
             users.post('unblacklistMembers', '#unblacklistMembers', {as: 'unblacklistMembers'});
@@ -69,7 +69,7 @@ exports.routes = function (map) {
             users.get('profilefields/new', '#newProfileField', {as: 'newProfileField'});
             users.get('profilefields/:id/edit', '#editProfileField', {as: 'editProfileField'});
             users.post('profilefields/reorder', '#reorderProfileFields', {as: 'reorderProfileFields'});
-            users.post('profilefields/save', '#saveProfileField', {as: 'saveProfileField'});
+            users.post('profilefields/save.:format?', '#saveProfileField', {as: 'saveProfileField'});
             users.post('profilefields/:id/delete', '#deleteProfileField', {as: 'deleteProfileField'});
             users.get('export', '#exportForm', {as: 'export'});
             users.post('export', '#export', {as: 'export'});
