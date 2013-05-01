@@ -439,17 +439,19 @@ function StyleEditorController() {
         $.ajax(pathTo('admin/stylesheet/theme?name=' + theme), {
             type: 'POST',
             success: function(res) {
-                //reload the stylesheet
-                setStylesheetHref(res.url);
-
-                c.els.themeSaveButtons.addClass("hidden");
-
                 $.unblockUI();
 
-                //display notification
-                setTimeout(function() {
-                    $.noty({text: "<i class='icon-ok'></i> Theme changed to " + theme, type: "success"});
-                }, 500);
+                if (res.url) {
+                    // reload the stylesheet
+                    setStylesheetHref(res.url);
+                    c.els.themeSaveButtons.addClass("hidden");
+
+                    setTimeout(function() {
+                        $.noty({text: "<i class='icon-ok'></i> Theme changed to " + theme, type: "success"});
+                    }, 500);
+                } else {
+                    $.noty({text: "<i class='icon-info-sign'></i> Error changing theme", type: "error"});
+                }
             }
         });
     }
