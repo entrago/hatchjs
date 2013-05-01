@@ -49,15 +49,21 @@ module.exports = function (compound, Stylesheet) {
             self.lastUpdate = new Date();
 
             self.save(function(err) {
-                Group.find(self.groupId, function (err, group) {
-                    group.cssVersion = self.version + '-' + new Date().getTime();
-                    group.save(function(err) {
-                        callback(err, {
-                            version: group.cssVersion,
-                            url: group.cssUrl
+                if (self.groupId) {
+                    Group.find(self.groupId, function (err, group) {
+                        group.cssVersion = self.version + '-' + new Date().getTime();
+                        group.save(function(err) {
+                            callback(err, {
+                                version: group.cssVersion,
+                                url: group.cssUrl
+                            });
                         });
                     });
-                });
+                } else {
+                    callback(err, {
+                        version: self.version
+                    });
+                }
             });
         });
     };
@@ -219,7 +225,9 @@ module.exports = function (compound, Stylesheet) {
                     });
                 }
             ], function(err, results) {
-                if(err) throw new Error(err);
+                if(err) {
+                    return callback(err);
+                }
 
                 //save to cache
                 Stylesheet.cache[name] = {
