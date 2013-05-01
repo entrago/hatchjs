@@ -1,0 +1,46 @@
+<div class="edit-console" id="editConsole">
+    <div>
+        <div class="console-header">
+            <div class="pull-right close">
+                <i class="icon-remove"></i>
+            </div>
+            @model.t('editconsole.headers.editconsole')
+        </div>
+        <div class="accordion" id="accordion2">
+            <div class="accordion-group">
+                <div class="accordion-heading">
+                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne" id="contentTab">
+                        @model.t('editconsole.headers.widgets')
+                    </a>
+                </div>
+                <div id="collapseOne" class="accordion-body collapse in">
+                    <div class="accordion-inner" id="edit-console-widgets">
+                        @html.include('page/_editconsolewidgets')
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-group">
+                <div class="accordion-heading">
+                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo" id="columnsTab">
+                        @model.t('editconsole.headers.layout')
+                    </a>
+                </div>
+                <div id="collapseTwo" class="accordion-body collapse">
+                    <div class="accordion-inner" id="edit-console-layouts">
+                        @html.include('page/_editconsolelayouts')
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-group">
+                <div class="accordion-heading">
+                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree" id="designTab">
+                        @model.t('editconsole.headers.design')
+                    </a>
+                </div>
+                <div id="collapseThree" class="accordion-body collapse">
+                    @html.include('page/_editconsolestyle')
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
