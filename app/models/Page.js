@@ -21,6 +21,7 @@ var ejs = require('ejs');
 var path = require('path');
 var request = require('request');
 var qs = require('querystring');
+var http = require('http');
 
 module.exports = function (compound, Page) {
     var api = compound.hatch.api;
@@ -365,7 +366,7 @@ module.exports = function (compound, Page) {
         var apiDomain = this.url.match(/^[^\/]+/)[0];
         apiDomain = 'localhost:3000';
         var url = [
-            'http://' + apiDomain,
+            //'http://' + apiDomain,
             req.pagePath.replace(/^\/|\/$/g, ''),
             'do',
             widget.type.replace('/', '/widgets/'),
@@ -378,17 +379,36 @@ module.exports = function (compound, Page) {
             groupId: this.groupId,
             templateWidget: !!widget.templateWidget
         };
-        request.post(
-            url,
-            {form: {
-                token: 'test',
-                data: JSON.stringify(data)
-            }},
-            function (err, res) {
-                cb(err, res && res.body);
-            }
-        );
+        // request.post(
+        //     url,
+        //     {form: {
+        //         token: 'test',
+        //         data: JSON.stringify(data)
+        //     }},
+        //     function (err, res) {
+        //         cb(err, res && res.body);
+        //     }
+        // );
+        inAppRequest(url, {token: 'test', data: JSON.stringify(data)}, function(err, res) {
+            cb(err, res);
+        });
+
     };
+
+    function inAppRequest(url, data, callback) {
+        var req = new http.IncomingMessage;
+        var res = new http.ServerResponse({method: 'NOTHEAD'});
+        res.end = function(body) {
+            console.log(arguments);
+            callback(null, body);
+        };
+        req.body = data;
+        req.method = 'POST';
+        req.connection = {};
+        req.url      = '/' + url;
+        req.headers  = { host: 'localhost' };
+        compound.app.handle(req, res);
+    }
 
     Page.prototype.pathname = function (req) {
         return this.url.replace(req.group.homepage.url, '').replace(/^\/|\/$/g, '');
