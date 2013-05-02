@@ -3,7 +3,7 @@ var search = new SearchController();
 
 //pathTo is the client side routing function
 window.pathTo = function pathTo(action) {
-    var pageId = $('meta[name=pageId]').attr('content');
+    var pageId = $('meta[name=pageId]:last').attr('content');
     var groupId = $('meta[name=groupId]').attr('content');
     var pageUrl = location.href.replace(/^https?:\/\//, '');
     var url =  [

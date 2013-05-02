@@ -1,19 +1,19 @@
 <div class="accordion-inner">
     <ul class="nav nav-tabs" id="styleEditorTabs">
         <li class="active">
-            <a href="#themes" data-toggle="tab"><%- __('Themes') %></a>
+            <a href="#themes" data-toggle="tab">@model.t('editconsole.headers.themes')</a>
         </li>
         <li>
-            <a href="#fonts" data-toggle="tab"><%- __('Fonts') %></a>
+            <a href="#fonts" data-toggle="tab">@model.t('editconsole.headers.fonts')</a>
         </li>
         <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%- __('Style') %> <b class="caret"></b></a>
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">@model.t('editconsole.headers.style') <b class="caret"></b></a>
             <ul class="dropdown-menu">
-                <li class="hidden"><a href="#style-properties" data-toggle="tab" id="properties-tab"><i class="icon-list-ol"></i> <%- __('Properties') %></a></li>
+                <li class="hidden"><a href="#style-properties" data-toggle="tab" id="properties-tab"><i class="icon-list-ol"></i> @model.t('editconsole.actions.properties')</a></li>
                 <li class="divider hidden"></li>
-                <li class=""><a href="#style-select" data-toggle="tab" id="styleSelectTab"><i class="icon-screenshot"></i> <%- __('Select element') %></a></li>
+                <li class=""><a href="#style-select" data-toggle="tab" id="styleSelectTab"><i class="icon-screenshot"></i> @model.t('editconsole.actions.select')</a></li>
                 <li class="dropdown-submenu pull-left hidden" id="styleSimilarElements">
-                  <a href="#"><i class="icon-search"></i> <%- __('Similar elements') %></a>
+                  <a href="#"><i class="icon-search"></i> @model.t('editconsole.actions.similarElements')</a>
                   <ul class="dropdown-menu">
                     
                   </ul>
@@ -23,9 +23,9 @@
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">CSS <b class="caret"></b></a>
             <ul class="dropdown-menu pull-right">
-                <li><a href="#css-variables" data-toggle="tab"><i class="icon-cogs"></i> <%- __('Variables') %></a></li>
-                <li><a href="#css-bootswatch" data-toggle="tab"><i class="icon-bold"></i> <%- __('Bootswatch') %></a></li>
-                <li><a href="#css-custom" data-toggle="tab"><i class="icon-star"></i> <%- __('Custom CSS') %></a></li>
+                <li><a href="#css-variables" data-toggle="tab"><i class="icon-cogs"></i> @model.t('editconsole.headers.variables')</a></li>
+                <li><a href="#css-bootswatch" data-toggle="tab"><i class="icon-bold"></i> @model.t('editconsole.headers.bootswatch')</a></li>
+                <li><a href="#css-custom" data-toggle="tab"><i class="icon-star"></i> @model.t('editconsole.headers.custom')</a></li>
             </ul>
         </li>
     </ul>
@@ -34,7 +34,7 @@
         <div class="pull-left"><a href="#" id="styleSelectElement" class="btn btn-mini btn-success" data-toggle="button"><i class="icon-screenshot"></i></a></div>
         <div class="pull-right"><a href="#" id="styleAdvancedToggle" class="btn btn-mini" data-toggle="button"><i class="icon-cogs"></i></a></div>
         <div class="alert">
-            <a href="#" id="styleUpElement"><i class="icon-chevron-up"></i></a> <span id="style-selected-element" class="one-line"><%- __('click on an element') %></span>
+            <a href="#" id="styleUpElement"><i class="icon-chevron-up"></i></a> <span id="style-selected-element" class="one-line">@model.t('editconsole.help.clickElement')</span>
             {&nbsp;...&nbsp;}
         </div>
 
@@ -320,9 +320,9 @@
                         <div class="controls">
                             <select id="theme-select">
                                 <option value="">Select theme</option>
-                                <% themes.forEach(function(theme) { %>
-                                    <option value="<%- theme.name %>" data-thumbnail="<%- theme.thumbnail %>"><%- theme.title %></option>
-                                <% }) %>
+                                @model.themes.forEach(function(theme) {
+                                    <option value="@theme.name" data-thumbnail="@theme.thumbnail">@theme.title</option>
+                                })
                             </select>
                         </div>
                     </div>
@@ -409,18 +409,28 @@
         </div>
 
         <div class="hidden" id="css-editor-changes-pending">
-            <p><%- __('Please save or undo changes before editing CSS via the text editor.') %></p>
+            <p>
+                @model.t('editconsole.help.changesPending')
+            </p>
         </div>
 
         <div class="form-actions hidden" id="css-save-buttons">
             <!-- <button type="submit" class="btn btn-success" id="style-preview-css-button">Preview</button> -->
-            <button type="submit" class="btn btn-primary" id="style-save-css-button"><%- __('Save changes') %></button>
-            <button class="btn" id="style-undo-css-button"><%- __('Undo') %></button>
+            <button type="submit" class="btn btn-primary" id="style-save-css-button">
+                @model.t('editconsole.actions.save')
+            </button>
+            <button class="btn" id="style-undo-css-button">
+                @model.t('common.undo')
+            </button>
         </div>
     
         <div class="form-actions hidden" id="style-save-buttons">
-            <button type="button" class="btn btn-primary" id="style-save-button"><%- __('Save changes') %></button>
-            <button class="btn" id="style-undo-button"><%- __('Undo') %></button>
+            <button type="button" class="btn btn-primary" id="style-save-button">
+                @model.t('editconsole.actions.save')
+            </button>
+            <button class="btn" id="style-undo-button">
+                @model.t('common.undo')
+            </button>
         </div>
     
     </form>

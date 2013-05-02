@@ -31,10 +31,17 @@ function PageController(init) {
 
 // finds the page that we are performing the action on
 function findPage (c) {
-    c.req.group.definePage(c.req.pagePath, c, function (err, page) {
-        c.req.page = page;
-        c.next();
-    });
+    if (c.req.query.pageId) {
+        c.Page.find(c.req.query.pageId, function (err, page) {
+            c.req.page = page;
+            c.next();
+        })
+    } else {
+        c.req.group.definePage(c.req.pagePath, c, function (err, page) {
+            c.req.page = page;
+            c.next();
+        });
+    }
 }
 
 require('util').inherits(PageController, Application);
@@ -48,6 +55,7 @@ PageController.prototype.editconsole = function editConsole(c) {
     c.req.widgets = [];
     var groupModulesIndex = {};
     var tab = c.req.query.tab || '';
+    var view = (tab ? '_':'') + 'editconsole' + tab;
 
     // get the modules that are loaded for this group
     c.req.group.modules.forEach(function (m) {
@@ -76,15 +84,8 @@ PageController.prototype.editconsole = function editConsole(c) {
         });
     });
 
-    //load the template pages and then render
-    var Page = c.Page;
-
-    Page.all({ where: { groupId: c.req.group.id, type: 'template' }}, function (err, templates) {
-        c.templates = templates;
-        c.locals.themes = c.compound.hatch.themes.getThemes();
-        c.render('editconsole' + tab, { layout : false });
-    });
-
+    c.locals.themes = c.compound.hatch.themes.getThemes();
+    c.render(view, { layout : false });
 };
 
 /**

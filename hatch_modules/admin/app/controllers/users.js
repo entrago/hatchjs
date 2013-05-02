@@ -155,12 +155,12 @@ UsersController.prototype.index = function (c) {
 UsersController.prototype.ids = function ids(c) {
     this.filterBy = c.req.query.filterBy || c.req.params.filterBy;
 
+    // make sure we get all users
     c.req.query.limit = 1000000;
-    c.req.query.offset = 0;
 
-    loadMembers(c, function(err, users) {
+    loadMembers(c, function(err, members) {
         c.send({
-            ids: _.pluck(users, 'id')
+            ids: _.pluck(members, 'id')
         });
     });
 };
@@ -195,7 +195,7 @@ UsersController.prototype.removeMembers = function(c) {
         });
     }, function() {
         c.send({
-            message: count + ' user' + (count != 1 ? 's':'') + ' removed from community',
+            message: c.t(['users.help.removed', count]),
             status: 'success',
             icon: 'ok'
         });
@@ -219,7 +219,7 @@ UsersController.prototype.blacklistMembers = function(c) {
         });
     }, function() {
         c.send({
-            message: count + ' user' + (count != 1 ? 's':'') + ' blacklisted',
+            message: c.t(['users.help.blacklisted', count]),
             status: 'success',
             icon: 'ok'
         });
@@ -243,7 +243,7 @@ UsersController.prototype.unblacklistMembers = function(c) {
         });
     }, function() {
         c.send({
-            message: count + ' user' + (count != 1 ? 's':'') + ' un-blacklisted',
+            message: c.t(['users.help.unblacklisted', count]),
             status: 'success',
             icon: 'ok'
         });
@@ -333,7 +333,7 @@ UsersController.prototype.sendMessage = function(c) {
     // validation
     if (!subject || !body) {
         return c.send({
-            message: 'Please enter a subject and message',
+            message: c.t('users.validation.sendMessage'),
             status: 'error',
             icon: 'warning-sign'
         });
@@ -361,7 +361,7 @@ UsersController.prototype.sendMessage = function(c) {
             });
         }, function() {
             c.send({
-                message: 'Message sent to ' + selectedUsers.length + ' users',
+                message: c.t(['users.help.messageSent', selectedUsers.length]),
                 status: 'success',
                 icon: 'ok'
             });
@@ -390,14 +390,14 @@ UsersController.prototype.sendInvites = function(c) {
     //validation
     if(!c.req.body.usernames) {
         return c.send({
-            message: 'Please enter some usernames or emails',
+            message: c.t('users.validation.invite'),
             status: 'error',
             icon: 'warning-sign'
         });
     }
     if(!subject || !body) {
         return c.send({
-            message: 'Please enter a subject and message',
+            message: c.t('users.validation.sendMessage'),
             status: 'error',
             icon: 'warning-sign'
         });
@@ -428,7 +428,7 @@ UsersController.prototype.sendInvites = function(c) {
 
     function done(err) {
         c.send({
-            message: 'Invites sent to ' + c.body.usernames.length + ' users',
+            message: c.t(['users.help.inviteSent', c.body.usernames.length]),
             status: 'success',
             icon: 'ok'
         });
@@ -471,19 +471,14 @@ UsersController.prototype.saveProfileField = function(c) {
 
     //validation
     if(!c.req.body.name) {
-        return c.send({
-            message: 'Please enter a field name',
-            status: 'error',
-            icon: 'warning-sign'
+        return c.sendError({
+            message: c.t('users.validation.fieldName')
         });
     }
 
     c.req.group.saveCustomProfileField(c.req.body, function (err, group) {
-        c.send({
-            message: 'Profile field saved',
-            status: 'success',
-            icon: 'ok'
-        });
+        c.flash('info', c.t('users.help.fieldSaved'));
+        c.redirect(c.pathTo.profileFields());
     });
 };
 
@@ -500,7 +495,7 @@ UsersController.prototype.reorderProfileFields = function(c) {
 
     c.req.group.save(function() {
         c.send({
-            message: 'Profile fields order saved',
+            message: c.t('users.help.fieldOrderSaved'),
             status: 'success',
             icon: 'ok'
         })
@@ -535,11 +530,11 @@ UsersController.prototype.exportForm = function(c) {
 UsersController.prototype.export = function(c) {
     var filename = 'users-' + (new Date().getTime()) + '.' + c.req.body.format;
 
+    // make sure we get aall users
     c.req.query.limit = 1000000;
-    c.req.query.offset = 0;
 
-    loadMembers(c, function(err, users) {
-        c.compound.hatch.exportData.export(c, users, filename);
+    loadMembers(c, function(err, members) {
+        c.compound.hatch.exportData.export(c, members, filename);
     });
 };
 

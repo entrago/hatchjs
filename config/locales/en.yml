@@ -19,6 +19,7 @@ en:
     email: Email
     pause: Pause
     play: Play
+    undo: Undo
   layout:
     manageGroup: Manage group
     toggleEditConsole: Edit console

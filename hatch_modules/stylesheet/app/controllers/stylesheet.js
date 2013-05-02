@@ -91,13 +91,18 @@ StylesheetController.prototype.theme = function (c) {
     var cssVersion = c.req.params.version;
     var css = null;
 
-    c.Stylesheet.all({ where: {name: c.req.params.name}}, function(err, stylesheets) {
+    c.Stylesheet.all({ where: { name: c.req.params.name }}, function(err, stylesheets) {
         if(stylesheets.length === 0) {
             var stylesheet = new c.Stylesheet();
             stylesheet.name = c.req.params.name;
             stylesheet.version = 0;
 
-            stylesheet.setTheme(c.req.params.name, function() {
+            stylesheet.setTheme(c.req.params.name, function(err, stylesheet) {
+                if (err) { 
+                    return c.sendError({
+                        error: err
+                    });
+                }
                 output(stylesheet.css);
             });
         }

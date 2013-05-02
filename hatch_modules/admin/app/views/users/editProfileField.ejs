@@ -104,15 +104,5 @@
 
         //convert richtexts
         setupRichtextEditors();
-
-        //bind the form ajax
-        $('#profile-field-form').bind('ajax:success', function(e, data) {
-            $.noty({text: '<i class="icon-' + data.icon + '"></i> ' + data.message, type: data.status});
-
-            if(data.status == "success") {
-                //refresh the page
-                setTimeout(function() { window.location = '<%- pathTo.profileFields() %>'; }, 1000);
-            }
-        });
     });
 </script>

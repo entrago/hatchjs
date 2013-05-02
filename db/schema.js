@@ -265,3 +265,10 @@ var Tag = define('Tag', function () {
     set('ignoreNullValues', true);
     set('defaultSort', 'count DESC');
 });
+
+var Cache = define('Cache', function () {
+    property('pageId', Number, {index: true});
+    property('key', String, {index: true});
+    property('pageAndKey', String, {index: true});
+    property('text', String);
+});
