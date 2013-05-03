@@ -1,20 +1,32 @@
+var path = require('path');
+
 exports.__ = function (s) {
     return '<span style="color: red;">' + s + '</span>';
 };
 
 exports.renderPartial = function (view) {
     var result = '';
-    this.res.render(view, this.viewContext, function (err, html) {
+
+    if (view.indexOf('.') < 3) {
+        view = path.join(this.controllerName, view).replace(/\\/g, "/");
+        view = this.compound.structure.views[view];
+    }
+    
+    this.res.render(view, this.viewContext, done);
+    
+    function done (err, html) {
         if(err) {
             result = err;
         } else {
             result = html;
         }
-    });
+    }
+
     var res = new String(result);
     res.toHtmlString = function() {
         return result;
     };
+
     return res;
 };
 
