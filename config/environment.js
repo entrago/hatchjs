@@ -44,6 +44,13 @@ module.exports = function (compound) {
         app.use(hatch.middleware(compound));
         app.use(app.router);
         app.use(function (err, req, res, next) {
+            if (req.params.format === 'json') {
+                console.log(err.stack);
+                return res.send({
+                    code: err.code || 500,
+                    error: err
+                });
+            }
             if (err.message == '404') {
                 if (req.group) {
                     var found;

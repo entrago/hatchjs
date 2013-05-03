@@ -19,6 +19,16 @@
 var _ = require('underscore');
 
 var Application = module.exports = function Application(init) {
+
+    init.before(function requireUser(c) {
+        this.admin = c.req.user && c.req.user.adminOf(c.req.group);
+        if (this.admin) {
+            c.next();
+        } else {
+            c.next(new Error('403'));
+        }
+    });
+
     init.before(function initApp(c) {
         var locals = this;
         this.pageName = c.actionName;

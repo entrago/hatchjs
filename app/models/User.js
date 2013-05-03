@@ -22,6 +22,7 @@ var _ = require('underscore');
 var moment = require('moment');
 
 module.exports = function (compound, User) {
+    var Group = compound.models.Group;
 
     var crypto = compound.hatch.crypto;
 
@@ -663,6 +664,21 @@ module.exports = function (compound, User) {
             membership.state = state;
         }
         this.save(callback);
+    };
+
+    /**
+     * Check whether user is eligible to manage group
+     *
+     * @param {Number} groupId - id of group
+     */
+    User.prototype.adminOf = function (groupId) {
+        if (groupId instanceof Group) groupId = groupId.id;
+        var m = this.getMembership(Number(groupId));
+        if (m && (m.role === 'admin' || m.role === 'owner')) {
+            return m;
+        } else {
+            return null;
+        }
     };
 
     /**
