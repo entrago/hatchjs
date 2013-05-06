@@ -7,9 +7,11 @@ settings:
     apiKey:
       type: text
       title: Twitter App ID
+      required: true
     secret:
       type: text
       title: Twitter App Secret
+      required: true
     accessToken:
       type: text
       title: Access token
