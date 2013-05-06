@@ -47,7 +47,7 @@ SessionController.prototype.create = function(c) {
 
                             c.send({user: user, message: message});
                         } else {
-                            c.redirect(c.pathTo.root());
+                            c.redirect('/');
                         }
                     });
                 });
