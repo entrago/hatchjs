@@ -179,22 +179,10 @@ PagesController.prototype.create = function(c) {
             if (err) {
                 c.next(err);
             } else {
-                console.log(c.req.params)
-
-                if (c.req.params.format === 'json' || c.req.body.inline) {
-                    //bump all the other pages up one in the hierarchy order
-                    if (c.body.order) {
-                        reorderPages(function() { renderPageTree(c); })
-                    } else {
-                        renderPageTree(c);
-                    }
-                }
-                else {
-                    if (page.type && page.type !== 'page') {
-                        c.send({ redirect : c.pathTo.specialPages(c.req.group) });
-                    } else {
-                        c.send({ redirect : c.pathTo.pages(c.req.group) });
-                    }
+                if (page.type && page.type !== 'page') {
+                    c.redirect(c.pathTo.specialPages);
+                } else {
+                    c.redirect(c.pathTo.pages);
                 }
             }
         });
