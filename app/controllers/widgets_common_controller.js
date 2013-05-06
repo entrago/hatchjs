@@ -8,8 +8,8 @@ before('init env', function (c) {
     locals.group = req.group;
     locals.user = req.user;
     locals.data = body.data && JSON.parse(body.data).data;
-    locals.inlineEditAllowed = true;
-    locals.canEdit = true;
+    locals.canEdit = req.user && req.group && req.user.adminOf(req.group);
+    locals.inlineEditAllowed = locals.canEdit;
 
     locals.group.definePage(req.pagePath, c, gotPage);
 

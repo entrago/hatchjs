@@ -373,7 +373,6 @@ module.exports = function (compound, Page) {
             action + querystring].filter(Boolean).join('/');
 
         var data = {
-            userId: 1,
             data: params,
             widgetId: widgetId,
             groupId: this.groupId,
@@ -389,19 +388,20 @@ module.exports = function (compound, Page) {
         //         cb(err, res && res.body);
         //     }
         // );
-        inAppRequest(url, {token: 'test', data: JSON.stringify(data)}, function(err, res) {
+        inAppRequest(url, req.user, {token: 'test', data: JSON.stringify(data)}, function(err, res) {
             cb(err, res);
         });
 
     };
 
-    function inAppRequest(url, data, callback) {
+    function inAppRequest(url, user, data, callback) {
         var req = new http.IncomingMessage;
         var res = new http.ServerResponse({method: 'NOTHEAD'});
         res.end = function(body) {
             console.log(arguments);
             callback(null, body);
         };
+        req.user = user;
         req.body = data;
         req.method = 'POST';
         req.connection = {};
