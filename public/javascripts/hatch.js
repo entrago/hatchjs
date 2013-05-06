@@ -116,20 +116,22 @@ $(document).ready(function() {
     $('body').on(
         'server:error', 'form[data-remote=true]',
         function(ev, error) {
-            var $form = $(this);
-            var data = $form.serializeArray();
+            var $form = $(this), data;
+            if ($form.is('form')) {
+                data = $form.serializeArray();
+            }
             var text;
             if (error.context) {
                 text = t('errors.' + context + '.' + error.code);
             }
             if (!text) {
-                text = t('errors.default.' + error.code, error.message);
+                text = t('errors.default.' + error.name, error.message);
             }
             $.noty({
                 type: 'error',
                 text: '<i class="icon-warning-sign"></i> ' + text
             });
-            if (error.codes) {
+            if (error.codes && data) {
                 var $el;
                 for (var i = 0; i < data.length; i++) {
                     var name = data[i].name;
