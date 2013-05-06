@@ -1,0 +1,4 @@
+en:
+  errors:
+    default:
+      RequestTokenError: 'Twitter could not authorize request, it could happen because of problems on twitter side or in case of auth module misconfiguration.'
