@@ -17,6 +17,6 @@
 //
 
 module.exports = function routing(map) {
-    map.get('auth', 'twitter#auth');
+    map.post('auth.:format?', 'twitter#auth');
     map.get('callback', 'twitter#callback');
 };
