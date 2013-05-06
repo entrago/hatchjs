@@ -62,5 +62,5 @@ SessionController.prototype.create = function(c) {
 
 SessionController.prototype.destroy = function(c) {
     delete c.req.session.userId;
-    c.redirect(c.pathTo.root());
+    c.redirect('/');
 };
