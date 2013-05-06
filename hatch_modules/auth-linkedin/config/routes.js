@@ -17,6 +17,6 @@
 //
 
 module.exports = function routing(map) {
-    map.get('auth', 'linkedin#auth');
+    map.post('auth.:format?', 'linkedin#auth');
     map.get('callback', 'linkedin#callback');
 };

@@ -34,9 +34,9 @@ module.exports = function (c) {
         with (viewContext) {
             return contentFor(
                 'login',
-                '<li>' + linkTo(
+                '<li>' + linkToRemote(
                     icon('linkedin-sign') + 'Sign in with LinkedIn',
-                    pathFor('auth-linkedin').auth
+                    pathFor('auth-linkedin').auth({format: 'json'})
                 ) + '</li>'
             );
         }

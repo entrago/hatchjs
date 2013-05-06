@@ -1,0 +1,4 @@
+en:
+  errors:
+    default:
+      LinkedinRequestTokenError: 'Linkedin could not authorize request, it could happen because of problems on linkedin side or in case of auth module misconfiguration.'

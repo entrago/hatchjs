@@ -51,7 +51,7 @@ LinkedinAuthController.prototype.auth = function (c) {
         },
         function (err, token, secret) {
             if (err) {
-                return c.next(err);
+                return c.next(new c.LinkedinRequestTokenError(err));
             }
             c.req.session.linkedinOauthRequestToken = token;
             c.req.session.linkedinOauthRequestTokenSecret = secret;
