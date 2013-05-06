@@ -39,9 +39,9 @@ module.exports = function (c) {
         with (viewContext) {
             return contentFor(
                 'login',
-                '<li>' + linkTo(
+                '<li>' + linkToRemote(
                     icon('twitter-sign') + 'Sign in with Twitter',
-                    pathFor('auth-twitter').auth
+                    pathFor('auth-twitter').auth({format: 'json'})
                 ) + '</li>'
             );
         }

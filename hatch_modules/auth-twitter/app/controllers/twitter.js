@@ -4,14 +4,17 @@
 // 
 // This file is part of Hatch.js
 // 
-// Hatch.js is free software: you can redistribute it and/or modify it under the terms of the
-// GNU General Public License as published by the Free Software Foundation, version 3
+// Hatch.js is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free
+// Software Foundation, version 3
 // 
-// Hatch.js is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// Hatch.js is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE.
 // 
-// See the GNU General Public License for more details. You should have received a copy of the GNU
-// General Public License along with Hatch.js. If not, see <http://www.gnu.org/licenses/>.
+// See the GNU General Public License for more details. You should have
+// received a copy of the GNU General Public License along with Hatch.js. If
+// not, see <http://www.gnu.org/licenses/>.
 // 
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
@@ -19,7 +22,6 @@
 var oauth = require('oauth');
 
 module.exports = TwitterAuthController;
-
 
 function TwitterAuthController(init) {
     init.before(consumer);
@@ -29,7 +31,7 @@ TwitterAuthController.prototype.auth = function twitterAuth(c) {
     c.consumer().getOAuthRequestToken(
         function (err, token, secret) {
             if (err) {
-                return c.next(err);
+                return c.next(new c.RequestTokenError(err));
             }
             c.req.session.twitterOauthRequestToken = token;
             c.req.session.twitterOauthRequestTokenSecret = secret;
@@ -39,8 +41,8 @@ TwitterAuthController.prototype.auth = function twitterAuth(c) {
 };
 
 TwitterAuthController.prototype.callback = function twitterCallback(c) {
-    if(c.req.query.denied) {
-        return c.redirect('../../../');
+    if (c.req.query.denied) {
+        return c.redirect('/');
     }
 
     c.consumer().getOAuthAccessToken(
