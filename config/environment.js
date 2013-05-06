@@ -45,9 +45,9 @@ module.exports = function (compound) {
         app.use(app.router);
         app.use(function (err, req, res, next) {
             if (req.params.format === 'json') {
-                console.log(err.stack);
+                console.log(err.stack || err);
                 return res.send({
-                    code: err.code || 500,
+                    code: err.code == '404' ? 404 : 500,
                     error: err
                 });
             }
@@ -70,7 +70,7 @@ module.exports = function (compound) {
                 }
                 res.render(compound.structure.views['common/404']);
             } else {
-                console.log(err.stack);
+                console.log(err.stack || err);
                 res.render(compound.structure.views['common/500']);
             }
         });
