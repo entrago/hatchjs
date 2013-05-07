@@ -122,7 +122,7 @@ $(document).ready(function() {
             }
             var text;
             if (error.context) {
-                text = t('errors.' + context + '.' + error.code);
+                text = t('errors.' + error.context + '.' + error.name);
             }
             if (!text) {
                 text = t('errors.default.' + error.name, error.message);
