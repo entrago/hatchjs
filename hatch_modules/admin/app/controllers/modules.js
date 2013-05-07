@@ -93,11 +93,8 @@ ModulesController.prototype.update = function(c) {
     var mod = this.group.modules.find(c.params.id, 'name');
     mod.contract = c.req.body;
     this.group.save(function() {
-        c.send({
-            status: 'success',
-            icon: 'ok',
-            message: 'Module settings updated'
-        });
+        c.flash('info', 'Module settings updated');
+        c.redirect(c.pathTo.modules);
     });
 };
 
