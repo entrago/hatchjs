@@ -47,7 +47,7 @@ SessionController.prototype.create = function(c) {
 
                             c.send({user: user, message: message});
                         } else {
-                            c.redirect('/');
+                            c.redirect(c.req.pagePath || '/');
                         }
                     });
                 });
@@ -62,5 +62,5 @@ SessionController.prototype.create = function(c) {
 
 SessionController.prototype.destroy = function(c) {
     delete c.req.session.userId;
-    c.redirect('/');
+    c.redirect(c.req.pagePath || '/');
 };

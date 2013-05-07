@@ -1,15 +1,16 @@
 module.exports = function(compound) {
-    compound.models.LinkedinRequestTokenError = LinkedinRequestTokenError;
+    compound.models.RequestTokenError = RequestTokenError;
 };
 
-function LinkedinRequestTokenError(e) {
-    if (!(this instanceof LinkedinRequestTokenError)) return new LinkedinRequestTokenError(e);
+function RequestTokenError(e) {
+    if (!(this instanceof RequestTokenError)) return new RequestTokenError(e);
 
-    this.name = 'LinkedinRequestTokenError';
+    this.name = 'RequestTokenError';
     this.code = e.statusCode || 500;
+    this.context = 'linkedin';
     this.message = e.data;
     this.origin = e;
     Error.call(this, this.message);
 };
 
-LinkedinRequestTokenError.prototype.__proto__ = Error.prototype;
+RequestTokenError.prototype.__proto__ = Error.prototype;
