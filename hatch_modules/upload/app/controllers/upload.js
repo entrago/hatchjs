@@ -40,7 +40,15 @@ UploadController.prototype.upload = function (c) {
         authorId: c.req.user && c.req.user.id
     };
 
-    c.Media.createWithFiles(c.req.files, params, function (err, media) {
+    var url = c.req.query.url || c.req.body.url;
+
+    if (url) {
+        c.Media.createWithUrl(url, params, callback)
+    } else {
+        c.Media.createWithFiles(c.req.files, params, callback);
+    }
+
+    function callback (err, media) {
         if (err) {
             return c.send({
                 status: 'error',
@@ -56,6 +64,6 @@ UploadController.prototype.upload = function (c) {
             url: media.url,
             media: media
         });
-    });
+    }
 };
 
