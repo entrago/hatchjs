@@ -235,6 +235,7 @@ PagesController.prototype.update = function(c) {
     c.body.groupId = c.req.group.id;
 
     c.flash('info', c.t('models.Page.messages.saved'));
+    delete c.body.undefined;
 
     //c.Tag.assignTagsForObject(page, c.req.body.tags, function () {
         page.update(c.body, function(err, page) {
