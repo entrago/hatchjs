@@ -11,7 +11,7 @@ require('util').inherits(PageController, Application);
 PageController.prototype.show = function (c) {
     var Page = c.Page;
 
-    this.group.definePage(c.req.url, c, function render(err, page) {
+    this.group.definePage(decodeURIComponent(c.req.url), c, function render(err, page) {
         if (err || !page) {
             return c.next(err);
         }
