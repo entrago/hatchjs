@@ -81,7 +81,7 @@ exports.run = function(c, path, domain, done) {
 
             // import all of the data
             async.forEachSeries(modelData.data, function(entity, next) {
-                if (typeof entity === 'undefined') {
+                if (!entity) {
                     return;
                 }
                 fixDomain(entity);
@@ -92,18 +92,18 @@ exports.run = function(c, path, domain, done) {
                 console.log('import: ' + entity.id + ' = ' + (i++) + '/' + modelData.count);
 
                 // fix group
-                if (modelData.model === 'Group') {
+                if (modelData.model === 'Group' && entity.homepage) {
                     entity.url = entity.homepage.url.replace(/\/$/, '');
                 }
                 // fix page
-                if (modelData.model === 'Page') {
+                if (modelData.model === 'Page' && entity.url) {
                     entity.url = entity.url.replace(/\/$/, '');
                 }
 
                 //create the data in the database
                 model.create(entity, function(err, entity) {
                     //never error
-                    if(err) console.log(err);
+                    if (err) console.log(err);
 
                     console.log('created: ' + entity.id + ' = ' + (j++) + '/' + modelData.count);
                     clearTimeout(timeout);
