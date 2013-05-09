@@ -395,7 +395,7 @@
         csrf_token = $('meta[name=csrf-token]').attr('content');
         csrf_param = $('meta[name=csrf-param]').attr('content');
         $('form input[name="' + csrf_param + '"]').val(csrf_token);
-        $('a[data-modal]').live('ajax:success', function (e, html) {
+        $('a[data-modal]').on('ajax:success', function (e, html) {
             var modal = $(html);
 
             var $modalContainer = $("#modal-container");
@@ -405,7 +405,7 @@
             modal.modal();
             hatchModalInit();
         });
-        $('*[data-target-id]').live('ajax:success', function(e, html) {
+        $('*[data-target-id]').on('ajax:success', function(e, html) {
             var id = $(this).attr('data-target-id');
             var el = $('*[data-remote-id=' + id + ']');
             if(el.length == 0) el = $('#' + id);

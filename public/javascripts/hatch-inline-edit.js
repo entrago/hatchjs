@@ -147,8 +147,8 @@ InlineEditController.prototype.init = function() {
         return false;
     }
 
-    $(".module:not(.not-editable-widget) .inline-edit").live("dblclick", inlineEdit);
-    $(".inline-edit-link").live("click", function() {
+    $(".module:not(.not-editable-widget) .inline-edit").on("dblclick", inlineEdit);
+    $(".inline-edit-link").on("click", function() {
         var widget = $(this).parents(".module");
         var content = $(".inline-edit", widget);
 
@@ -157,5 +157,5 @@ InlineEditController.prototype.init = function() {
         return false;
     });
 
-    $(".module:not(.not-editable-widget) .content > h2").live("dblclick", titleEdit);
+    $(".module:not(.not-editable-widget) .content > h2").on("dblclick", titleEdit);
 }

@@ -52,7 +52,7 @@
         });
 
         //attach the event handler
-        this.live("change keyup keydown blur", update);
+        this.on("change keyup keydown blur", update);
 
         return this;
     }

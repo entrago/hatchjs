@@ -33,7 +33,7 @@ $(document).ready(function() {
 
     //validation and default ajax handlers
     //redirect
-    $('*[data-remote=true]').live("ajax:success", function(e, data) {
+    $('*[data-remote=true]').on("ajax:success", function(e, data) {
         var timeout = data.message && 2000 || 0;
         if (data.redirect) {
             console && console.error('Deprecated redirect to ' + data.redirect);
@@ -43,7 +43,7 @@ $(document).ready(function() {
         }
     });
     //errors
-    $('*[data-remote=true]').live("ajax:error", function(xhr, status, error) {
+    $('*[data-remote=true]').on("ajax:error", function(xhr, status, error) {
         var data = JSON.parse(status.responseText);
         var message = '';
         var fields = [];
@@ -74,7 +74,7 @@ $(document).ready(function() {
     });
 
     //ajax modals
-    $("a[data-toggle=modal]").live('click', function (e) {
+    $("a[data-toggle=modal]").on('click', function (e) {
         target = $(this).attr('data-target');
         url = $(this).attr('href');
         if(url.indexOf('#') == -1) {
@@ -87,7 +87,7 @@ $(document).ready(function() {
     $("textarea[rel*=autogrow]").autogrow();
 
     //focus comment links on the textarea below
-    $("a[rel=comment]").live("click", function() {
+    $("a[rel=comment]").on("click", function() {
         var $post = $(this).parents("div[data-remote-id]:first");
         $post.find('.comments-and-likes').removeClass('hidden');
         $post.find("textarea").focus();
@@ -95,13 +95,13 @@ $(document).ready(function() {
     });
 
     //submit on enter textareas
-    $("textarea[rel*=submitenter]").live("keypress", function(e) {
+    $("textarea[rel*=submitenter]").on("keypress", function(e) {
         if(e.charCode === 13 && !e.shiftKey) {
             $(this).parents("form").submit();
             return false;
         }
     });
-    $("textarea[rel*=submitcommandenter]").live("focus", function() {
+    $("textarea[rel*=submitcommandenter]").on("focus", function() {
         var textarea = this;
         $(window).unbind('keydown').bind("keydown", function(e) {
             if(e.keyCode === 13 && (e.metaKey || e.ctrlKey)) {
@@ -109,7 +109,7 @@ $(document).ready(function() {
             }
         });
     });
-    $("textarea[rel*=submitcommandenter]").live("blur", function() {
+    $("textarea[rel*=submitcommandenter]").on("blur", function() {
         $(window).unbind("keydown");
     });
 
@@ -203,7 +203,7 @@ function hatchInit() {
     $('.typeahead.dropdown-menu').remove();
 
     //setup popups
-    $('a[rel=popup]').live('click', function() {
+    $('a[rel=popup]').on('click', function() {
         window.open(this.href, '_popup', 'status = 1, height = 400, width = 600, resizable = 0');
         return false;
     });
@@ -218,7 +218,7 @@ function hatchInit() {
         //setup tooltips
         $("*[rel=tooltip]").tooltip();
         //hide tooltips on click to stop stray tooltips from hanging around
-        $("*[rel=tooltip]").live("click", function() {
+        $("*[rel=tooltip]").on("click", function() {
             $(".tooltip").hide();
         });
         $("*[rel=popover]").popover({ placement: "top", trigger: "hover", animation: false, delay: { show: 20, hide: 400 } });
@@ -238,7 +238,7 @@ function hatchInit() {
             inlineedit.init();
 
             //setup the widget settings
-            $('#modal-container').live('show', function() {
+            $('#modal-container').on('show', function() {
                 if($('#modal-settings').length == 0) return;
 
                 $('a[rel=widget-privacy]').bind('click', function() {
