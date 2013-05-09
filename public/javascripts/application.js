@@ -8,47 +8,47 @@ $(function () {
     pageId = $('meta[name=pageId]:last').attr('content');
     groupId = $('meta[name=groupId]').attr('content');
 
-    $('.new-widgets-list a').live('click', function (e) {
+    $('.new-widgets-list a').on('click', function (e) {
         e.stopPropagation();
         var type = $(this).attr('href').substr(1);
         createWidget(type);
         return false;
     });
 
-    $('.inline-edit').live('contents-updated', updateWidgetContent);
+    $('.inline-edit').on('contents-updated', updateWidgetContent);
 
-    $('.module-controls > .delete').live('click', function (e) {
+    $('.module-controls > .delete').on('click', function (e) {
         e.stopPropagation();
         var $module = $(this).closest('.module');
         removeWidget($module);
         return false;
     });
 
-    $(document).live('order-changed', updateWidgetsOrder);
+    $(document).on('order-changed', updateWidgetsOrder);
 
-    $('.page-item').live('page-reorder', savePageOrder);
+    $('.page-item').on('page-reorder', savePageOrder);
 
-    $('.widget-settings-form').live('ajax:success', function (e, data) {
+    $('.widget-settings-form').on('ajax:success', function (e, data) {
         $.noty({ text: '<i class="icon-ok"></i> Widget settings saved', type: 'success' });
 
         $(this).modal('hide');
     });
 
-    $('[data-widget-action]').die().live('ajax:success', function () {
+    $('[data-widget-action]').unbind().on('ajax:success', function () {
         var $el = $(this);
         var handle = $(this).attr('data-widget-action');
         var data = $(this).attr('data-widget-action-params');
         widgetAction(handle, data);
     });
 
-    $('[data-update-content]').die().live('ajax:success', function (e, data) {
+    $('[data-update-content]').unbind().on('ajax:success', function (e, data) {
         var selector = $.map($(this).attr('data-update-content').split(':'), function (id) {
             return '[data-id=' + id + ']';
         }).join(' ');
         $(selector).replaceWith(data);
     });
 
-    $('.adjust').die().live('ajax:success', function (e, data) {
+    $('.adjust').unbind().on('ajax:success', function (e, data) {
         //reload the widget
         widgetAction('render:' + $(this).parents(".module").attr("data-id"));
     });
@@ -183,7 +183,6 @@ function savePageOrder(e, revert) {
         url: $(this).attr('data-path'),
         order: [].slice.call(order)
     }, function (data) {
-        console.log(data);
         if (data.error) {
             $.noty({text: "<i class='icon-warning-sign'></i> " + data.error, type: "error"});
             revert();
