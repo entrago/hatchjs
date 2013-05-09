@@ -1,7 +1,7 @@
 <li class="nav-header"><%= t('content.header.actions') %></li>
 
 <% editableContentTypes.forEach(function (type) { %>
-    <%- li('new') %>
+    <%- li('new-' + type.name) %>
         <%- linkTo(icon(type.icon) + t('content.new' + type.name),
             pathTo.newContentForm(type.name)) %>
     <%- liEnd %>

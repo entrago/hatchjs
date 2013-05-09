@@ -202,6 +202,7 @@ ContentController.prototype.ids = function ids(c) {
 ContentController.prototype.new = function(c) {
     this.post = new c.Content();
     this.post.type = c.req.params.type;
+    this.pageName = 'new-' + this.post.type;
 
     renderInputForm(c, function () {
         c.render();

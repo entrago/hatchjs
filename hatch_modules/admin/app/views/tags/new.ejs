@@ -8,7 +8,7 @@
                 <h3><%= t('tags.headers.add') %></h3>
                 <hr/>
 
-                <%- formTagBegin({action: pathTo.tag(type), remote: true, method: 'PUT', id: 'tag-form' }) %>
+                <%- formTagBegin({action: pathTo.tag(sectionName), remote: true, method: 'PUT', id: 'tag-form' }) %>
                     <input type="hidden" name="id" value="<%- tag && tag.id %>" />
 
                     <% include _form %>
