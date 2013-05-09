@@ -183,7 +183,6 @@ function savePageOrder(e, revert) {
         url: $(this).attr('data-path'),
         order: [].slice.call(order)
     }, function (data) {
-        console.log(data);
         if (data.error) {
             $.noty({text: "<i class='icon-warning-sign'></i> " + data.error, type: "error"});
             revert();

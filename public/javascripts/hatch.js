@@ -12,7 +12,6 @@ window.pathTo = function pathTo(action) {
             'groupId=' + groupId
         ].join('&')
     ].join(action.match(/\?/) ? '&' : '?');
-    console.log(url);
     return url;
 };
 
