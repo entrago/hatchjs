@@ -20,11 +20,10 @@ var mailer = require('nodemailer');
 var async = require('async');
 var _ = require('underscore');
 var moment = require('moment');
+var crypto = require('crypto');
 
 module.exports = function (compound, User) {
     var Group = compound.models.Group;
-
-    var crypto = compound.hatch.crypto;
 
     User.validatesPresenceOf('username', {message: 'Please enter a username'});
     User.validatesPresenceOf('email', {message: 'Please enter an email address'});
@@ -472,7 +471,7 @@ module.exports = function (compound, User) {
     User.verifyPassword = function (password, userPassword) {
         if (userPassword === null) return true;
 
-        if (password && crypto.calcSha(password) === userPassword || password === userPassword) {
+        if (password && calcSha(password) === userPassword || password === userPassword) {
             return true;
         }
         return false;
@@ -484,7 +483,7 @@ module.exports = function (compound, User) {
      * @param  {String} pwd - original password
      */
     User.setter.password = function (pwd) {
-        this._password = crypto.calcSha(pwd);
+        this._password = calcSha(pwd);
     };
 
     /**
@@ -786,6 +785,27 @@ module.exports = function (compound, User) {
         }
     };
 
+    /**
+     * encrypts a password
+     * 
+     * @param  {[string]} payload [password to encrypyt]
+     * @return {[string]}         [encrypted password]
+     */
+    User.calcSha = function(payload) {
+        return calcSha(payload);
+    }
+
+    /**
+     * calculates a sha1 of the specified string
+     * 
+     * @param  {[String]} payload 
+     * @return {[String]}         
+     */
+    function calcSha(payload) {
+        if (!payload) return '';
+        if (payload.length == 64) return payload;
+        return crypto.createHash('sha256').update(payload).update(compound.app.get('password salt') || '').digest('hex');
+    }
 
     /**
      * Check whether this user has the specified permission.
