@@ -27,5 +27,8 @@ module.exports = function (parent) {
         s.controllers.setup = SetupController;
         s.views['setup/show'] = path.join(__dirname, 'views/setup.ejs');
     });
-    parent.injectMiddlewareAfter('router', middleware(parent));
+
+    process.nextTick(function () {
+        parent.injectMiddlewareAfter('hatchMiddleware', middleware(parent));
+    });
 };
