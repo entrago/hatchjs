@@ -100,7 +100,12 @@ module.exports = function (compound, Group) {
     Group.prototype.definePage = function definePage(url, c, cb) {
         var group = this;
         var path = url.split('?')[0];
-        var page = this.matchPage(path);
+        var page = c.req.page || this.matchPage(path);
+
+        if (c.req.page) {
+            console.log('got page from request')
+            console.log(page.show)
+        }
 
         // special page out of this group (sp.defaultPage)
         if (page && page.type !== 'page' && !page.id) {
@@ -111,6 +116,8 @@ module.exports = function (compound, Group) {
 
         if (!page) {
             cb(null, null);
+        } else if (page.renderHtml) {
+            gotPage(null, page);
         } else if (page.id) {
             Page.find(page.id, gotPage);
         } else {
@@ -118,7 +125,6 @@ module.exports = function (compound, Group) {
         }
 
         function gotPage(err, page) {
-
             if (page && page.templateId) {
                 var found = group.getCachedPage(page.templateId);
 
@@ -127,6 +133,10 @@ module.exports = function (compound, Group) {
                     return cb(err, page);
                 }
             }
+
+            // store the page in the request
+            c.req.page = page;
+            console.log('type = ' + typeof page)
 
             cb(err, page);
         }

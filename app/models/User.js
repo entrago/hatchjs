@@ -823,8 +823,6 @@ module.exports = function (compound, User) {
             return membership.groupId == group.id;
         });
 
-        console.log(membership)
-
         // non-members or not-accepted members - return false
         if(!membership || membership.state !== 'accepted') {
             return callback(null, false);

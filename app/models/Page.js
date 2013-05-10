@@ -375,7 +375,6 @@ module.exports = function (compound, Page) {
         var data = {
             data: params,
             widgetId: widgetId,
-            groupId: this.groupId,
             templateWidget: !!widget.templateWidget
         };
         // request.post(
@@ -388,25 +387,39 @@ module.exports = function (compound, Page) {
         //         cb(err, res && res.body);
         //     }
         // );
-        inAppRequest(url, req.user, {token: 'test', data: JSON.stringify(data)}, function(err, res) {
+        
+        inAppRequest(req, url, { token: 'test', data: JSON.stringify(data) }, function(err, res) {
             cb(err, res);
         });
 
     };
 
-    function inAppRequest(url, user, data, callback) {
+    function inAppRequest(parent, url, data, callback) {
         var req = new http.IncomingMessage;
         var res = new http.ServerResponse({method: 'NOTHEAD'});
+
         res.end = function(body) {
-            console.log(arguments);
             callback(null, body);
         };
-        req.user = user;
+
+        // set the entities associated with this request from the parent so that
+        // they don't have to be loaded again by ID
+        req.user = parent.user;
+        req.group = parent.group;
+        req.page = parent.page;
+
+        // TODO: we need to set the cookies and session so that they can be 
+        // accessed and set (if required) from each widget. This doesn't seem
+        // to be working but I cannot understand why
+        //req.cookies = parent.cookies;
+        //req.session = parent.session;
+
         req.body = data;
         req.method = 'POST';
         req.connection = {};
         req.url      = '/' + url;
-        req.headers  = { host: 'localhost' };
+        req.headers  = { host: parent.headers.host };
+
         compound.app.handle(req, res);
     }
 
