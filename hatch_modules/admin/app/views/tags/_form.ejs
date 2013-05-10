@@ -65,7 +65,7 @@
                         <i class="icon-lock"></i> <%- t('tags.labels.permissions') %>
                     </a>
                 </div>
-                <div id="list" class="accordion-body collapse <%- theTag.permissions.length > 0 ? 'in':'' %>">
+                <div id="list" class="accordion-body collapse <%- theTag.permissions && theTag.permissions.length > 0 ? 'in':'' %>">
                     <div class="accordion-inner">
                         <ul class="unstyled">
                             <%- renderPermissions(permissions.root) %>

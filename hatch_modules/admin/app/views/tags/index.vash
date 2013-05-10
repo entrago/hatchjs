@@ -1,6 +1,6 @@
 <div class="row-fluid">
 
-    @model.renderPartial('../content/_sidebar')
+    @model.renderPartial('_sidebar')
 
     <div class="span10">
         <div class="module">

@@ -146,16 +146,16 @@
         $("#newPageForm")[0].reset();
     });
 
-    $("#cancelButton").die().live("click", function() {
+    $("#cancelButton").unbind().on("click", function() {
         $(".new-page-form").hide().appendTo($("#pages-table tbody"));
     });
 
-    $("#newPageFormInline").die().live("ajax:success", function(data) {
+    $("#newPageFormInline").unbind().on("ajax:success", function(data) {
         $("#pages-table tbody").load('<%- pathTo.renderTree() %>');
     });
 
     //stop delete page from reloading
-    $("a[rel=delete-page]").die().live("click", function() {
+    $("a[rel=delete-page]").unbind().on("click", function() {
         var el = this;
         if(confirm("Are you sure you wish to delete this page?")) {
             $.ajax(this.href, {

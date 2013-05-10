@@ -1,5 +1,5 @@
-<% if (type === 'content') { %>
-    <%- include ../content/_sidebar %>
-<% } else if (type === 'users') { %>
-    <%- include ../users/_sidebar %>
+<% if (modelName === 'Content') { %>
+    <%- renderPartial('../content/_sidebar') %>
+<% } else if (modelName === 'User') { %>
+    <%- renderPartial('../users/_sidebar') %>
 <% } %>
