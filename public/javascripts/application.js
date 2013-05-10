@@ -8,7 +8,7 @@ $(function () {
     pageId = $('meta[name=pageId]:last').attr('content');
     groupId = $('meta[name=groupId]').attr('content');
 
-    $('.new-widgets-list a').on('click', function (e) {
+    $(document).on('click', '.new-widgets-list a', function (e) {
         e.stopPropagation();
         var type = $(this).attr('href').substr(1);
         createWidget(type);
