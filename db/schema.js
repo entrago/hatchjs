@@ -70,6 +70,8 @@ var Group = define('Group', function () {
     property('url', String, {index: true});
     property('path', String);
     property('name', String,  {fulltext: true, sort: true});
+    property('type', String, {index: true});
+    property('privacy', String, {index: true});
     property('subgroups', JSON);
     property('pagesCache', []);
     property('homepage', JSON);
@@ -170,6 +172,17 @@ var Content = define('Content', function () {
     set('defaultSort', 'createdAt DESC');
 });
 
+Content.schema.adapter.defineFulltextIndex('Content', 'fulltext');
+
+var ContentFeedItem = define('ContentFeedItem', function () {
+    property('userId', Number, {index: true });
+    property('contentId',  Number ),
+    property('createdAt', Date, {index: true} );
+
+    set('ignoreNullValues', true);
+    set('defaultSort', 'createdAt DESC');
+});
+
 var Comment = define('Comment', function () {
     property('text', String, {fulltext: true});
     property('groupId', Number, {index: true});
@@ -192,14 +205,14 @@ var Like = define('Like', function () {
     set('defaultSort', 'createdAt');
 });
 
-Content.schema.adapter.defineFulltextIndex('Content', 'fulltext');
+var Activity = define('Activity', function () {
+    property('createdAt', Date);
+    property('type', String, {index: true});
+    property('userId', Number, {index: true});
+    property('userId', Number, {index: true});
+    property('contentId', Number, {index: true});
+    property('groupId', Number, {index: true});
 
-var ContentFeedItem = define('ContentFeedItem', function () {
-    property('userId', Number, {index: true });
-    property('contentId',  Number ),
-    property('createdAt', Date, {index: true} );
-
-    set('ignoreNullValues', true);
     set('defaultSort', 'createdAt DESC');
 });
 
