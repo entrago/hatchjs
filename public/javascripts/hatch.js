@@ -468,8 +468,8 @@ function setupRichtextEditor(el, options) {
     var editor = $(el).redactor($.extend({
         focus : false,
         minHeight : $(el).height() -30,
-        convertDivs : true,
-        fixed: true,
+        convertDivs : false,
+        fixed: false,
         modal_image_edit: '<label>' + RLANG.title + '</label>' +
             '<input id="redactor_file_alt" type="text" class="redactor_input" />' +
             '<label>' + RLANG.image_position + '</label>' +
