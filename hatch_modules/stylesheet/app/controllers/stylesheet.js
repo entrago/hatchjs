@@ -112,9 +112,7 @@ StylesheetController.prototype.theme = function (c) {
             if(stylesheet.less && (stylesheet.lastUpdate < c.Stylesheet.lastUpdate || typeof stylesheet.lastUpdate == 'undefined')) {
                 console.log("Stylesheet: out of date stylesheet - recompiling");
                 stylesheet.setTheme(stylesheet.name, function () {
-                    stylesheet.save(function() {
-                        output(stylesheet.css);    
-                    });
+                    output(stylesheet.css);    
                 });
             }
             else {
