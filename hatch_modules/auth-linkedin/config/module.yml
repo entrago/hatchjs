@@ -1,5 +1,5 @@
 title: LinkedIn OAuth
-description: Authenticate user with LinkedIn
+description: Enable users to authenticate user with LinkedIn
 icon: linkedin-sign
 settings:
   intro: Please enter your LinkedIn Application details
