@@ -1,3 +1,5 @@
+var should = require('./');
+
 var app, compound, Content, Comment;
 var async = require('async');
 

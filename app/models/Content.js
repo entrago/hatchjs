@@ -636,5 +636,29 @@ module.exports = function (compound, Content) {
             });
         })
     };
+
+    /**
+     * works out whether the specified user likes this post
+     * 
+     * @param  {[User]} user [user to check]
+     * @return {[Boolean]}
+     */
+    Content.prototype.doesLike = function(user) {
+        if (!user) return false;
+        var id = user.id || user;
+        return this.likes.find(id, 'userId');
+    };
+
+    /**
+     * works out whether the specified user dislikes this post
+     * 
+     * @param  {[User]} user [user to check]
+     * @return {[Boolean]}
+     */
+    Content.prototype.doesDislike = function(user) {
+        if(!user) return false;
+        var id = user.id || user;
+        return this.dislikes.find(id, 'userId');
+    };
 };
 

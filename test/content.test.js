@@ -1,3 +1,4 @@
+var should = require('./');
 var app, compound, Content;
 
 describe('Content', function() {

@@ -1,3 +1,4 @@
+var should = require('./');
 var Group, Page, app, compound;
 var should = require('should');
 
