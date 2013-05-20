@@ -253,7 +253,7 @@ en:
       url: URL
       headerfooter: Header and footer
       analytics: Analytics
-      changeUrl: URL
+      changeUrl: Edit URL
     labels:
       title: Title
       joinPermissions: Join permissions

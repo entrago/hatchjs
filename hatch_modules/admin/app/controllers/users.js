@@ -36,7 +36,7 @@ require('util').inherits(UsersController, Application);
 
 // load the user tags for this group to display on the left navigation
 function loadTags(c) {
-    c.Tag.all({ where: { groupIdByType: c.req.group.id + '-User' }}, function (err, tags) {
+    c.Tag.all({ where: { groupIdByType: c.req.group.id + '-User' }, limit: 5}, function (err, tags) {
         delete tags.countBeforeLimit;
         c.locals.tags = tags;
         c.next();
