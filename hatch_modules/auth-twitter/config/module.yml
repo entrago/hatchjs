@@ -1,5 +1,5 @@
 title: Twitter OAuth
-description: Authenticate user with Twitter
+description: Enable users to authenticate user with Twitter
 icon: twitter-sign
 settings:
   intro: Please enter your Twitter Application details

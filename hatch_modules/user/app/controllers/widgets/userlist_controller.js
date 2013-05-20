@@ -17,7 +17,6 @@
 //
 
 before(function init(c) {
-    var locals = this;
     var group = this.group;
     var User = c.User;
     var cond = {};
@@ -32,27 +31,24 @@ before(function init(c) {
         where: cond,
         limit: limit,
         offset: offset,
-        order: group.id + ':membership:joinedAt DESC'
+        order: group.id + ':membership:joinedAt DESC',
+        fulltext: c.req.param('query')
     };
 
-    //setup the groups list so that they are available from settings
-    // c.widgetCore.info.settings.fields.displayMode.options = this._.reject(c.widgetCore.info.settings.fields.displayMode.options, function(option) { return option.indexOf('custom-') == 0; });
-    // (group.memberLists || []).forEach(function(list) { c.widgetCore.info.settings.fields.displayMode.options.push('custom-' + list.id + ':' + list.title); });
-
-    //use the selected user or current user
+    // use the selected user or current user
     var user = c.req.selectedUser || c.req.user;
 
-    //fulltext search?
-    if(c.req.query.query) {
-        query.fulltext = c.req.query.query;
-    }
-
-    //a-z index
+    // a-z index
     if(c.req.query.letter) {
         cond.lastnameLetter = c.req.query.letter;
     }
 
-    //build the query condition
+    // filter by tags
+    if (this.widget.settings.tags) {
+        cond.tags = this.widget.settings.tags;
+    }
+
+    // build the query condition
     switch(this.widget.settings.displayMode) {
         case 'followers':
             if(user) {
@@ -70,27 +66,17 @@ before(function init(c) {
             }
             break;
         case 'members':
-            //standard: get the list of users for this group
-            cond['membership:groupId'] = group.id;
-            cond['membership:state'] = 'approved';
-
-            //allow fall through
-        default:
-            //custom: filter by member lists
-            if(this.widget.settings.displayMode.indexOf('custom-') == 0) {
-                cond['customListIds'] = group.id + '-' + this.widget.settings.displayMode.split('custom-')[1];
-            }
-            break;
+            // standard: get the list of users for this group
+            cond.membershipGroupId = c.req.group.id;
     }
 
     runQuery(cond);
 
     function runQuery(cond) {
-        c.locals.profileFields = locals._.filter(group.profileFields(), function(field) { return field.privacy == 'public'; });
+        c.locals.profileFields = c.locals._.filter(group.profileFields(), function(field) { return field.privacy == 'public'; });
 
-        //check for invalid query condition
+        // check for invalid query condition
         if(Object.keys(cond).length === 0 || (typeof cond.id != 'undefined' && (cond.id == null || cond.id.length == 0))) {
-
             c.locals.letter = c.req.query.letter;
             c.locals.users = [];
             c.locals.pagination = { page: 1, size: pageSize, count: 0 };
@@ -99,13 +85,13 @@ before(function init(c) {
         }
 
         User.all(query, function (err, users) {
-
-            //get whether the current user is following each one
+            // get whether the current user is following each one
             users.forEach(function(user) { user.isFollowed = locals._.find(c.req.user && c.req.user.ifollow || [], function(id) { return id == user.id; }); });
 
             c.locals.letter = c.req.query.letter;
             c.locals.pagination = { page: page, size: pageSize, count: users.countBeforeLimit };
             c.locals.users = users;
+            c.locals.req = c.req;
 
             c.next();
         });

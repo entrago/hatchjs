@@ -1,5 +1,5 @@
 title: Facebook OAuth
-description: Authenticate user with Facebook
+description: Enable users to authenticate user with Facebook
 icon: facebook-sign
 settings:
   intro: Please enter your Facebook Application details

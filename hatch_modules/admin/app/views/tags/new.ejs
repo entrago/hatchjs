@@ -1,6 +1,6 @@
 <div class="row-fluid">
 
-    <%- renderPartial('../content/_sidebar') %>
+    <%- renderPartial('_sidebar') %>
 
     <div class="span10">
         <div class="module">
@@ -8,7 +8,7 @@
                 <h3><%= t('tags.headers.add') %></h3>
                 <hr/>
 
-                <%- formTagBegin({action: pathTo.tag(type), remote: true, method: 'PUT', id: 'tag-form' }) %>
+                <%- formTagBegin({action: pathTo.tag(sectionName), remote: true, method: 'PUT', id: 'tag-form' }) %>
                     <input type="hidden" name="id" value="<%- tag && tag.id %>" />
 
                     <% include _form %>

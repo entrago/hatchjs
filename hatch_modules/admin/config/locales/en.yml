@@ -242,7 +242,7 @@ en:
       noSpecialPages: No special pages have been defined for this group yet
       areYouSureDelete: 'Are you sure you wish to delete this page?'
       overrideTitle: Overrides the title in the browser
-      drag: Drag me onto the sitemap to add a new page
+      drag: Drag me to the place you wish to add a new page
       enterTitle: 'Type your page title and hit enter ...'
       delete: Delete this page
   group:

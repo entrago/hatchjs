@@ -98,7 +98,7 @@
 <% } %>
 
 <script type="text/javascript">
-    $('.module[data-id=<%- widget.id %>] a[rel=follow]').die().live('ajax:success', function(e, data) {
+    $('.module[data-id=<%- widget.id %>] a[rel=follow]').unbind().on('ajax:success', function(e, data) {
         $.noty({
             type: data.status,
             text: '<i class="icon-' + (data.icon || 'ok') + '"></i> ' + data.message

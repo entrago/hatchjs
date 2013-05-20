@@ -8,7 +8,7 @@ $(function () {
     pageId = $('meta[name=pageId]:last').attr('content');
     groupId = $('meta[name=groupId]').attr('content');
 
-    $('.new-widgets-list a').on('click', function (e) {
+    $(document).on('click', '.new-widgets-list a', function (e) {
         e.stopPropagation();
         var type = $(this).attr('href').substr(1);
         createWidget(type);
@@ -26,7 +26,7 @@ $(function () {
 
     $(document).on('order-changed', updateWidgetsOrder);
 
-    $('.page-item').on('page-reorder', savePageOrder);
+    $(document).on('page-reorder', '.page-item', savePageOrder);
 
     $('.widget-settings-form').on('ajax:success', function (e, data) {
         $.noty({ text: '<i class="icon-ok"></i> Widget settings saved', type: 'success' });
@@ -89,8 +89,9 @@ function send(action, data, response, done) {
 
     pageId = $('meta[name=pageId]:last').attr('content');
 
-    var pathname = window.location.pathname;
+    var pathname = window.location.pathname.split('/do/')[0];
     if (pathname === '/') pathname = '';
+
     var path = pathname + '/do/admin/' + action;
 
     $.post(path, data, function (data) {

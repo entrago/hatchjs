@@ -51,4 +51,40 @@ module.exports = function (compound, Like) {
     Like.afterDestroy = function (next) {
         Content.updateLikes(this.contentId, next);
     };
+
+    /**
+     * Check whether the specified content is liked by the specified user.
+     * 
+     * @param  {Number}   contentId - id of the content
+     * @param  {Number}   userId    - id of the user
+     * @param  {Function} callback  [description]
+     * @return {[type]}             [description]
+     */
+    Like.doesLike = function (contentId, userId, callback) {
+        Like.findOne({ contentId: contentId, userId: userId }, function (err, like) {
+            callback (err, like != null);
+        });
+    };
+
+    /**
+     * Get all of the likes for the specified user.
+     * 
+     * @param  {Number}   userId   - id of the user
+     * @param  {Function} callback - callback function
+     */
+    Like.getLikes = function (userId, callback) {
+        Like.all({ where: { userId: userId }}, callback);
+    };
+
+    /**
+     * Get all of the content ids for likes for the specified user.
+     * 
+     * @param  {Number}   userId   - id of the user
+     * @param  {Function} callback - callback function
+     */
+    Like.getLikeIds = function (userId, callback) {
+        Like.getLikes(userIds, function (err, likes) {
+            callback(err, !err && _.pluck(likes, 'contentId'));
+        });
+    };
 };

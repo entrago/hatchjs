@@ -40,7 +40,7 @@ require('util').inherits(ContentController, Application);
 
 // Load the content tags for this group to display on the left navigation
 function loadTags(c) {
-    c.Tag.all({ where: { groupIdByType: c.req.group.id + '-Content' }}, function (err, tags) {
+    c.Tag.all({ where: { groupIdByType: c.req.group.id + '-Content' }, limit: 5 }, function (err, tags) {
         delete tags.countBeforeLimit;
         c.locals.tags = tags;
         c.next();
@@ -202,6 +202,7 @@ ContentController.prototype.ids = function ids(c) {
 ContentController.prototype.new = function(c) {
     this.post = new c.Content();
     this.post.type = c.req.params.type;
+    this.pageName = 'new-' + this.post.type;
 
     renderInputForm(c, function () {
         c.render();

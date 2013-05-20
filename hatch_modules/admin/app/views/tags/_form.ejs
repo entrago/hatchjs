@@ -1,174 +1,175 @@
 
 
-                    <div class="control-group">
-                        <label class="control-label" for="title"><%= t('tags.labels.name') %></label>
-                        <div class="controls">
-                            <input type="text" class="input-xlarge" id="title" name="title" value="<%- theTag.title %>">
-                        </div>
+
+<div class="control-group">
+    <label class="control-label" for="title"><%= t('tags.labels.name') %></label>
+    <div class="controls">
+        <input type="text" class="input-xlarge" id="title" name="title" value="<%- theTag.title %>">
+    </div>
+</div>
+
+<div class="control-group">
+    <label class="control-label" for="sortOrder"><%= t('tags.labels.sortOrder') %></label>
+    <div class="controls">
+        <select id="sortOrder" name="sortOrder">
+            <% sortOrders.forEach(function (order) { %>
+                <option value="<%- order.value %>" <%- order.value === theTag.sortOrder ? 'selected="selected"':'' %>>
+                    <%- order.name %>
+                </option>
+            <% }) %>
+        </select>
+    </div>
+</div>
+
+<div class="control-group">
+    <label class="control-label" for="description"><%= t('tags.labels.description') %></label>
+    <div class="controls">
+        <textarea id="description" name="description" class="input-xlarge span6 richtext" rows="5"><%- theTag.description %></textarea>
+    </div>
+</div>
+
+<div class="control-group">
+    <label class="checkbox">
+        <input type="checkbox" class="checkbox" name="filterEnabled" id="filterEnabled" <%- theTag.filter ? 'checked="checked"':'' %> />
+        <%= t('tags.labels.filter') %>
+    </label>
+
+    <input type="hidden" name="filter" id="filterValue" value="<%- escape(theTag.filter) %>" />
+
+    <div class="filter <%- theTag.filter ? 'enabled':'' %>" id="filter-holder">
+        <div class="editor">
+            <div id="filter" rows="10"><%- theTag.filter || defaultFilter %></div>
+        </div>
+        <div class="filter-cover"></div>
+
+        <label class="checkbox">
+            <input type="checkbox" class="checkbox" name="filterExisting" id="filterExisting" />
+            <%= t('tags.labels.applyFilter') %>
+        </label>
+
+        <div id="filter-count" style="display : none;">
+            <span><%= __('Number of matches') %>: <strong id="filter-results-count">0</strong></span>
+            <a href="#" id="refresh-filter"><i class="icon-refresh"></i></a>
+        </div>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <% if(modelName === 'User') { %>
+        <hr/>
+
+        <div class="accordion" id="permissions">
+            <div class="accordion-group">
+                <div class="accordion-heading">
+                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#permissions" href="#list">
+                        <i class="icon-lock"></i> <%- t('tags.labels.permissions') %>
+                    </a>
+                </div>
+                <div id="list" class="accordion-body collapse <%- theTag.permissions && theTag.permissions.length > 0 ? 'in':'' %>">
+                    <div class="accordion-inner">
+                        <ul class="unstyled">
+                            <%- renderPermissions(permissions.root) %>
+                        </ul>
                     </div>
+                </div>
+            </div>
+        </div>
+    <% } %>
 
-                    <div class="control-group">
-                        <label class="control-label" for="sortOrder"><%= t('tags.labels.sortOrder') %></label>
-                        <div class="controls">
-                            <select id="sortOrder" name="sortOrder">
-                                <% sortOrders.forEach(function (order) { %>
-                                    <option value="<%- order.value %>" <%- order.value === theTag.sortOrder ? 'selected="selected"':'' %>>
-                                        <%- order.name %>
-                                    </option>
-                                <% }) %>
-                            </select>
-                        </div>
-                    </div>
+    <style>
+        #filter
+        {
+            position : relative;
+            width : auto;
+            height: 100px;
+            font-family : 'Courier New', Courier, fixed-width;
+            padding: 0px;
+        }
 
-                    <div class="control-group">
-                        <label class="control-label" for="description"><%= t('tags.labels.description') %></label>
-                        <div class="controls">
-                            <textarea id="description" name="description" class="input-xlarge span6 richtext" rows="5"><%- theTag.description %></textarea>
-                        </div>
-                    </div>
+        .filter-cover
+        {
+            background: #ddd url(/img/stripes.png);
+            height: 120px;
+            margin: -121px 1px 0;
+            opacity: .85;
+        }
 
-                    <div class="control-group">
-                        <label class="checkbox">
-                            <input type="checkbox" class="checkbox" name="filterEnabled" id="filterEnabled" <%- theTag.filter ? 'checked="checked"':'' %> />
-                            <%= t('tags.labels.filter') %>
-                        </label>
+        .filter
+        {
+            display : none;
+        }
 
-                        <input type="hidden" name="filter" id="filterValue" value="<%- escape(theTag.filter) %>" />
+        .filter.enabled
+        {
+            display: block;
+        }
 
-                        <div class="filter <%- theTag.filter ? 'enabled':'' %>" id="filter-holder">
-                            <div class="editor">
-                                <div id="filter" rows="10"><%- theTag.filter || defaultFilter %></div>
-                            </div>
-                            <div class="filter-cover"></div>
+        .filter.enabled .filter-cover
+        {
+            display : none;
+        }
 
-                            <label class="checkbox">
-                                <input type="checkbox" class="checkbox" name="filterExisting" id="filterExisting" />
-                                <%= t('tags.labels.applyFilter') %>
-                            </label>
+        .editor
+        {
+            padding: 10px;
+            border: solid 1px #ddd;
+            overflow: hidden;
+            opacity : .99;
+            margin-bottom: 10px;
+        }
 
-                            <div id="filter-count" style="display : none;">
-                                <span><%= __('Number of matches') %>: <strong id="filter-results-count">0</strong></span>
-                                <a href="#" id="refresh-filter"><i class="icon-refresh"></i></a>
-                            </div>
-                        </div>
+        .filter.enabled .editor
+        {
+            opacity : 1;
+        }
 
-                        <div class="clearfix"></div>
+        ul.unstyled ul
+        {
+            list-style: none;
+        }
+    </style>
 
-                        <% if(modelName === 'User') { %>
-                            <hr/>
+    <script src="/javascripts/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/javascripts/ace/mode-javascript.js" type="text/javascript" charset="utf-8"></script>
 
-                            <div class="accordion" id="permissions">
-                                <div class="accordion-group">
-                                    <div class="accordion-heading">
-                                        <a class="accordion-toggle" data-toggle="collapse" data-parent="#permissions" href="#list">
-                                            <i class="icon-lock"></i> <%- t('tags.labels.permissions') %>
-                                        </a>
-                                    </div>
-                                    <div id="list" class="accordion-body collapse <%- theTag.permissions.length > 0 ? 'in':'' %>">
-                                        <div class="accordion-inner">
-                                            <ul class="unstyled">
-                                                <%- renderPermissions(permissions.root) %>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        <% } %>
+    <script type="text/javascript">
+        var editor = ace.edit("filter");
+        var JavaScriptMode = require("ace/mode/javascript").Mode;
+        editor.getSession().setMode(new JavaScriptMode());
+        editor.renderer.setShowGutter(false);
+        editor.renderer.setPrintMarginColumn(-1);
 
-                        <style>
-                            #filter
-                            {
-                                position : relative;
-                                width : auto;
-                                height: 100px;
-                                font-family : 'Courier New', Courier, fixed-width;
-                                padding: 0px;
-                            }
+        editor.getSession().on('change', function(){
+            document.getElementById("filterValue").value = editor.getSession().getValue();
+        });
 
-                            .filter-cover
-                            {
-                                background: #ddd url(/img/stripes.png);
-                                height: 120px;
-                                margin: -121px 1px 0;
-                                opacity: .85;
-                            }
+        $("#filterEnabled").bind("click", function() {
+            if(this.checked) $("#filter-holder").addClass("enabled");
+            else $("#filter-holder").removeClass("enabled");
+        });
 
-                            .filter
-                            {
-                                display : none;
-                            }
+        function refreshFilterResults() {
+            var url = '<%- pathTo.groupTag %>';
+            $('#filter-results-count').load(url, {
+                type: 'POST',
+                filter: $('#filterValue').val()
+            });
 
-                            .filter.enabled
-                            {
-                                display: block;
-                            }
+            return false;
+        }
 
-                            .filter.enabled .filter-cover
-                            {
-                                display : none;
-                            }
+        $('#refresh-filter').bind('click', refreshFilterResults);
 
-                            .editor
-                            {
-                                padding: 10px;
-                                border: solid 1px #ddd;
-                                overflow: hidden;
-                                opacity : .99;
-                                margin-bottom: 10px;
-                            }
+        $('#filterExisting').bind('click', function() {
+            if(this.checked) {
+                $('#filter-count').show();
+                refreshFilterResults();
+            }
+            else $('#filter-count').hide();
+        });
+    </script>
 
-                            .filter.enabled .editor
-                            {
-                                opacity : 1;
-                            }
-
-                            ul.unstyled ul
-                            {
-                                list-style: none;
-                            }
-                        </style>
-
-                        <script src="/javascripts/ace/ace.js" type="text/javascript" charset="utf-8"></script>
-                        <script src="/javascripts/ace/mode-javascript.js" type="text/javascript" charset="utf-8"></script>
-
-                        <script type="text/javascript">
-                            var editor = ace.edit("filter");
-                            var JavaScriptMode = require("ace/mode/javascript").Mode;
-                            editor.getSession().setMode(new JavaScriptMode());
-                            editor.renderer.setShowGutter(false);
-                            editor.renderer.setPrintMarginColumn(-1);
-
-                            editor.getSession().on('change', function(){
-                                document.getElementById("filterValue").value = editor.getSession().getValue();
-                            });
-
-                            $("#filterEnabled").bind("click", function() {
-                                if(this.checked) $("#filter-holder").addClass("enabled");
-                                else $("#filter-holder").removeClass("enabled");
-                            });
-
-                            function refreshFilterResults() {
-                                var url = '<%- pathTo.groupTag %>';
-                                $('#filter-results-count').load(url, {
-                                    type: 'POST',
-                                    filter: $('#filterValue').val()
-                                });
-
-                                return false;
-                            }
-
-                            $('#refresh-filter').bind('click', refreshFilterResults);
-
-                            $('#filterExisting').bind('click', function() {
-                                if(this.checked) {
-                                    $('#filter-count').show();
-                                    refreshFilterResults();
-                                }
-                                else $('#filter-count').hide();
-                            });
-                        </script>
-
-                    </div>
+</div>
 
 <script type="text/javascript">
     $(document).ready(function() {
