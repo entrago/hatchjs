@@ -30,7 +30,7 @@ function findPageAndWidget(c) {
     var widgetId = c.req.query.widgetId || c.req.params.widgetId;
     c.req.group.definePage(c.req.pagePath, c, function (err, page) {
         self.page = c.req.page = page;
-        c.canEdit = c.req.user.canEdit;
+        c.canEdit = c.req.user && c.req.user.adminOf(c.req.group);
         if (widgetId) {
             self.widget = page.widgets[widgetId];
             if (!self.widget.settings) self.widget.settings = {};

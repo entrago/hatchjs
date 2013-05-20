@@ -44,7 +44,7 @@ module.exports = function (compound) {
         app.use(hatch.middleware(compound));
         app.use(app.router);
         app.use(function (err, req, res, next) {
-            if (req.params.format === 'json') {
+            if (req.params && req.params.format === 'json') {
                 console.log(err.stack || err);
                 return res.send({
                     code: err.code == '404' ? 404 : 500,
