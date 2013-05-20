@@ -1,16 +1,13 @@
 var should = require('./');
-var app, compound, Content;
+var app, compound, Content, Group;
 
 describe('Content', function() {
 
-    before(function (done) {
-        app = require('../')();
+    before(function(done) {
+        app = getApp(done);
         compound = app.compound;
-        compound.on('ready', function () {
-            Content = compound.models.Content;
-            Content.destroyAll(done);
-            Group = compound.models.Group;
-        });
+        Content = compound.models.Content;
+        Group = compound.models.Group;
     });
 
     it('should create content with a URI and a URL', function (done) {

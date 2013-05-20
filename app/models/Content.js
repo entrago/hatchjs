@@ -180,8 +180,6 @@ module.exports = function (compound, Content) {
                     data.url += '-' + (data.createdAt || new Date(0)).getTime();
                 }
 
-                console.log("Content URL set to: " + data.url);
-
                 return done();
             })
         }

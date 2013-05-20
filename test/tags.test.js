@@ -1,18 +1,13 @@
 var should = require('./');
 var app, compound, Content, Tag;
 
-describe('tags', function() {
+describe('Tag', function() {
 
     before(function (done) {
-        app = require('../')();
+        app = getApp(done);
         compound = app.compound;
-        compound.on('ready', function () {
-            Content = compound.models.Content;
-            Tag = compound.models.Tag;
-            Tag.destroyAll(function() {
-                Content.destroyAll(done);
-            });
-        });
+        Content = compound.models.Content;
+        Tag = compound.models.Tag;
     });
 
     it('should get all content tagged with "popular" sorted by "score desc"', function (done) {
@@ -29,7 +24,7 @@ describe('tags', function() {
         });
 
         popular.save(function () {
-            popular.updateModel();    
+            popular.updateModel();
 
             Content.create({
                 createdAt: new Date(),

@@ -4,18 +4,11 @@ var should = require('should');
 
 describe('Group', function() {
 
-    before(function (done) {
-        app = getApp();
+    before(function(done) {
+        app = getApp(done);
         compound = app.compound;
-        compound.on('ready', function() {
-            Group = compound.models.Group;
-            Page = compound.models.Page;
-            Group.destroyAll(function() {
-                Page.destroyAll(function() {
-                    compound.seed(done);
-                });
-            });
-        });
+        Group = compound.models.Group;
+        Page = compound.models.Page;
     });
 
     it('should create clone', function(done) {

@@ -145,7 +145,6 @@ module.exports = function (compound, Page) {
          * @param  {Function} done [continuation function]
          */
         function cascadingUpdate(root, done) {
-            console.log('cascading update page url');
             Page.all({where: {groupId: root.groupId}}, function (err, pages) {
                 var subtree = Page.tree(pages, root.id);
                 var wait = subtree.length;
@@ -203,8 +202,6 @@ module.exports = function (compound, Page) {
 
             var currentUrl = this.url;
 
-            console.log(parentUrl);
-
             Page.all({where: {url: parentUrl}}, function (err, parent) {
                 if (err) {
                     return done(err);
@@ -221,7 +218,6 @@ module.exports = function (compound, Page) {
                 data.parentId = parent.id;
                 data.groupId = parent.groupId;
 
-                console.log(data);
                 done(null, data);
             });
         } 
@@ -433,7 +429,6 @@ module.exports = function (compound, Page) {
      * @param  {[Number]} groupId [id of group to update]
      */
     Page.updateGroup = function (groupId, next) {
-        console.log('updating group');
         var Group = compound.models.Group;
         Group.find(groupId, function (err, group) {
             if(!group) {
@@ -467,7 +462,6 @@ module.exports = function (compound, Page) {
         template.widgets.forEach(function (w) {
             w.notEditable = true;
             w.templateWidget = true;
-            console.log(w.id);
         });
 
         template.columns.forEach(function (col, i) {

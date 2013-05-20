@@ -103,8 +103,8 @@ module.exports = function (compound, Group) {
         var page = c.req.page || this.matchPage(path);
 
         if (c.req.page) {
-            console.log('got page from request')
-            console.log(page.show)
+            // console.log('got page from request')
+            // console.log(page.show)
         }
 
         // special page out of this group (sp.defaultPage)
@@ -219,14 +219,12 @@ module.exports = function (compound, Group) {
         }
 
         function createHomepage(done) {
-            console.log('createHomepage', pages);
             pages.forEach(function (p) {
                 if (p.url === newUrl + '/') {
                     p.url = newUrl;
                     var oldId = p.id;
                     delete p.id;
                     Page.create(p, function (err, page) {
-                        console.log('dasda');
                         group.homepage.id = page.id;
                         group.save(done);
                         pages.forEach(function (p) {
@@ -240,7 +238,6 @@ module.exports = function (compound, Group) {
         }
 
         function createTemplates(done) {
-            console.log('createTemplates');
             var wait = 1;
             pages.forEach(function (p) {
                 if (p.type === 'template') {
@@ -268,7 +265,6 @@ module.exports = function (compound, Group) {
         }
 
         function createPages() {
-            console.log('createPages');
             var p = pages.shift();
             if (!p) {
                 Page.updateGroup(group.id);
@@ -316,7 +312,6 @@ module.exports = function (compound, Group) {
                 if (sph.handler) {
                     console.log('got special page for that event', name);
                     sph.handler(env, function () {
-                        console.log(env.req.page.toObject());
                         // and then pass controll to admin/page#show (using pubsub->page)
                         env.api.pubsub.emit('page', env);
                     });
