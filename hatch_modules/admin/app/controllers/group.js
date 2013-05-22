@@ -52,10 +52,10 @@ require('util').inherits(GroupController, Application);
  *                       c.tab - settings tab to show
  */
 GroupController.prototype.settings = function (c) {
-    c.locals.tab = c.req.params.tab || 'settings';
+    var tab = c.locals.tab = c.req.params.tab || 'settings';
     c.locals.pageName = 'group-'  + c.locals.tab;
     c.locals.group = c.req.group;
-    c.render();
+    c.render(tab);
 };
 
 /**

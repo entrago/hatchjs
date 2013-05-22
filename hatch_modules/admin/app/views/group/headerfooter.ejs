@@ -1,0 +1,93 @@
+<div class="row-fluid">
+
+    <% include _sidebar %>
+
+    <div class="span10">
+        <div class="module">
+            <div class="content">
+
+                <%- formTagBegin({ action: pathTo.groupSave, id: 'settingsForm', class: 'form-vertical', method: 'post', enctype: 'multipart/form-data', remote: true }) -%>
+
+                    <h3><%- t('group.headers.headerfooter') %></h3>
+
+                    <hr/>
+
+                    <div class="control-group">
+                        <label class="control-label" for="navBarType">
+                            <%- t('group.labels.navbarType') %>
+                        </label>
+                        <div class="controls">
+                            <select id="navBarType" name="navBarType">
+                                <option value="default"><%- t('group.labels.navbarDefault') %></option>
+                                <option value="fixed" <%- group.navBarType === 'fixed' ? 'selected="selected"':'' %>><%- t('group.labels.navbarFixed') %></option>
+                                <option value="mouseover" <%- group.navBarType === 'mouseover' ? 'selected="selected"':'' %>><%- t('group.labels.navbarMouseover') %></option>
+                                <option value="click" <%- group.navBarType === 'click' ? 'selected="selected"':'' %>><%- t('group.labels.navbarMouseclick') %></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="navBarStyle">
+                            <%- t('group.labels.navbarStyle') %>
+                        </label>
+                        <div class="controls">
+                            <select id="navBarStyle" name="navBarStyle">
+                                <option value="default"><%- t('group.labels.navbarDefault') %></option>
+                                <option value="inverse" <%- group.navBarStyle === 'inverse' ? 'selected="selected"':'' %>><%- t('group.labels.navbarInverse') %></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr/>
+
+                    <div class="control-group">
+                        <label class="control-label" for="headerHtml">
+                            <span>
+                                <%- t('group.labels.headerHtml') %>
+                                <i class="icon-info-sign" rel="popover" title="<%- t('common.help') %>" data-content="<%- t('group.help.headerHtml') %>"></i>
+                            </span>
+                        </label>
+                        <div class="controls">
+                            <textarea class="input-xlarge span6 richtext" id="headerHtml" name="headerHtml" rows="10"><%- group.headerHtml %></textarea>
+                        </div>
+                    </div>
+
+                    <hr/>
+
+                    <div class="control-group">
+                        <label class="control-label" for="footerHtml">
+                            <span>
+                                <%- t('group.labels.footerHtml') %>
+                                <i class="icon-info-sign" rel="popover" title="<%- t('common.help') %>" data-content="<%- t('group.help.footerHtml') %>"></i>
+                            </span>
+                        </label>
+                        <div class="controls">
+                            <textarea class="input-xlarge span6 richtext" id="footerHtml" name="footerHtml" rows="10"><%- group.footerHtml %></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"><%- t('group.actions.save') %></button>
+                    </div>
+
+                <%- formTagEnd() %>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        //bind the form ajax
+        $('#settingsForm').bind('ajax:success', function(e, data) {
+            $.noty({text: '<i class="icon-' + data.icon + '"></i> ' + data.message, type: data.status});
+
+            //refresh the page
+            setTimeout(function() { window.location = window.location; }, 1000);
+        });
+
+        //convert richtexts
+        setupRichtextEditors(null, { fixed: false });
+    });
+</script>
