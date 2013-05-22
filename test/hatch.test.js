@@ -16,11 +16,11 @@ describe('Hatch', function() {
         mod.compound.on('ready', function() {
             done();
         });
-        mod.info.name.should.equal('simple-module');
+        mod.info.name.should.equal('simple');
     });
 
     it('should load widgets', function(done) {
-        hatch.loadModuleFromPath('widgets', __dirname + '/fixtures/widgets');
+        hatch.loadModule('widgets', __dirname + '/fixtures/widgets');
         done();
     });
 
