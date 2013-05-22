@@ -2,7 +2,7 @@ module.exports = function (compound) {
 
     var express = require('express');
     var app = compound.app;
-    var hatch = require(app.root + '/lib/hatch');
+    var hatch = compound.hatch;
 
     var MemoryStore = express.session.MemoryStore;
     var RedisStore = require('connect-redis')(express);
@@ -39,9 +39,9 @@ module.exports = function (compound) {
             cookie: { maxAge: 86400000 * 365 }
         }));
         app.use(express.methodOverride());
-        app.use(hatch.rewrite(compound));
-        app.use('/do', hatch.modules(compound));
-        app.use(hatch.middleware(compound));
+        app.use(hatch.middleware.rewrite(compound));
+        app.use('/do', hatch.mediator);
+        app.use(hatch.middleware.hatch(compound));
         app.use(app.router);
         app.use(function (err, req, res, next) {
             if (req.params && req.params.format === 'json') {

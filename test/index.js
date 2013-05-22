@@ -17,16 +17,18 @@ if (!process.env.TRAVIS) {
 var Seed = require('seedjs/lib/seed.js');
 var supertest = require('supertest');
 
-var app = require('../')();
-var seed = new Seed(app.compound);
+var app;
 
 before(function(done) {
-    var schema = app.compound.orm._schemas[0];
-    if (schema.connected) {
-        done();
-    } else {
-        schema.once('connected', done);
-    }
+    app = require('../')();
+    app.compound.on('ready', function() {
+        var schema = app.compound.orm._schemas[0];
+        if (schema.connected) {
+            done();
+        } else {
+            schema.once('connected', done);
+        }
+    });
 });
 
 global.getApp = function(done) {
