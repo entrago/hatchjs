@@ -1,7 +1,7 @@
 var path = require('path');
 
 exports.__ = function (s) {
-    return '<span style="color: red;">' + s + '</span>';
+    return s;
 };
 
 exports.renderPartial = function (view) {
@@ -11,7 +11,7 @@ exports.renderPartial = function (view) {
         view = path.join(this.controllerName, view).replace(/\\/g, "/");
         view = this.compound.structure.views[view];
     }
-    
+
     this.res.render(view, this.viewContext, done);
     
     function done (err, html) {
