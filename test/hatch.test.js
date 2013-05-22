@@ -24,5 +24,13 @@ describe('Hatch', function() {
         done();
     });
 
+    it('should register core model', function() {
+        var CoreModel = {modelName: 'CoreModel'};
+        hatch.registerCoreModel(CoreModel);
+        should.exist(hatch.modules.simple.compound.models.CoreModel);
+        should.exist(hatch.modules.widgets.compound.models.CoreModel);
+        should.exist(hatch.compound.models.CoreModel);
+    });
+
 });
 
