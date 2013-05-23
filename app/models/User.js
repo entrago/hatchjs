@@ -765,6 +765,12 @@ module.exports = function (compound, User) {
         delete obj.mailSettings;
         delete obj.fulltext;
         delete obj.type;
+        delete obj.membershipGroupId;
+        delete obj.memberGroupId;
+        delete obj.pendingGroupId;
+        delete obj.editorGroupId;
+        delete obj.blacklistedGroupId;
+        delete obj.inviteGroupId;
 
         return obj;
     };

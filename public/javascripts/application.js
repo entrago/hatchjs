@@ -15,7 +15,7 @@ $(function () {
         return false;
     });
 
-    $('.inline-edit').on('contents-updated', updateWidgetContent);
+    $(document).on('contents-updated', '.inline-edit', updateWidgetContent);
 
     $('.module-controls > .delete').on('click', function (e) {
         e.stopPropagation();
@@ -28,27 +28,26 @@ $(function () {
 
     $(document).on('page-reorder', '.page-item', savePageOrder);
 
-    $('.widget-settings-form').on('ajax:success', function (e, data) {
+    $(document).on('ajax:success', '.widget-settings-form', function (e, data) {
         $.noty({ text: '<i class="icon-ok"></i> Widget settings saved', type: 'success' });
-
         $(this).modal('hide');
     });
 
-    $('[data-widget-action]').unbind().on('ajax:success', function () {
+    $(document).on('ajax:success', '[data-widget-action]', function () {
         var $el = $(this);
         var handle = $(this).attr('data-widget-action');
         var data = $(this).attr('data-widget-action-params');
         widgetAction(handle, data);
     });
 
-    $('[data-update-content]').unbind().on('ajax:success', function (e, data) {
+    $(document).on('ajax:success', '[data-update-content]', function (e, data) {
         var selector = $.map($(this).attr('data-update-content').split(':'), function (id) {
             return '[data-id=' + id + ']';
         }).join(' ');
         $(selector).replaceWith(data);
     });
 
-    $('.adjust').unbind().on('ajax:success', function (e, data) {
+    $(document).on('ajax:success', '.adjust', function (e, data) {
         //reload the widget
         widgetAction('render:' + $(this).parents(".module").attr("data-id"));
     });

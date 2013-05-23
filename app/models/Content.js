@@ -548,11 +548,13 @@ module.exports = function (compound, Content) {
      */
     Content.prototype.like = function (user, callback) {
         var self = this;
+        var doesLike = false;
 
         self.getLike(user, function (err, like) {
             if (like) {
                 like.destroy(done);
             } else {
+                doesLike = true;
                 Like.create({
                     userId: user.id,
                     contentId: self.id,
@@ -565,7 +567,7 @@ module.exports = function (compound, Content) {
         function done(err) {
             if (callback) {
                 Content.find(self.id, function (err, content) {
-                    callback(err, content);
+                    callback(err, content, doesLike);
                 });
             }
         }
