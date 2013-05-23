@@ -19,7 +19,6 @@
 module.exports = function (compound, Content) {
     'use strict';
 
-    var api = compound.hatch.api;
     var User = compound.models.User;
     var Page = compound.models.Page;
     var Comment = compound.models.Comment;
@@ -120,7 +119,7 @@ module.exports = function (compound, Content) {
     };
 
     /**
-     * gets the total likes - total dislikes
+     * Get the total likes - total dislikes
      * 
      * @return {[Number]} 
      */
@@ -129,7 +128,7 @@ module.exports = function (compound, Content) {
     };
 
     /**
-     * before content is saved, make sure all automatic tag filters are applied
+     * Before content is saved, make sure all automatic tag filters are applied
      * 
      * @param  {Function} done [continuation function]
      */
@@ -277,6 +276,7 @@ module.exports = function (compound, Content) {
      * @return {[String]} 
      */
     Content.prototype.permalink = function () {
+        return 'PERMALINK NOT IMPLEMENTED';
         var sp = api.module.getSpecialPageByContentType(this.type);
         if (!sp) {
             // throw new Error('Content type ' + this.type + ' is not supported');
@@ -391,7 +391,7 @@ module.exports = function (compound, Content) {
     }
 
     /**
-     * gets the news feed for the specified user
+     * Get the news feed for the specified user
      * 
      * @param  {[params]}   params 
      * @param  {Function}   callback [continuation function]
@@ -416,7 +416,7 @@ module.exports = function (compound, Content) {
     };
 
     /**
-     * registers a page view for this content and saves
+     * Register a page view for this content and saves
      */
     Content.prototype.registerView = function() {
         this.views ++;
@@ -424,7 +424,7 @@ module.exports = function (compound, Content) {
     };
 
     /**
-     * calculates the total number of replies to this post
+     * Calculate the total number of replies to this post
      * 
      * @param  {Function} callback [continuation function]
      */
