@@ -1,5 +1,5 @@
 icon: "icon-cogs"
-name: "Management area"
+name: "admin"
 version: "0.0.1"
 description: "Admin module, manages core entities of the hatch platform"
 system: true
