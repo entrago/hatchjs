@@ -31,8 +31,8 @@ $(document).ready(function() {
     }
 
     //validation and default ajax handlers
-    //redirect
-    $('*[data-remote=true]').on("ajax:success", function(e, data) {
+    //redirect or show message
+    $(document).on("ajax:success", '*[data-remote=true]', function(e, data) {
         var timeout = data.message && 2000 || 0;
         if (data.redirect) {
             console && console.error('Deprecated redirect to ' + data.redirect);
@@ -40,9 +40,15 @@ $(document).ready(function() {
                 window.location = data.redirect;
             }, timeout);
         }
+        if (data.message) {
+            $.noty({
+                type: data.status || 'success',
+                text: '<i class="icon-' + (data.icon || 'ok') + '"></i> ' + data.message
+            });
+        }
     });
     //errors
-    $('*[data-remote=true]').on("ajax:error", function(xhr, status, error) {
+    $(document).on("ajax:error", '*[data-remote=true]', function(xhr, status, error) {
         var data = JSON.parse(status.responseText);
         var message = '';
         var fields = [];
