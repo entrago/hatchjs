@@ -23,10 +23,9 @@ var middleware = require('./lib/middleware');
 var path = require('path');
 
 module.exports = function (parent) {
-    parent.on('structure', function(s) {
-        s.controllers.setup = SetupController;
-        s.views['setup/show'] = path.join(__dirname, 'views/setup.ejs');
-    });
+    var s = parent.structure;
+    s.controllers.setup = SetupController;
+    s.views['setup/show'] = path.join(__dirname, 'views/setup.ejs');
 
     process.nextTick(function () {
         parent.injectMiddlewareAfter('hatchMiddleware', middleware(parent));
