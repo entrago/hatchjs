@@ -126,7 +126,7 @@ module.exports = function (compound, Tag) {
                     var tag = {
                         title: tagId,
                         groupId: obj.groupId,
-                        type: obj.tagModelName || obj.constructor.modelName,
+                        type: data.tagModelName || obj.tagModelName || obj.constructor.modelName,
                         sortOrder: 'id DESC'
                     };
 
