@@ -16,9 +16,13 @@
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
 
-module.exports = function(compound) {
-    compound.on('ready', function () {
+var compound = require('compound');
+
+module.exports = function(c) {
+    c.on('ready', function () {
         var media = require('./app/models/Media');
         media(compound, compound.models.Media);
     });
+
+    return compound.createServer({root: __dirname});
 };
