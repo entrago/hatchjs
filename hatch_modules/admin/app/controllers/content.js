@@ -55,14 +55,9 @@ function renderInputForm(c, next) {
     c.locals.datetimeformat = c.app.get('datetimeformat');
 
     c.prepareViewContext();
-    c.renderView('content/edit/' + contentType.name, function (err, html) {
-        if (err) {
-            html = err;
-        }
+    c.locals.editForm = c.renderContent(c.locals.post, 'editForm');
 
-        c.locals.editForm = html;
-        next();
-    });
+    next();
 }
 
 // Load content based on the current filter/critera
