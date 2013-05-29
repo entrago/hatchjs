@@ -115,7 +115,11 @@ module.exports = function (compound, Content) {
      * @return {String} - concatenated tag names
      */
     Content.getter.tagNames = function () {
-        return this.tags.pluck('title').join(', ');
+        if (this.tags.length === 0) {
+            return '';
+        } else {
+            return this.tags.pluck('title').join(', ');
+        }
     };
 
     /**

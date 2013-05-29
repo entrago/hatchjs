@@ -3,8 +3,8 @@
 <% } %>
 <% modulesEnabled.forEach(function(inst) { %>
     <% if(!inst.module || !inst.module.info.settings) { return; } %>
-    <%- li('module-' + inst.module.info.name) %>
-        <%- linkTo(icon(inst.module.info.icon) + ' ' + inst.module.info.title, pathTo.setupModule(inst.module.info.name)
+    <%- li('module-' + inst.module.name) %>
+        <%- linkTo(icon(inst.module.info.icon) + ' ' + inst.module.info.title, pathTo.setupModule(inst.module.name)
 ) %>
     <%- liEnd %>
 <% }) %>

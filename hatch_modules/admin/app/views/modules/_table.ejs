@@ -23,7 +23,7 @@
                     <%- icon(module.info.icon || 'cog') %>
                 </td>
                 <td>
-                    <%= module.info.title || module.info.name %>
+                    <%= module.info.title || module.name %>
                 </td>
                 <td>
                     <%= module.info.description || '' %>
@@ -32,19 +32,19 @@
                     <%- moduleEnabled(module.info.name) ? icon(moduleConfigured(module.info.name) ? 'ok' : 'warning-sign') : '' %>
                 </td>
                 <td nowrap="nowrap" align="right">
-                    <% if (moduleEnabled(module.info.name)) { %>
+                    <% if (moduleEnabled(module.name)) { %>
                         <% if (module.info.settings) { %>
                             <%- linkTo(
                                 t('modules.actions.edit'),
-                                pathTo.setupModule(module.info.name)
+                                pathTo.setupModule(module.name)
                             ) %>&nbsp;
                         <% } %>
-                        <a rel="tooltip" data-original-title="<%- t('modules.help.disable') %>" href="<%- pathTo.disableModule(module.info.name) %>">
+                        <a rel="tooltip" data-original-title="<%- t('modules.help.disable') %>" href="<%- pathTo.disableModule(module.name) %>">
                             <i class="icon-remove"></i></a>
                     <% } else { %>
                         <%- linkTo(
                             t('modules.actions.enable'),
-                            pathTo.enableModule(module.info.name)
+                            pathTo.enableModule(module.name)
                         ) %>
                     <% } %>
                 </td>
