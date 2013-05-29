@@ -420,7 +420,7 @@ module.exports = function (compound, Group) {
      * @return {[ModuleInstance]}      [module]
      */
     Group.prototype.getModule = function(name) {
-        return _.find(this.modules, function(module) {
+        return _.find(this.modules.items, function(module) {
             return module && module.name == name;
         });
     };
