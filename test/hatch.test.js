@@ -24,6 +24,11 @@ describe('Hatch', function() {
         done();
     });
 
+    it('should load pages', function(done) {
+        hatch.loadModule('pages', __dirname + '/fixtures/pages');
+        done();
+    });
+
     it('should register core model', function() {
         var CoreModel = {modelName: 'CoreModel'};
         hatch.registerCoreModel(CoreModel);
