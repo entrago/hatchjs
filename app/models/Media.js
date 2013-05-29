@@ -40,9 +40,26 @@ module.exports = function (compound, Media) {
         var uploadPath = compound.app.get('upload path');
         var filename = path.join(uploadPath, new Date().getTime() + '-' + url.split('/').slice(-1)[0]);
 
-        request.get(url, function (err, resp, body) {
-            Media.createWithFilename(filename, params, callback);
-        }).pipe(fs.createWriteStream(filename));
+        // videos we just create directly with the url
+        if (Media.isVideo(filename)) {
+            var data = { url: url };
+            data = _.extend(data, params);
+
+            // if we have a video encoder, run now
+            if (Media.encodeVideo) { 
+                Media.encodeVideo(data, function (err, data) {
+                    Media.create(data, callback);
+                });
+            } else {
+                Media.create(data, callback);
+            }
+        } 
+        // other files we download first and then re-upload 
+        else {
+            request.get(url, function (err, resp, body) {
+                Media.createWithFilename(filename, params, callback);
+            }).pipe(fs.createWriteStream(filename));
+        }
     };
 
     /**
@@ -205,11 +222,11 @@ module.exports = function (compound, Media) {
     };
 
     /**
-     * Get the image URL for the specified size. Will retrive the image equal to
+     * Get the media URL for the specified size. Will retrive the media equal to
      * or greater than the specified size.
      * 
-     * @param  {String} size - image size to look for
-     * @return {String}      - URL for the resized image
+     * @param  {String} size - media size to look for
+     * @return {String}      - URL for the resized media
      */
     Media.prototype.getUrl = function (size) {
         var i;
@@ -221,15 +238,19 @@ module.exports = function (compound, Media) {
         var width = parseInt(size.split('x')[0]);
         var height = parseInt(size.split('x')[1] || 0);
 
-        // check for larger/equal images
+        // check for larger/equal media
         for (i=0; i < this.resized.length; i++) {
             var resize = this.resized.items[i];
             if (resize.width >= width && resize.height >= height) {
-                return this.url.split('/').slice(0, -1).join('/') + '/' + resize.filename;
+                if (resize.url) {
+                    return resize.url;
+                } else {
+                    return this.url.split('/').slice(0, -1).join('/') + '/' + resize.filename;
+                }
             }
         }
 
-        // fallback - return the default image url
+        // fallback - return the default media url
         return this.url;
     };
 

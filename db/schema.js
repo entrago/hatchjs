@@ -219,6 +219,7 @@ var Activity = define('Activity', function () {
 var Media = define('Media', function () {
     property('type', String, {index: true});
     property('userId', Number, {index: true});
+    property('groupId', Number, {index: true});
     property('createdAt', Date);
     property('url', String);
     property('width', Number);
