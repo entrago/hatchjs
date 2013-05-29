@@ -82,4 +82,6 @@ module.exports = function (compound, Media) {
         });
     };
 
+    Media.uploadToCDN = Media.uploadToS3;
+
 };
