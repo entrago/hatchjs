@@ -25,20 +25,22 @@ module.exports = function (compound, AccessToken) {
      * Load the auth token from the current request object and then load the
      * User attached to this token.
      * 
-     * @param  {HttpRequest}   req      - current request
-     * @param  {Function}      callback - callback function
+     * @param  {String} token - string representing access token.
+     * @param  {Function} callback - called with (err, user).
      */
-    AccessToken.loadFromRequest = function (req, callback) {
-        var token = req.headers.token || req.body.token || req.query.token;
+    AccessToken.loadUser = function (token, callback) {
 
         // if there is no token present, just continue
         if (!token) {
-            return callback();
+            throw new Error('No access token given');
         }
 
-        AccessToken.findOne({ where: { token: token }}, function (err, token) {
+        AccessToken.findOne({where: {token: token }}, function (err, token) {
             if (token) {
                 User.find(token.userId, function (err, user) {
+                    if (err) {
+                        return callback(err);
+                    }
                     // validate the token
                     if (!user) {
                         return callback(new Error('User in access token not found'));
@@ -47,10 +49,7 @@ module.exports = function (compound, AccessToken) {
                         return callback(new Error('Access token is invalid'));
                     }
 
-                    req.user = user;
-                    req.token = token;
-
-                    callback();
+                    callback(null, user);
                 });
             } else {
                 callback();
@@ -70,7 +69,7 @@ module.exports = function (compound, AccessToken) {
     /**
      * Generate a new token for the specified user/client and save to the 
      * database and return via callback.
-     * 
+     *
      * @param  {Number}   userId        - Id of the user
      * @param  {Number}   clientId      - Id of the client application
      * @param  {Object}   scope         - scope of access
