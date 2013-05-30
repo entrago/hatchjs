@@ -129,8 +129,10 @@ $(document).ready(function() {
             if (error.context) {
                 text = t('errors.' + error.context + '.' + error.name);
             }
-            if (!text) {
+            if (!text && (error.name || error.message)) {
                 text = t('errors.default.' + error.name, error.message);
+            } else {
+                text = 'An error has occured';
             }
             $.noty({
                 type: 'error',
