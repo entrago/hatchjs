@@ -14,6 +14,8 @@
         type: 'page'
         order: 0
         level: 0
+    pageUrls:
+      - 'localhost:3000'
     modules:
       -
         name: user
@@ -85,6 +87,7 @@
     password: 'secr3t'
     email: 'user101@hatchplatform.com'
     avatar: '/img/default-profile-pic.png'
+    type: 'administrator'
     memberships:
       -
         groupId: 1

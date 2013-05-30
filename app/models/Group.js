@@ -28,6 +28,30 @@ module.exports = function (compound, Group) {
 
     Group.hasMany(Page, {as: 'pages', foreignKey: 'groupId'});
 
+    /**
+     * Before a group is saved, make sure the URLs are up to date.
+     * 
+     * @param  {JSON}     data - data to save
+     * @param  {Function} next - continuation function
+     */
+    Group.beforeCreate = Group.beforeSave = function (next, data) {
+        if (data.id) {
+            Group.updatePageUrls(data, next);
+        } else {
+            data.createdAt = new Date();
+            next();
+        }
+    };
+
+    Group.updatePageUrls = function (group, callback) {
+        Page.all({ where: { groupId: group.id }}, function (err, pages) {
+            console.log('UPDATE PAGE URLS')
+
+            group.pageUrls = _.pluck(pages, 'url');
+            callback();
+        });
+    };
+
     Group.getter.path = function () {
         return this._url && this._url.replace(/[^\/]+/, '');
     };
@@ -107,6 +131,8 @@ module.exports = function (compound, Group) {
             // console.log(page.show)
         }
 
+        console.log(page)
+
         // special page out of this group (sp.defaultPage)
         if (page && page.type !== 'page' && !page.id) {
             if (page.handler) {
@@ -136,8 +162,6 @@ module.exports = function (compound, Group) {
 
             // store the page in the request
             c.req.page = page;
-            console.log('type = ' + typeof page)
-
             cb(err, page);
         }
 
@@ -157,15 +181,15 @@ module.exports = function (compound, Group) {
      * clones a group and saves the new one to the database
      * 
      * @param  {[params]}   params [clone parameters]
-     * @param  {Function}   cb     [continuation function]
+     * @param  {Function}   callback     [continuation function]
      */
-    Group.prototype.clone = function (params, cb) {
+    Group.prototype.clone = function (params, callback) {
         var oldGroup = this;
         var newUrl = params.url;
         var newName = params.name;
 
         if (!newUrl || !newName) {
-            return cb(new Error('Name and URL required'));
+            return callback(new Error('Name and URL required'));
         }
 
         var g = oldGroup.toObject();
@@ -188,7 +212,7 @@ module.exports = function (compound, Group) {
 
         Page.findOne({where: { url: newUrl }}, function (err, p) {
             if (p) {
-                return cb(new Error('URL already taken'));
+                return callback(new Error('URL already taken'));
             }
             createGroup();
         });
@@ -202,7 +226,7 @@ module.exports = function (compound, Group) {
                     group = gg;
                     oldGroup.pages(function (err, ps) {
                         if (ps.length === 0) {
-                            return cb(null, group);
+                            return callback(null, group);
                         }
                         pages = Page.tree(ps).map(function (page) {
                             var p = page.toObject();
@@ -268,7 +292,7 @@ module.exports = function (compound, Group) {
             var p = pages.shift();
             if (!p) {
                 Page.updateGroup(group.id);
-                return cb(null, group);
+                return callback(null, group);
             }
             var oldId = p.id;
             delete p.id;
@@ -282,6 +306,32 @@ module.exports = function (compound, Group) {
             });
         }
     };
+
+    /**
+     * Set the specified user as the owner of this group.
+     * 
+     * @param {User}     user     - new owner
+     * @param {Function} callback - callback function
+     */
+    Group.prototype.setOwner = function (user, callback) {
+        var membership = user.memberships.find(this.id, 'groupId');
+        
+        if (!membership) {
+            membership = {
+                groupId: this.id,
+                joinedAt: new Date(),
+                role: 'owner',
+                state: 'accepted'
+            };
+
+            user.memberships.push(membership);
+        }
+        
+        membership.role = 'owner';
+        membership.state = 'accepted';
+
+        user.save(callback);
+    }
 
     // TODO: deprecate
     Group.prototype.handle = function groupEventHandler(name, env, done) {

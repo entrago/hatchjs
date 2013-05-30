@@ -7,7 +7,7 @@ before('init env', function (c) {
     locals._ = _;
     locals.group = req.group;
     locals.user = req.user;
-    locals.data = body.data && JSON.parse(body.data).data;
+    locals.data = body.data;
     locals.canEdit = req.user && req.group && req.user.adminOf(req.group);
     locals.inlineEditAllowed = locals.canEdit;
 
@@ -18,8 +18,9 @@ before('init env', function (c) {
             return send('Widget not found');
         }
         locals.page = page;
-        var wc = req.data.templateWidget ? 'templateWidgets' : 'widgets';
-        locals.widget = page[wc][req.data.widgetId];
+        var wc = req.body.data.templateWidget ? 'templateWidgets' : 'widgets';
+        locals.widget = page[wc][req.body.data.widgetId];
+
         if (locals.widget) {
             locals.widget.settings = locals.widget.settings || {};
         }

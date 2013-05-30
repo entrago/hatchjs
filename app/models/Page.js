@@ -383,8 +383,9 @@ module.exports = function (compound, Page) {
         //         cb(err, res && res.body);
         //     }
         // );
+        // 
         
-        inAppRequest(req, url, { token: 'test', data: JSON.stringify(data) }, function(err, res) {
+        inAppRequest(req, url, { token: 'test', data: data }, function(err, res) {
             cb(err, res);
         });
 
