@@ -158,7 +158,7 @@
             }
         });
 
-        $("a[rel=delete-field]").die().live("click", function() {
+        $("a[rel=delete-field]").on("click", function() {
             var el = this;
             if(confirm("<%- t('users.help.deleteProfileField') %>")) {
                 $.post(this.href, { success: function() {
