@@ -47,7 +47,7 @@ module.exports = function (compound, Activity) {
             };
 
             var afterCreate = model.afterCreate;
-            Content.afterCreate = function (done, obj) {
+            model.afterCreate = function (done, obj) {
                 var self = this;
                 Activity.generateActivity(obj || self, model.modelName, 'create', next);
 
