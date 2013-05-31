@@ -7,7 +7,8 @@ before('init env', function (c) {
     locals._ = _;
     locals.group = req.group;
     locals.user = req.user;
-    locals.data = body.data && JSON.parse(body.data).data;
+    req.data = body.data && JSON.parse(body.data);
+    locals.data = req.data && req.data.data;
     locals.canEdit = req.user && req.group && req.user.adminOf(req.group);
     locals.inlineEditAllowed = locals.canEdit;
 
