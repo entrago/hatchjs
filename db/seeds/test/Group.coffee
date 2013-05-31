@@ -4,7 +4,10 @@ Group.seed ->
     path: ''
     name: 'Dev Group'
     subgroups: [{"path":"/extranet","id":2}]
-    pagesCache: [{"id":1,"title":"Dev Group","url":"example.com","order":null,"level":0,"parentId":null,"type":null,"hideFromNavigation":null}]
+    pagesCache: [
+      {"id":1,"title":"Dev Group","url":"example.com","order":null,"level":0,"parentId":null,"type":null,"hideFromNavigation":null},
+      {"id":3, "title": "501 error", "type": "501", "hideFromNavigation": true}
+    ]
     homepage: {"id":"1","title":"Dev Group","url":"example.com","order":null,"parentId":null,"type":null,"hideFromNavigation":null}
     modules: [{"name":"user","contract":{"google":true,"local":true}},
       {"name":"admin"},{"name":"core"},{"name":"stylesheet"},

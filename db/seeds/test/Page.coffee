@@ -36,3 +36,21 @@ Page.seed ->
     parentId: null
     groupId: 2
 
+Page.seed ->
+    id: 3
+    title: '501'
+    url: 'example.com'
+    customUrl: null
+    grid: '02-two-columns'
+    columns: [{"size":"4","widgets":[1]},{"size":"6","widgets":[]},{"size":"6","widgets":[]}]
+    widgets: [{"id":1,"type":"core-widgets/static","settings":{"title":"Hello world", "content": "Click me to edit"}}]
+    metaTitle: null
+    metaDescription: null
+    metaKeywords: null
+    type: null
+    tags: null
+    hideFromNavigation: true
+    order: null
+    templateId: null
+    parentId: null
+    groupId: 1
