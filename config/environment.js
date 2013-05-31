@@ -23,11 +23,7 @@ module.exports = function (compound) {
         app.set('timeformat', 'HH:mm:ss');
         app.set('datetimeformat', app.get('dateformat') + ' ' + app.get('timeformat'));
 
-        // TODO move render speed hook to proper place
-        compound.injectMiddlewareAt(2, function timeLogger(req, res, next) {
-            req.startedAt = Date.now();
-            next();
-        });
+        compound.injectMiddlewareAt(2, hatch.middleware.timeLogger(compound));
 
         app.use(express.static(app.root + '/public', { maxAge: 86400000 }));
         app.use(express.bodyParser());
@@ -43,37 +39,7 @@ module.exports = function (compound) {
         app.use('/do', hatch.mediator);
         app.use(hatch.middleware.hatch(compound));
         app.use(app.router);
-        app.use(function (err, req, res, next) {
-            if (req.params && req.params.format === 'json') {
-                console.log(err.stack || err);
-                return res.send({
-                    code: err.code == '404' ? 404 : 500,
-                    error: err
-                });
-            }
-            if (err.message == '404') {
-                if (req.group) {
-                    var found;
-                    req.group.pagesCache.forEach(function (p) {
-                        if (p.type === '404') found = p;
-                    });
-                    if (found) {
-                        app.compound.models.Page.find(found.id, function (e, p) {
-                            req.page = p;
-                            compound.controllerBridge.callControllerAction(
-                                'page',
-                                'render', req, res, next
-                            );
-                        });
-                        return;
-                    }
-                }
-                res.render(compound.structure.views['common/404']);
-            } else {
-                console.log(err.stack || err);
-                res.render(compound.structure.views['common/500']);
-            }
-        });
-    });
+        app.use(hatch.middleware.errorHandler(compound));
 
+    });
 };

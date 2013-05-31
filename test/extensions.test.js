@@ -142,6 +142,50 @@ describe('extensions /controller/', function() {
 
     });
 
+    describe('errors', function() {
+
+        it('should raise 404 error', test(function(c) {
+            should.exist(c.errors.NotFound);
+            var err = c.errors.NotFound('message');
+            err.should.be.instanceOf(Error);
+            err.should.be.instanceOf(c.errors.NotFound);
+            err.code.should.equal(404);
+            err.message.should.equal('message');
+            c.next();
+        }));
+
+        it('should raise 403 error', test(function(c) {
+            should.exist(c.errors.Forbidden);
+            var err = c.errors.Forbidden('message');
+            err.should.be.instanceOf(Error);
+            err.should.be.instanceOf(c.errors.Forbidden);
+            err.code.should.equal(403);
+            err.message.should.equal('message');
+            c.next();
+        }));
+
+        it('should raise 500 error', test(function(c) {
+            should.exist(c.errors.InternalError);
+            var err = c.errors.InternalError('message');
+            err.should.be.instanceOf(Error);
+            err.should.be.instanceOf(c.errors.InternalError);
+            err.code.should.equal(500);
+            err.message.should.equal('message');
+            c.next();
+        }));
+
+        it('should raise 503 widget error', test(function(c) {
+            should.exist(c.errors.WidgetError);
+            var err = c.errors.WidgetError('message');
+            err.should.be.instanceOf(Error);
+            err.should.be.instanceOf(c.errors.WidgetError);
+            err.code.should.equal(503);
+            err.message.should.equal('message');
+            c.next();
+        }));
+
+    });
+
 });
 
 function test(fn) {
