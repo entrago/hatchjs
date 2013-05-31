@@ -210,10 +210,11 @@ var Like = define('Like', function () {
 var Activity = define('Activity', function () {
     property('createdAt', Date);
     property('type', String, {index: true});
+    property('action', String, {index: true});
     property('userId', Number, {index: true});
-    property('userId', Number, {index: true});
-    property('contentId', Number, {index: true});
+    property('objectId', Number, {index: true});
     property('groupId', Number, {index: true});
+    property('object', JSON);
 
     set('defaultSort', 'createdAt DESC');
 });

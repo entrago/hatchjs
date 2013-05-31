@@ -18,6 +18,70 @@
 
 'use strict';
 
+var async = require('async');
+
 module.exports = function (compound, Activity) {
-    
+    var Content = compound.models.Content;
+    var MODELS = ['Content', 'Comment', 'Like', 'Page'];
+
+    /**
+     * Attaches event handlers to Content creation and update to automatically
+     * create an associated activity record.
+     */
+    process.nextTick(function () {
+        MODELS.forEach(function (modelName) {
+            var model = compound.models[modelName];
+
+            var afterUpdate = model.afterUpdate;
+            model.afterUpdate = function (done, obj) {
+                var self = this;
+                Activity.generateActivity(obj || self, model.modelName, 'update', next);
+
+                function next() {
+                    if (afterUpdate) {
+                        afterUpdate.call(self, done, obj);
+                    } else {
+                        done();
+                    }
+                }
+            };
+
+            var afterCreate = model.afterCreate;
+            Content.afterCreate = function (done, obj) {
+                var self = this;
+                Activity.generateActivity(obj || self, model.modelName, 'create', next);
+
+                function next() {
+                    if (afterCreate) {
+                        afterCreate.call(self, done, obj);
+                    } else {
+                        done();
+                    }
+                }
+            };
+        });
+    });
+
+    /**
+     * Generate an activity based on an action on a database object.
+     * 
+     * @param  {Object}   obj      - object being acted upon
+     * @param  {String}   action   - action
+     * @param  {Function} callback - callback function
+     */
+    Activity.generateActivity = function (obj, type, action, callback) {
+        var publicObj = obj.toPublicObject && obj.toPublicObject() || obj;
+
+        var activity = {
+            createdAt: new Date(),
+            type: type,
+            action: action,
+            userId: obj.userId || obj.authorId,
+            objectId: obj.id,
+            object: publicObj,
+            groupId: obj.groupId
+        };
+
+        Activity.create(activity, callback);
+    };
 };
