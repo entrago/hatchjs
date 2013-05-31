@@ -37,7 +37,7 @@ exports.handler = function (env, done) {
             where: { username: this.specialPageParams.username }
         }, function (err, users) {
             if (err || !users || !users[0]) {
-                return env.next(new Error(404));
+                return env.next(new env.errors.NotFound(env.req, 'Profile not found'));
             } else {
                 env.req.selectedUser = users[0];
                 done();
