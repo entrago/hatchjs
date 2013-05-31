@@ -185,8 +185,11 @@ module.exports = function (compound, User) {
     User.findByUsername = function (username, callback) {
         var cond = {};
 
-        if(username.indexOf('@') > -1) cond.email = username;
-        else cond.username = username;
+        if (username.indexOf('@') > -1) {
+            cond.email = username;
+        } else {
+            cond.username = username;
+        }
 
         User.findOne({ where: cond }, callback);
     };
