@@ -68,6 +68,7 @@ var OAuthClient = define('OAuthClient', function () {
 
 var Group = define('Group', function () {
     property('url', String, {index: true});
+    property('pageUrls', JSON, {index: true});
     property('path', String);
     property('name', String,  {fulltext: true, sort: true});
     property('type', String, {index: true});
@@ -91,6 +92,7 @@ var Group = define('Group', function () {
     property('customProfileFields', []);
     property('tags', [], {index: true});
     property('importStreams', JSON);
+    property('createdAt', Date, {sort: true});
 
     set('ignoreNullValues', true);
     set('defaultSort', 'name');
@@ -219,6 +221,7 @@ var Activity = define('Activity', function () {
 var Media = define('Media', function () {
     property('type', String, {index: true});
     property('userId', Number, {index: true});
+    property('groupId', Number, {index: true});
     property('createdAt', Date);
     property('url', String);
     property('width', Number);

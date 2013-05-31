@@ -19,8 +19,9 @@ before('init env', function (c) {
             return send('Widget not found');
         }
         locals.page = page;
-        var wc = req.data.templateWidget ? 'templateWidgets' : 'widgets';
-        locals.widget = page[wc][req.data.widgetId];
+        var wc = req.body.data.templateWidget ? 'templateWidgets' : 'widgets';
+        locals.widget = page[wc][req.body.data.widgetId];
+
         if (locals.widget) {
             locals.widget.settings = locals.widget.settings || {};
         }

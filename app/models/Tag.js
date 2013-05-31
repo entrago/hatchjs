@@ -35,7 +35,7 @@ module.exports = function (compound, Tag) {
      * @return {String} groupId+type
      */
     Tag.getter.groupIdByType = function () {
-        return this.groupId + '-' + this.type;
+        return (this.groupId || '0') + '-' + this.type;
     };
 
     /**
