@@ -11,7 +11,7 @@ if (!process.env.TRAVIS) {
         });
     }
 
-    semicov.init('lib', 'Hatch.js Core');
+    semicov.init(['lib', 'app'], 'Hatch.js Core');
 }
 
 var Seed = require('seedjs/lib/seed.js');
