@@ -93,8 +93,6 @@
     $(document).ready(function() {
         //bind the form ajax
         $('#settingsForm').bind('ajax:success', function(e, data) {
-            $.noty({text: '<i class="icon-' + data.icon + '"></i> ' + data.message, type: data.status});
-
             //refresh the page
             setTimeout(function() { window.location = window.location; }, 1000);
         });
