@@ -45,7 +45,6 @@ module.exports = function (compound, Group) {
 
     Group.updatePageUrls = function (group, callback) {
         Page.all({ where: { groupId: group.id }}, function (err, pages) {
-            console.log('UPDATE PAGE URLS')
 
             group.pageUrls = _.pluck(pages, 'url');
             callback();
@@ -243,8 +242,11 @@ module.exports = function (compound, Group) {
         }
 
         function createHomepage(done) {
+            var calledOnce = false;
             pages.forEach(function (p) {
+                if (calledOnce) return
                 if (p.url === newUrl + '/') {
+                    calledOnce = true;
                     p.url = newUrl;
                     var oldId = p.id;
                     delete p.id;
