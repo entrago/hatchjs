@@ -19,10 +19,5 @@
 var compound = require('compound');
 
 module.exports = function(c) {
-    c.on('ready', function () {
-        var media = require('./app/models/Media');
-        media(compound, compound.models.Media);
-    });
-
     return compound.createServer({root: __dirname});
 };

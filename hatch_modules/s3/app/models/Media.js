@@ -22,6 +22,15 @@ module.exports = function (compound, Media) {
     var async = require('async');
     var fs = require('fs');
 
+
+    Media.s3 = compound.app.get('s3');
+
+    // if we didn't find any settings, return here
+    if (!Media.s3) {
+        return;
+    }
+
+
     /**
      * Upload the files for this media object to S3. Replace the Media.uploadToCDN
      * function with this to turn on uploading to S3 for CDN. You also need to
@@ -72,10 +81,12 @@ module.exports = function (compound, Media) {
             }
 
             // work out the new url - either a mapped domain or sub-subdomain of amazonaws.com
-            if (settings.bucket.split('.').length > 1) {
+            if (settings.cdn) {
+                data.url = '//' + settings.cdn + '/' + path + filename;
+            } else if (settings.bucket.split('.').length > 1) {
                 data.url = '//' + settings.bucket + '/' + path + filename;
             } else {
-                data.url = bucket + '.s3.amazonaws.com/' + path + filename;
+                data.url = '//' + settings.bucket + '.s3.amazonaws.com/' + path + filename;
             }
 
             return callback(err, data);
