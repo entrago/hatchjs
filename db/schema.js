@@ -141,7 +141,7 @@ var Content = define('Content', function () {
     property('text', String, { sort: true });
     property('excerpt', String);
     property('previewImage', String);
-    property('attachment', JSON);
+    property('attachments', JSON);
     property('poll', JSON);
     property('location', JSON);
     property('comments', [], {fulltext: true });
@@ -223,6 +223,7 @@ var Media = define('Media', function () {
     property('type', String, {index: true});
     property('userId', Number, {index: true});
     property('groupId', Number, {index: true});
+    property('contentIds', JSON);
     property('createdAt', Date);
     property('url', String);
     property('width', Number);
