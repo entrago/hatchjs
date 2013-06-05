@@ -219,6 +219,9 @@ TagController.prototype.add = function (c) {
 
     c.req.body.ids.forEach(function (id) {
         model.find(id, function (err, obj) {
+            if (!obj) {
+                return;
+            }
             self.theTag.add(obj, function (err) {
                 obj.save();
             });
@@ -242,6 +245,9 @@ TagController.prototype.remove = function (c) {
 
     c.req.body.ids.forEach(function (id) {
         model.find(id, function (err, obj) {
+            if (!obj) {
+                return;
+            }
             self.theTag.remove(obj, function (err) {
                 obj.save();
             });
