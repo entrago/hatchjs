@@ -183,7 +183,7 @@ ContentController.prototype.ids = function ids(c) {
 
     loadContent(c, function(err, posts) {
         c.send({
-            ids: _.pluck(posts, 'id')
+            ids: _.map(posts, function (post) { return parseInt(post.id); })
         });
     });
 };
