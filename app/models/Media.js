@@ -30,14 +30,33 @@ module.exports = function (compound, Media) {
     var _ = require('underscore');
 
     /**
+     * Before a media item is created, make sure the type is set.
+     * 
+     * @param  {Function} next - continuation function
+     * @param  {Object}   data - data to create with
+     */
+    Media.beforeCreate = function (next, data) {
+        if (!data.type) {
+            if (Media.isVideo(data.url)) {
+                data.type = 'video';
+            }
+            if (Media.isImage(data.url)) {
+                data.type = 'image';
+            }
+        }
+
+        next();
+    };
+
+    /**
      * After a media item is updated, make sure to update the content records in
      * which it is referenced as an attachment.
      * 
      * @param  {Function} next - continuation function
      * @param  {Object    data - data to save 
      */
-    Media.afterUpdate = function (next, data) {
-        Media.prototype.updateContent.apply(data, next);
+    Media.afterSave = function (next, data) {
+        this.updateContent(next);
     };
 
     /**
@@ -243,7 +262,7 @@ module.exports = function (compound, Media) {
     Media.prototype.getUrl = function (size) {
         var i;
 
-        if (!this.resized.length) {
+        if (!this.resized || !this.resized.length) {
             return this.url;
         }
 
@@ -252,7 +271,7 @@ module.exports = function (compound, Media) {
 
         // check for larger/equal media
         for (i=0; i < this.resized.length; i++) {
-            var resize = this.resized.items[i];
+            var resize = this.resized.items && this.resized.items[i] || this.resized[i];
             if (resize.width >= width && resize.height >= height) {
                 if (resize.url) {
                     return resize.url;
@@ -267,6 +286,18 @@ module.exports = function (compound, Media) {
     };
 
     /**
+     * Get the media URL for the specified size. Will retrive the media equal to
+     * or greater than the specified size.
+     *
+     * @param  {Object} media - media object to get url for
+     * @param  {String} size  - media size to look for
+     * @return {String}       - URL for the resized media
+     */
+    Media.getUrl = function (media, size) {
+        return Media.prototype.getUrl.apply(media, [size]);
+    };
+
+    /**
      * Assign multiple media items to a content post.
      * 
      * @param  {Array}    ids      - array of media ids
@@ -274,6 +305,17 @@ module.exports = function (compound, Media) {
      * @param  {Function} callback - callback function
      */
     Media.assignToContentMulti = function (ids, post, callback) {
+        if (!ids || ids.length === 0) {
+            return callback(null, post);
+        }
+
+        // if we have full media json strings instead of ids, parse them to get ids
+        if (typeof ids[0] === 'string') {
+            ids = _.map(ids, function (json) {
+                return JSON.parse(json).id;
+            });
+        }
+
         Media.all({ where: { id: { inq: ids }}}, function (err, items) {
             items.forEach(function (media) {
                 media.assignToContent(post);
