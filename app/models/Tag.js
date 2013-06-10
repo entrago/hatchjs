@@ -100,7 +100,7 @@ module.exports = function (compound, Tag) {
             data = [data];
         }
 
-        if (!obj.tags) {
+        if (!obj.tags || !obj.tags.forEach) {
             obj.tags = [];
         }
 
