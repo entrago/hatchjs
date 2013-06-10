@@ -22,6 +22,7 @@ var path = require('path');
 var request = require('request');
 var qs = require('querystring');
 var http = require('http');
+var _ = require('underscore');
 
 module.exports = function (compound, Page) {
     var api = compound.hatch.api;
@@ -274,63 +275,53 @@ module.exports = function (compound, Page) {
         }
     };
 
-    Page.prototype.renderHtml = function (req, cb) {
-        var index = {}, result = {}, self = this;
-        if (this.templateWidgets) {
-            this.templateWidgets.forEach(function (widget) {
-                index[widget.id] = widget;
-            });
-        }
-        var wait = 0;
-        this.columns.forEach(function (col) {
-            col.widgets.forEach(function (widgetId) {
-                wait += 1;
-                var w, suf;
-                if (col.fromTemplate) {
-                    suf = 't';
-                    w = index[widgetId];
-                } else {
-                    w = self.widgets[widgetId];
-                    suf = 'p';
-                }
-                self.renderWidget(w, req, function (err, html) {
+    Page.prototype.renderHtml = function (req, callback) {
+        var result = {}, self = this;
+        
+        async.forEach(self.widgets.items, function (widget, next) {
+            self.renderWidgetDirect(widget, req, function (err, html) {
+                if (!result[widget.id]) {
                     if (err) {
-                        result[widgetId + suf] = err;
+                        result[widget.id] = err;
                     } else {
-                        result[widgetId + suf] = html;
+                        result[widget.id] = html;
                     }
-                    done();
-                });
+                    next();
+                } else {
+                    console.log('2nd callback')
+                    console.log(arguments)
+                }
             });
-        });
-
-        if (!wait) {
-            wait = 1;
-            done();
-        }
+        }, done);
 
         function done() {
             var cols = [], sizes = [];
-            if (0 !== --wait) {
-                return;
-            }
             self.columns.forEach(function (col) {
                 var html = '';
-                var suf = col.fromTemplate ? 't' : 'p';
                 col.widgets.forEach(function (widgetId) {
-                    html += result[widgetId + suf];
+                    html += result[widgetId];
                 });
                 cols.push(html);
                 sizes.push(col.size);
             });
             var gridHtml = Page.grids[self.grid || '02-two-columns'] || [''];
-            cb(null, ejs.render(gridHtml[0], {
+
+            callback(null, ejs.render(gridHtml[0], {
                 column: cols,
                 size: sizes,
                 filename: self.grid + (self.templateId || ''),
                 cache: true
             }));
         }
+    };
+
+    Page.prototype.renderWidgetDirect = function (widget, req, cb) {
+        var moduleName = widget.type.split('/')[0];
+        var widgetName = 'widgets/' + widget.type.split('/').slice(1).join('/');
+
+        return renderWidgetAction(req, moduleName, widgetName, widget, 'show', function (err, body) {
+            cb(err, body);
+        });
     };
 
     Page.prototype.renderWidget = function (widget, req, cb) {
@@ -385,11 +376,37 @@ module.exports = function (compound, Page) {
         // );
         // 
         
-        inAppRequest(req, url, { token: 'test', data: data }, function(err, res) {
+        inAppRequest(req, url, { data: data }, function(err, res) {
             cb(err, res);
         });
 
     };
+
+    function renderWidgetAction(req, moduleName, widgetName, widget, action, callback) {
+        var module = compound.hatch.modules[moduleName];
+        req.body.data = {
+            widgetId: widget.id,
+            templateWidget: false
+        }
+
+        var res = new http.ServerResponse({method: 'NOTHEAD'});
+
+        res.controllerName = widgetName.split('/')[0];
+        res.compound = module.compound;
+        res.req = req;
+        res.context = {
+            req: req,
+            res: res,
+            inAction: true
+        };
+        res.render = function (file, viewContext, next) { 
+            console.log(file)
+            console.log((next || callback).toString())
+            compound.app.render(file, viewContext, next || callback); 
+        };
+        
+        module.compound.controllerBridge.callControllerAction(widgetName, action, req, res, callback);
+    }
 
     function inAppRequest(parent, url, data, callback) {
         var req = new http.IncomingMessage;
