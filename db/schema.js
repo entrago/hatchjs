@@ -1,7 +1,7 @@
 
 var User = define('User', function () {
     property('username', String, {index: true, sort: true, fulltext: true});
-    property('email', String, {index: true});
+    property('email', String, {index: true, sort: true, fulltext: true});
     property('type', String, {index: true});
     property('password', String);
     property('hasPassword', Boolean);
