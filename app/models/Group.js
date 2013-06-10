@@ -218,25 +218,21 @@ module.exports = function (compound, Group) {
 
         function createGroup() {
             Group.create(g, function (err, gg) {
-                if (!oldGroup.subgroups) oldGroup.subgroups = [];
-                oldGroup.subgroups.push({path: gg.path});
-                oldGroup.save(function() {
-
-                    group = gg;
-                    oldGroup.pages(function (err, ps) {
-                        if (ps.length === 0) {
-                            return callback(null, group);
-                        }
-                        pages = Page.tree(ps).map(function (page) {
-                            var p = page.toObject();
-                            p.url = p.url.replace(oldUrl, newUrl + '/');
-                            p.groupId = group.id;
-                            return p;
-                        });
-                        createHomepage(
-                            createTemplates.bind(null, createPages)
-                        );
+                group = gg;
+                oldGroup.pages(function (err, ps) {
+                    if (ps.length === 0) {
+                        return callback(null, group);
+                    }
+                    pages = Page.tree(ps).map(function (page) {
+                        var p = page.toObject();
+                        p.url = p.url.replace(oldUrl, newUrl + '/');
+                        p.url = p.url.replace('//', '/');
+                        p.groupId = group.id;
+                        return p;
                     });
+                    createHomepage(
+                        createTemplates.bind(null, createPages)
+                    );
                 });
             });
         }
