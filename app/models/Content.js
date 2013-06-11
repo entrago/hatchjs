@@ -641,28 +641,18 @@ module.exports = function (compound, Content) {
         })
     };
 
-    /**
-     * works out whether the specified user likes this post
-     * 
-     * @param  {[User]} user [user to check]
-     * @return {[Boolean]}
-     */
-    Content.prototype.doesLike = function(user) {
-        if (!user) return false;
-        var id = user.id || user;
-        return this.likes.find(id, 'userId');
-    };
+    Content.setDoesLikes = function (posts, user, callback) {
+        if (!user) {
+            return callback(null, posts);
+        }
 
-    /**
-     * works out whether the specified user dislikes this post
-     * 
-     * @param  {[User]} user [user to check]
-     * @return {[Boolean]}
-     */
-    Content.prototype.doesDislike = function(user) {
-        if(!user) return false;
-        var id = user.id || user;
-        return this.dislikes.find(id, 'userId');
+        Like.getLikeIds(user.id, function (err, ids) {
+            posts.forEach(function (post) {
+                post.doesLike = ids.indexOf(post.id) > -1;
+            });
+
+            callback(err, posts);
+        });
     };
 };
 
