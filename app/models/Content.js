@@ -38,7 +38,7 @@ module.exports = function (compound, Content) {
     Content.validatesPresenceOf('createdAt', 'title', 'text');
 
     // register the functions which can be called from the REST api
-    Content.allowedApiActions = ['like', 'postComment', 'flag', 'vote', 'doesLike', 'doesDislike'];
+    Content.allowedApiActions = ['like', 'getLike', 'vote', 'postComment', 'flag', 'clearFlags', 'destroyAndBan', 'registerView'];
 
 
     /**
@@ -646,7 +646,7 @@ module.exports = function (compound, Content) {
      * 
      * @param {Array}    posts    - list of posts
      * @param {User}     user     - logged in user
-     * @param {Function} callback - callback function
+     * @param {Function} callback - callback
      */
     Content.setDoesLikes = function (posts, user, callback) {
         if (!user) {
