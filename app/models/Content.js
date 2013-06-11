@@ -641,6 +641,13 @@ module.exports = function (compound, Content) {
         })
     };
 
+    /**
+     * Set the the doesLike properties for a list of content items.
+     * 
+     * @param {Array}    posts    - list of posts
+     * @param {User}     user     - logged in user
+     * @param {Function} callback - callback function
+     */
     Content.setDoesLikes = function (posts, user, callback) {
         if (!user) {
             return callback(null, posts);
