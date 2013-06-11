@@ -312,7 +312,7 @@ module.exports = function (compound, Media) {
         // if we have full media json strings instead of ids, parse them to get ids
         if (typeof ids[0] === 'string') {
             ids = _.map(ids, function (json) {
-                return JSON.parse(json).id;
+                return JSON.parse(json).id || json;
             });
         }
 
