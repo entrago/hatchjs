@@ -277,7 +277,7 @@ module.exports = function (compound, Page) {
 
     Page.prototype.renderHtml = function (req, callback) {
         var result = {}, self = this;
-        
+
         async.forEach(self.widgets.items, function (widget, next) {
             self.renderWidgetDirect(widget, req, function (err, html) {
                 if (!result[widget.id]) {
@@ -287,9 +287,6 @@ module.exports = function (compound, Page) {
                         result[widget.id] = html;
                     }
                     next();
-                } else {
-                    console.log('2nd callback')
-                    console.log(arguments)
                 }
             });
         }, done);
@@ -364,17 +361,6 @@ module.exports = function (compound, Page) {
             widgetId: widgetId,
             templateWidget: !!widget.templateWidget
         };
-        // request.post(
-        //     url,
-        //     {form: {
-        //         token: 'test',
-        //         data: JSON.stringify(data)
-        //     }},
-        //     function (err, res) {
-        //         cb(err, res && res.body);
-        //     }
-        // );
-        // 
         
         inAppRequest(req, url, { data: data }, function(err, res) {
             cb(err, res);
@@ -400,8 +386,6 @@ module.exports = function (compound, Page) {
             inAction: true
         };
         res.render = function (file, viewContext, next) { 
-            console.log(file)
-            console.log((next || callback).toString())
             compound.app.render(file, viewContext, next || callback); 
         };
         
