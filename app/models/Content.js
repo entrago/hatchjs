@@ -474,6 +474,29 @@ module.exports = function (compound, Content) {
     };
 
     /**
+     * Delete a comment attached to this post.
+     * 
+     * @param  {Number}   userId    - id of the deleting user
+     * @param  {Number}   commentId - id of the comment to delete
+     * @param  {Function} callback  - callback function
+     */
+    Content.prototype.deleteComment = function (userId, commentId, callback) {
+        Comment.findOne(commentId, function (err, comment) {
+            var hasPermission = false;
+            // TODO: check group admin permissions
+             
+            if (!comment) {
+                return callback(new Error('Comment not found'));
+            }
+            if ((comment.authorId != userId || comment.contentId != this.id) && !hasPermission) {
+                return callback(new Error('Permission denied'));
+            }
+
+            comment.destroy(callback);
+        });
+    };
+
+    /**
      * Update the comments cached on a content record and the total comment 
      * count.
      * 
