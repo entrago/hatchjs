@@ -65,7 +65,7 @@ SetupController.prototype.setup = function(c) {
     }
 
     // load the seed data and modify
-    var seeds = require('../seed.yml')[0];
+    var seeds = require(c.app.get('setupseed') || '../seed.yml')[0];
 
     seeds[0].Group.name = req.body.name;
     seeds[0].Group.url = req.body.url;
