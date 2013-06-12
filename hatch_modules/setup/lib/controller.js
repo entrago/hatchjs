@@ -40,8 +40,7 @@ SetupController.prototype.setup = function(c) {
     var res = c.res;
 
     // standard application setup
-    var fields = ['username', 'email', 'password', 'confirm', 'name',
-        'url'];
+    var fields = ['username', 'email', 'password', 'confirm', 'name', 'url'];
 
     // validate
     for (var f in fields) {
