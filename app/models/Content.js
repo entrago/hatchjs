@@ -43,26 +43,26 @@ module.exports = function (compound, Content) {
 
     /**
      * gets the popularity score for this content
-     * 
-     * @return {Number} 
+     *
+     * @return {Number}
      */
-    Content.getter.score = function() {
+    Content.getter.score = function () {
         return Math.min(Math.floor(((this.likes || []).length + (this.comments || []).length) / 2), 5);
     };
 
     /**
      * gets the time since this post was published
-     * 
+     *
      * @return {String}
      */
-    Content.getter.timeSince = function() {
+    Content.getter.timeSince = function () {
         return moment(this.createdAt || new Date()).fromNow();
     };
 
     /**
      * sets the date for this post with high level of flexibility.
      */
-    Content.setter.createdAt = function(value) {
+    Content.setter.createdAt = function (value) {
         value = value || '';
         if (value && value.toString().match(/now|immediately/i)) {
             this._createdAt = new Date();
@@ -76,7 +76,7 @@ module.exports = function (compound, Content) {
 
     /**
      * Get whether this content has been flagged.
-     * 
+     *
      * @return {Boolean}
      */
     Content.getter.hasFlag = function () {
@@ -85,11 +85,11 @@ module.exports = function (compound, Content) {
 
     /**
      * gets the timestamp for this content
-     * 
+     *
      * @return {[Number]}
      */
-    Content.getter.timestamp = function() {
-        if  (!this.createdAt || typeof this.createdAt === 'string' || !this.createdAt.getTime) {
+    Content.getter.timestamp = function () {
+        if (!this.createdAt || typeof this.createdAt === 'string' || !this.createdAt.getTime) {
             return 0;
         } else {
             return this.createdAt.getTime();
@@ -98,10 +98,10 @@ module.exports = function (compound, Content) {
 
     /**
      * gets the text for the fulltext index
-     * 
+     *
      * @return {[String]}
      */
-    Content.getter.fulltext = function() {
+    Content.getter.fulltext = function () {
         return [
             this.title,
             this.text,
@@ -111,7 +111,7 @@ module.exports = function (compound, Content) {
 
     /**
      * get the tag names as a single string for this post
-     * 
+     *
      * @return {String} - concatenated tag names
      */
     Content.getter.tagNames = function () {
@@ -124,16 +124,16 @@ module.exports = function (compound, Content) {
 
     /**
      * Get the total likes - total dislikes
-     * 
-     * @return {[Number]} 
+     *
+     * @return {[Number]}
      */
-    Content.getter.likesTotal = function() {
+    Content.getter.likesTotal = function () {
         return (this.likes || []).length - (this.dislikes || []).length;
     };
 
     /**
      * Before content is saved, make sure all automatic tag filters are applied
-     * 
+     *
      * @param  {Function} done [continuation function]
      */
     Content.beforeSave = function (done, data) {
@@ -144,8 +144,8 @@ module.exports = function (compound, Content) {
         data.updatedAt = new Date();
 
         //get the group and check all tag filters
-        Group.find(data.groupId, function(err, group) {
-            if(!group) {
+        Group.find(data.groupId, function (err, group) {
+            if (!group) {
                 return done();
             }
 
@@ -161,24 +161,24 @@ module.exports = function (compound, Content) {
      * @param  {[Group]}  group
      * @param  {Function} done  [continuation function]
      */
-    Content.generateUrl = function(data, group, done) {
+    Content.generateUrl = function (data, group, done) {
         if (!data.url) {
             var slug = slugify(data.title || (data.createdAt || new Date(0)).getTime().toString());
             data.url = (group.homepage.url + '/' + slug).replace('//', '/');
 
             //check for duplicate pages and content in parallel
             async.parallel([
-                function(callback) {
-                    Content.all({where: { url: data.url}}, function(err, posts) {
+                function (callback) {
+                    Content.all({where: { url: data.url}}, function (err, posts) {
                         callback(null, posts);
                     });
                 },
-                function(callback) {
-                    Page.all({where: { url: data.url}}, function(err, pages) {
+                function (callback) {
+                    Page.all({where: { url: data.url}}, function (err, pages) {
                         callback(null, pages);
                     });
                 }
-            ], function(err, results) {
+            ], function (err, results) {
                 if (results[0].length > 0 || results[1].length > 0) {
                     data.url += '-' + (data.createdAt || new Date(0)).getTime();
                 }
@@ -199,74 +199,84 @@ module.exports = function (compound, Content) {
 
     /**
      * votes on an option in the poll
-     * 
+     *
      * @param  {[Number]} userId   [id of voting user]
      * @param  {[Number]} optionId [id of option to vote for]
      */
-    Content.prototype.vote = function(userId, optionId) {
+    Content.prototype.vote = function (userId, optionId) {
         //first remove any existing vote for this user
-        this.poll.options.forEach(function(option) {
-            if(option.userIds.indexOf(userId) > -1) {
-                option.votes --;
-                option.userIds = _.reject(option.userIds, function(id) { return id == userId; });
+        this.poll.options.forEach(function (option) {
+            if (option.userIds.indexOf(userId) > -1) {
+                option.votes--;
+                option.userIds = _.reject(option.userIds, function (id) {
+                    return id == userId;
+                });
             }
         });
 
         //now add the vote
-        var option = _.find(this.poll.options, function(option) { return option.id == optionId; });
+        var option = _.find(this.poll.options, function (option) {
+            return option.id == optionId;
+        });
 
         option.userIds.push(userId);
-        option.votes ++;
+        option.votes++;
 
         //now recalculate total and all percentages
-        this.poll.total = total = _.pluck(this.poll.options, 'votes').reduce(function(a, b) { return a + b; });
+        this.poll.total = total = _.pluck(this.poll.options, 'votes').reduce(function (a, b) {
+            return a + b;
+        });
 
-        this.poll.options.forEach(function(option) {
+        this.poll.options.forEach(function (option) {
             option.percentage = parseInt(100 * option.votes / total);
         });
     };
 
     /**
      * populates all of the user objects for the specified content list
-     * 
+     *
      * @param  {[list]}   list     [list of content to populate]
      * @param  {Function} callback [continuation function]
      */
-    Content.populateUsers = function(list, callback) {
+    Content.populateUsers = function (list, callback) {
         var userIds = [];
 
         //if the list is not a list, make it a list
-        if(!list.length && list.id) list = [list];
+        if (!list.length && list.id) list = [list];
 
-        list.forEach(function(post) {
-            if(userIds.indexOf(post.authorId) == -1) userIds.push(post.authorId);
+        list.forEach(function (post) {
+            if (userIds.indexOf(post.authorId) == -1) userIds.push(post.authorId);
 
-            (post.likes || []).forEach(function(like) {
-                if(userIds.indexOf(like.userId) == -1) userIds.push(like.userId);
+            (post.likes || []).forEach(function (like) {
+                if (userIds.indexOf(like.userId) == -1) userIds.push(like.userId);
             });
 
-            (post.comments || []).forEach(function(comment) {
-                if(userIds.indexOf(comment.userId) == -1) userIds.push(comment.userId);
+            (post.comments || []).forEach(function (comment) {
+                if (userIds.indexOf(comment.userId) == -1) userIds.push(comment.userId);
             });
         });
 
-        if(userIds.length == 0) return callback(null, list);
+        console.log('userIDs is : ' + userIds);
+
+        if (userIds.length == 0) return callback(null, list);
 
         function findUser(users, id) {
-            return _.find(users, function(user) { return user.id == id; });
+            return _.find(users, function (user) {
+                return user.id == id;
+            });
         }
 
         //load all of the users
-        User.all({ where: {id: userIds }}, function(err, users) {
-            list.forEach(function(post) {
+        User.all({ where: {id: userIds }}, function (err, users) {
+            list.forEach(function (post) {
                 post.author = findUser(users, post.authorId);
 
-                (post.likes || []).forEach(function(like) {
+                (post.likes || []).forEach(function (like) {
                     like.user = findUser(users, like.userId);
                 });
 
-                (post.comments || []).forEach(function(comment) {
-                    comment.user = findUser(users, comment.userId);
+                (post.comments || []).forEach(function (comment) {
+                    comment.author = findUser(users, comment.userId);
                 });
             });
 
@@ -276,8 +286,8 @@ module.exports = function (compound, Content) {
 
     /**
      * gets the default permalink url
-     * 
-     * @return {[String]} 
+     *
+     * @return {[String]}
      */
     Content.prototype.permalink = function () {
         return 'PERMALINK NOT IMPLEMENTED';
@@ -293,7 +303,7 @@ module.exports = function (compound, Content) {
 
     /**
      * add content item to newsfeed for all group members and author's followers (and author)
-     * 
+     *
      * @param  {Function} done [continuation function]
      */
     Content.afterCreate = function (done) {
@@ -311,7 +321,7 @@ module.exports = function (compound, Content) {
         // 3. populate feeds
         var content = this;
         var userIds = [content.authorId];
-        var wait= 1;
+        var wait = 1;
 
         // all users from the group
         if (content.privacy === 'public') {
@@ -341,10 +351,10 @@ module.exports = function (compound, Content) {
         }
 
         //calculate replies for this post's parent async
-        if(content.replyToId) {
-            Content.find(content.replyToId, function(err, parent) {
-                if(parent) {
-                    parent.recalculateReplies(function() {
+        if (content.replyToId) {
+            Content.find(content.replyToId, function (err, parent) {
+                if (parent) {
+                    parent.recalculateReplies(function () {
                         parent.save();
                     });
                 }
@@ -374,17 +384,17 @@ module.exports = function (compound, Content) {
 
     /**
      * cleans up anything related to this post after it is deleted
-     * 
+     *
      * @param  {Function} done [continuation function]
      */
-    Content.afterDestroy = function(done) {
+    Content.afterDestroy = function (done) {
         var content = this;
 
         //calculate replies for this post's parent async
-        if(content.replyToId) {
-            Content.find(content.replyToId, function(err, parent) {
-                if(parent) {
-                    parent.recalculateReplies(function() {
+        if (content.replyToId) {
+            Content.find(content.replyToId, function (err, parent) {
+                if (parent) {
+                    parent.recalculateReplies(function () {
                         parent.save();
                     });
                 }
@@ -396,8 +406,8 @@ module.exports = function (compound, Content) {
 
     /**
      * Get the news feed for the specified user
-     * 
-     * @param  {[params]}   params 
+     *
+     * @param  {[params]}   params
      * @param  {Function}   callback [continuation function]
      */
     User.prototype.feed = function (params, callback) {
@@ -422,25 +432,25 @@ module.exports = function (compound, Content) {
     /**
      * Register a page view for this content and saves
      */
-    Content.prototype.registerView = function() {
-        this.views ++;
+    Content.prototype.registerView = function () {
+        this.views++;
         this.save();
     };
 
     /**
      * Calculate the total number of replies to this post
-     * 
+     *
      * @param  {Function} callback [continuation function]
      */
-    Content.prototype.recalculateReplies = function(callback) {
+    Content.prototype.recalculateReplies = function (callback) {
         var content = this;
-        Content.all({ where: { replyToId: this.id }}, function(err, posts) {
+        Content.all({ where: { replyToId: this.id }}, function (err, posts) {
             content.repliesTotal = posts.length;
             callback();
         });
     };
 
-    Content.prototype.createdAtNice = function() {
+    Content.prototype.createdAtNice = function () {
         var post = this;
         var diff = new Date() - post.createdAt;
         var oneHour = 1000 * 60 * 60;
@@ -456,7 +466,7 @@ module.exports = function (compound, Content) {
 
     /**
      * Post a comment on this content item.
-     * 
+     *
      * @param  {Number}   authorId - id of the author
      * @param  {String}   text     - comment text
      * @param  {Function} callback - callback function
@@ -475,7 +485,7 @@ module.exports = function (compound, Content) {
 
     /**
      * Delete a comment attached to this post.
-     * 
+     *
      * @param  {Number}   userId    - id of the deleting user
      * @param  {Number}   commentId - id of the comment to delete
      * @param  {Function} callback  - callback function
@@ -484,7 +494,7 @@ module.exports = function (compound, Content) {
         Comment.findOne(commentId, function (err, comment) {
             var hasPermission = false;
             // TODO: check group admin permissions
-             
+
             if (!comment) {
                 return callback(new Error('Comment not found'));
             }
@@ -497,9 +507,9 @@ module.exports = function (compound, Content) {
     };
 
     /**
-     * Update the comments cached on a content record and the total comment 
+     * Update the comments cached on a content record and the total comment
      * count.
-     * 
+     *
      * @param  {Number}   contentId - id of the content
      * @param  {Function} callback  - callback function
      */
@@ -513,7 +523,7 @@ module.exports = function (compound, Content) {
                     // reverse the comments so we can show latest at the end
                     comments.reverse();
 
-                    comments.forEach (function (comment) {
+                    comments.forEach(function (comment) {
                         post.comments.push(comment.toObject());
                     });
 
@@ -528,7 +538,7 @@ module.exports = function (compound, Content) {
     /**
      * Update the likes cached on a content record and record the total like
      * count.
-     * 
+     *
      * @param  {Number}   contentId - id of the content
      * @param  {Function} callback  - callback function
      */
@@ -545,7 +555,7 @@ module.exports = function (compound, Content) {
                 // reverse the likes so we can show latest at the end
                 likes.reverse();
 
-                likes.forEach (function (like) {
+                likes.forEach(function (like) {
                     post.likes.push(like.toObject());
                 });
 
@@ -556,7 +566,7 @@ module.exports = function (compound, Content) {
 
     /**
      * Get a like if a user likes this content item.
-     * 
+     *
      * @param  {User}     user     - user or userId
      * @param  {Function} callback - callback function
      */
@@ -569,7 +579,7 @@ module.exports = function (compound, Content) {
 
     /**
      * Like or unlike a content item.
-     * 
+     *
      * @param  {User}     user     - user performing the like
      * @param  {Function} callback - callback function
      */
@@ -602,7 +612,7 @@ module.exports = function (compound, Content) {
 
     /**
      * Dislike or un-dislike a content item.
-     * 
+     *
      * @param  {User}     user     - user performing the dislike
      * @param  {Function} callback - callback function
      */
@@ -622,7 +632,7 @@ module.exports = function (compound, Content) {
 
     /**
      * Flag or unflag a content item.
-     * 
+     *
      * @param  {User}     user     - user performing the flag
      * @param  {Function} callback - callback function
      */
@@ -651,7 +661,7 @@ module.exports = function (compound, Content) {
 
     /**
      * Delete this post and blacklist the author from the group it was posted to.
-     * 
+     *
      * @param  {Function} callback - call back function
      */
     Content.prototype.destroyAndBan = function (callback) {
@@ -666,7 +676,7 @@ module.exports = function (compound, Content) {
 
     /**
      * Set the the doesLike properties for a list of content items.
-     * 
+     *
      * @param {Array}    posts    - list of posts
      * @param {User}     user     - logged in user
      * @param {Function} callback - callback
