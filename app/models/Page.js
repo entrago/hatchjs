@@ -417,7 +417,10 @@ module.exports = function (compound, Page) {
         req.method = 'POST';
         req.connection = {};
         req.url      = '/' + url;
-        req.headers  = { host: parent.headers.host };
+        req.headers  = { 
+            host: parent.headers.host,
+            'user-agent': parent.headers['user-agent']
+        };
 
         compound.app.handle(req, res);
     }
