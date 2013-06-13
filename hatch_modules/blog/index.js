@@ -21,10 +21,18 @@
 var compound = require('compound');
 
 module.exports = function (c) {
-    c.hatch.contentType.registerContentType('blogpost', {
-        icon: 'align-left',
-        view: __dirname + '/content/blogpost.ejs',
-        editForm: __dirname + '/content/blogpost-form.ejs'
+    var contentTypes = {
+        blogpost: {
+            icon: 'align-left',
+            view: __dirname + '/content/blogpost.ejs',
+            editForm: __dirname + '/content/blogpost-form.ejs'
+        }
+    };
+
+    Object.keys(contentTypes).forEach(function (key) {
+        var type = contentTypes[key];
+        c.hatch.contentType.registerContentType(key, type);    
+        c.hatch.page.register(key, require('./specials/' + key));
     });
 
     return compound.createServer({root: __dirname});

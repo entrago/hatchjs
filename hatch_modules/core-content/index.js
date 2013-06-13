@@ -21,10 +21,18 @@
 var compound = require('compound');
 
 module.exports = function (c) {
-    c.hatch.contentType.registerContentType('statusupdate', {
-        icon: 'user',
-        view: __dirname + '/content/statusupdate.ejs'
-    });
+    var contentTypes = {
+        statusupdate: {
+            icon: 'user',
+            view: __dirname + '/content/statusupdate.ejs'
+        }
+    }
 
+    Object.keys(contentTypes).forEach(function (key) {
+        var type = contentTypes[key];
+        c.hatch.contentType.registerContentType(key, type);    
+        c.hatch.page.register(key, require('./specials/' + key));
+    });
+    
     return compound.createServer({root: __dirname});
 };

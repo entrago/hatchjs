@@ -388,7 +388,7 @@ module.exports = function (compound, Page) {
         res.render = function (file, viewContext, next) { 
             compound.app.render(file, viewContext, next || callback); 
         };
-        
+
         module.compound.controllerBridge.callControllerAction(widgetName, action, req, res, callback);
     }
 
@@ -405,6 +405,7 @@ module.exports = function (compound, Page) {
         req.user = parent.user;
         req.group = parent.group;
         req.page = parent.page;
+        req.post = parent.post;
 
         // TODO: we need to set the cookies and session so that they can be 
         // accessed and set (if required) from each widget. This doesn't seem

@@ -157,7 +157,6 @@ module.exports = function (compound, Group) {
             c.req.page = page;
             callback(err, page);
         }
-
     }
 
     /**
