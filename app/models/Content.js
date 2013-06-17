@@ -514,9 +514,12 @@ module.exports = function (compound, Content) {
     Content.updateComments = function (contentId, callback) {
         Content.find(contentId, function (err, post) {
             if (post) {
-                Comment.all({ where: { contentId: post.id }, limit: Content.CACHEDCOMMENTS }, function (err, comments) {
+                Comment.all({ where: { contentId: post.id }, limit: Content.CACHEDCOMMENTS, order: 'createdAt DESC' }, function (err, comments) {
                     post.commentsTotal = comments.countBeforeLimit;
                     post.comments.items = [];
+
+                    // reverse the comments so we can show latest at the end
+                    comments.reverse();
 
                     comments.forEach(function (comment) {
                         post.comments.push(comment.toObject());
