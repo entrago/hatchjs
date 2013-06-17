@@ -196,7 +196,7 @@ var Comment = define('Comment', function () {
     property('hasFlag', Boolean, {index: true});
     property('author', JSON);
 
-    set('defaultSort', 'createdAt DESC');
+    set('defaultSort', 'createdAt');
 });
 
 var Like = define('Like', function () {
