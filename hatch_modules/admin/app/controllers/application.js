@@ -35,7 +35,7 @@ var Application = module.exports = function Application(init) {
         this.sectionName = c.controllerName;
         this._ = _;
         this.req = c.req;
-        this.tabs = c.compound.tabs;
+        this.tabs = _.sortBy(c.compound.tabs, 'rank');
         locals.group = c.req.group;
         if (c.req.query.pageId && isNaN(parseInt(c.req.query.pageId, 10))) {
             var url = c.req.query.pageId.replace(/^.*?\//, '/');

@@ -43,32 +43,26 @@ module.exports = function (compound, Group) {
         }
     };
 
+    /**
+     * Update a group's URLs by getting the updated list from the pages within.
+     * 
+     * @param  {Group}    group    - group to update
+     * @param  {Function} callback - callback function
+     */
     Group.updatePageUrls = function (group, callback) {
         Page.all({ where: { groupId: group.id }}, function (err, pages) {
-
             group.pageUrls = _.pluck(pages, 'url');
             callback();
         });
     };
 
+    /**
+     * Get the path part of the URL for this group's homepage.
+     * 
+     * @return {String} - group path
+     */
     Group.getter.path = function () {
         return this._url && this._url.replace(/[^\/]+/, '');
-    };
-
-    Group.prototype.profileFields = function() {
-        return [];
-    };
-
-    Group.prototype.match = function (path) {
-        if (this.subgroups) {
-            var l = this.subgroups.length, i;
-            for (i = 0; i < l; i += 1) {
-                if (path.indexOf(this.subgroups[i].path) === 0) {
-                    return this.subgroups[i];
-                }
-            }
-        }
-        return this;
     };
 
     /**
@@ -120,17 +114,17 @@ module.exports = function (compound, Group) {
         return found;
     };
 
-    Group.prototype.definePage = function definePage(url, c, cb) {
+    /**
+     * Define the page for the current request context.
+     * 
+     * @param  {String}        url      - current url
+     * @param  {HttpContext}   c        - http context
+     * @param  {Function}      callback - callback function
+     */
+    Group.prototype.definePage = function definePage(url, c, callback) {
         var group = this;
         var path = url.split('?')[0];
         var page = c.req.page || this.matchPage(path);
-
-        if (c.req.page) {
-            // console.log('got page from request')
-            // console.log(page.show)
-        }
-
-        console.log(page)
 
         // special page out of this group (sp.defaultPage)
         if (page && page.type !== 'page' && !page.id) {
@@ -140,7 +134,7 @@ module.exports = function (compound, Group) {
         }
 
         if (!page) {
-            cb(null, null);
+            callback(null, null);
         } else if (page.renderHtml) {
             gotPage(null, page);
         } else if (page.id) {
@@ -155,17 +149,23 @@ module.exports = function (compound, Group) {
 
                 if (found) {
                     page.mergeTemplate(new Page(found));
-                    return cb(err, page);
+                    return callback(err, page);
                 }
             }
 
             // store the page in the request
             c.req.page = page;
-            cb(err, page);
+            callback(err, page);
         }
 
     }
 
+    /**
+     * Get a cached page from this group's pagesCache.
+     * 
+     * @param  {Number} id - page.id
+     * @return {Page}      - page object
+     */
     Group.prototype.getCachedPage = function getCachedPage(id) {
         var found;
         this.pagesCache.forEach(function (p) {
@@ -177,10 +177,10 @@ module.exports = function (compound, Group) {
     };
 
     /**
-     * clones a group and saves the new one to the database
+     * Clone this group and save the new group to the database.
      * 
-     * @param  {[params]}   params [clone parameters]
-     * @param  {Function}   callback     [continuation function]
+     * @param  {Object}     params   - clone parameters
+     * @param  {Function}   callback - continuation function
      */
     Group.prototype.clone = function (params, callback) {
         var oldGroup = this;
@@ -421,7 +421,7 @@ module.exports = function (compound, Group) {
     };
 
     /**
-     * updates the URL for this group
+     * Update the URL for this group.
      * 
      * @param  {String} url - new URL
      */
@@ -466,10 +466,10 @@ module.exports = function (compound, Group) {
     };
 
     /**
-     * gets a module for this group
+     * Get the specified module for this group.
      * 
-     * @param  {[String]} name [module name]
-     * @return {[ModuleInstance]}      [module]
+     * @param  {String} name - module name
+     * @return {Module}      - module
      */
     Group.prototype.getModule = function(name) {
         return _.find(this.modules.items, function(module) {

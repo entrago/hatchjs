@@ -66,6 +66,7 @@ GroupController.prototype.settings = function (c) {
  */
 GroupController.prototype.save = function(c) {
     var group = c.req.group;
+    delete c.req.body.undefined;
 
     if(c.body.url) {
         group.updateUrl(c.body.url, function(err) {
