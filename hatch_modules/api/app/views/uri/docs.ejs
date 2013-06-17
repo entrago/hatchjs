@@ -1,0 +1,41 @@
+<html>
+<head>
+    <title><%- modelName %> REST API documentation</title>
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container-fluid">
+        <h1><%- modelName %> REST API documentation</h1>
+        <hr />
+
+        <ul class="unstyled">
+            <% functions.forEach(function (fn) { %>
+                <li>
+                    <h3><%- fn.ctx.name %></h3>
+
+                    <p>
+                        <a href="#">/do/api/<%- modelName.toLowerCase() %>/:id/<%- fn.ctx.name.toLowerCase() %></a>
+                    </p>
+
+                    <p><%- fn.description.full %></p>
+
+                    <% if (fn.tags) { %>
+                        <ul class="unstyled">
+                            <% fn.tags.forEach(function (tag) { %>
+                                <% if (tag.name === 'callback') { return; } %>
+                                <li>
+                                    <strong>@<%- tag.name %></strong> 
+                                    <%- tag.description %>
+                                </li>
+                            <% }) %>
+                        </ul>
+                    <% } %>
+
+                </li>    
+            <% }) %>
+        </ul>
+    </div>
+
+</body>
+</html>

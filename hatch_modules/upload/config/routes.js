@@ -1,4 +1,4 @@
 exports.routes = function (map) {
-    map.post('add', 'upload#upload');
-    //map.get('add', 'upload#upload');
+    map.post('add', 'upload#upload', {as: 'add'});
+    map.get('add', 'upload#upload', {as: 'add'});
 };

@@ -18,6 +18,7 @@
 
 module.exports = function (compound, Like) {
     var Content = compound.models.Content;
+    var _ = require('underscore');
 
     // validation
     Like.validatesPresenceOf('contentId', 'userId');
@@ -83,7 +84,7 @@ module.exports = function (compound, Like) {
      * @param  {Function} callback - callback function
      */
     Like.getLikeIds = function (userId, callback) {
-        Like.getLikes(userIds, function (err, likes) {
+        Like.getLikes(userId, function (err, likes) {
             callback(err, !err && _.pluck(likes, 'contentId'));
         });
     };

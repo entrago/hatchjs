@@ -19,34 +19,40 @@
 'use strict';
 var _ = require('underscore');
 var ApiController = require('./apiController');
+var dox = require('dox');
+var fs = require('fs');
+var _ = require('underscore');
 
 module.exports = UriController;
 
 function UriController(init) {
     ApiController.call(this, init);
-    init.before(findObject);
+    init.before(getModel);
+    init.before(findObject, {only: 'get,perform'}); 
 }
 
 require('util').inherits(UriController, ApiController);
+
+function getModel(c) {
+    this.modelName = _.find(Object.keys(c.compound.models), function (key) {
+        return key.toLowerCase() === c.req.params.modelName.toLowerCase();
+    });
+    this.model = c.compound.models[this.modelName];
+    c.next();
+}
 
 function findObject(c) {
     var self = this;
     self.modelContext = c.compound.hatch.modelContext.getNewContext(c);
 
-    // TODO: change case-insensitive model find to compound.getModel when implemented
-    self.modelName = _.find(Object.keys(c.compound.models), function (key) {
-        return key.toLowerCase() === c.req.params.modelName.toLowerCase();
-    });
-    var model = c.compound.models[self.modelName];
-
-    if (!model) {
+    if (!self.model) {
         return c.send({
             status: 'error',
             message: 'Could not find model "' + c.req.params.modelName + '"'
         });
     }
 
-    model.find(c.req.params.id, function (err, obj) {
+    self.model.find(c.req.params.id, function (err, obj) {
         if (!obj) {
             return c.send({
                 status: 'error',
@@ -108,3 +114,25 @@ UriController.prototype.perform = function perform(c) {
     });
 };
 
+
+UriController.prototype.docs = function (c) {
+    var self = this;
+
+    // read the model file
+    fs.readFile(c.compound.parent.root + '/app/models/' + self.modelName + '.js', 'utf8', function (err, str) {
+        var results = [];
+        var comments = dox.parseComments(str);
+        
+        (self.model.allowedApiActions || []).forEach(function (key) {
+            var comment = _.find(comments, function (c) { return c.ctx.name === key; });
+            if (comment) {
+                results.push(comment);
+            }
+        }); 
+
+        c.locals.req = c.req;
+        c.locals.modelName = self.modelName;
+        c.locals.functions = results;
+        c.render({ layout: false });
+    });
+};

@@ -1,7 +1,7 @@
 
 var User = define('User', function () {
     property('username', String, {index: true, sort: true, fulltext: true});
-    property('email', String, {index: true});
+    property('email', String, {index: true, sort: true, fulltext: true});
     property('type', String, {index: true});
     property('password', String);
     property('hasPassword', Boolean);
@@ -141,7 +141,7 @@ var Content = define('Content', function () {
     property('text', String, { sort: true });
     property('excerpt', String);
     property('previewImage', String);
-    property('attachment', JSON);
+    property('attachments', JSON);
     property('poll', JSON);
     property('location', JSON);
     property('comments', [], {fulltext: true });
@@ -194,6 +194,7 @@ var Comment = define('Comment', function () {
     property('likes', []);
     property('flags', []);
     property('hasFlag', Boolean, {index: true});
+    property('author', JSON);
 
     set('defaultSort', 'createdAt');
 });
@@ -223,6 +224,7 @@ var Media = define('Media', function () {
     property('type', String, {index: true});
     property('userId', Number, {index: true});
     property('groupId', Number, {index: true});
+    property('contentIds', JSON);
     property('createdAt', Date);
     property('url', String);
     property('width', Number);

@@ -22,6 +22,7 @@ var path = require('path');
 var request = require('request');
 var qs = require('querystring');
 var http = require('http');
+var _ = require('underscore');
 
 module.exports = function (compound, Page) {
     var api = compound.hatch.api;
@@ -274,63 +275,50 @@ module.exports = function (compound, Page) {
         }
     };
 
-    Page.prototype.renderHtml = function (req, cb) {
-        var index = {}, result = {}, self = this;
-        if (this.templateWidgets) {
-            this.templateWidgets.forEach(function (widget) {
-                index[widget.id] = widget;
-            });
-        }
-        var wait = 0;
-        this.columns.forEach(function (col) {
-            col.widgets.forEach(function (widgetId) {
-                wait += 1;
-                var w, suf;
-                if (col.fromTemplate) {
-                    suf = 't';
-                    w = index[widgetId];
-                } else {
-                    w = self.widgets[widgetId];
-                    suf = 'p';
-                }
-                self.renderWidget(w, req, function (err, html) {
-                    if (err) {
-                        result[widgetId + suf] = err;
-                    } else {
-                        result[widgetId + suf] = html;
-                    }
-                    done();
-                });
-            });
-        });
+    Page.prototype.renderHtml = function (req, callback) {
+        var result = {}, self = this;
 
-        if (!wait) {
-            wait = 1;
-            done();
-        }
+        async.forEach(self.widgets.items, function (widget, next) {
+            self.renderWidgetDirect(widget, req, function (err, html) {
+                if (!result[widget.id]) {
+                    if (err) {
+                        result[widget.id] = err;
+                    } else {
+                        result[widget.id] = html;
+                    }
+                    next();
+                }
+            });
+        }, done);
 
         function done() {
             var cols = [], sizes = [];
-            if (0 !== --wait) {
-                return;
-            }
             self.columns.forEach(function (col) {
                 var html = '';
-                var suf = col.fromTemplate ? 't' : 'p';
                 col.widgets.forEach(function (widgetId) {
-                    html += result[widgetId + suf];
+                    html += result[widgetId];
                 });
                 cols.push(html);
                 sizes.push(col.size);
             });
             var gridHtml = Page.grids[self.grid || '02-two-columns'] || [''];
-            cb(null, ejs.render(gridHtml[0], {
+
+            callback(null, ejs.render(gridHtml[0], {
                 column: cols,
                 size: sizes,
                 filename: self.grid + (self.templateId || ''),
                 cache: true
             }));
         }
+    };
+
+    Page.prototype.renderWidgetDirect = function (widget, req, cb) {
+        var moduleName = widget.type.split('/')[0];
+        var widgetName = 'widgets/' + widget.type.split('/').slice(1).join('/');
+
+        return renderWidgetAction(req, moduleName, widgetName, widget, 'show', function (err, body) {
+            cb(err, body);
+        });
     };
 
     Page.prototype.renderWidget = function (widget, req, cb) {
@@ -373,23 +361,36 @@ module.exports = function (compound, Page) {
             widgetId: widgetId,
             templateWidget: !!widget.templateWidget
         };
-        // request.post(
-        //     url,
-        //     {form: {
-        //         token: 'test',
-        //         data: JSON.stringify(data)
-        //     }},
-        //     function (err, res) {
-        //         cb(err, res && res.body);
-        //     }
-        // );
-        // 
         
-        inAppRequest(req, url, { token: 'test', data: data }, function(err, res) {
+        inAppRequest(req, url, { data: data }, function(err, res) {
             cb(err, res);
         });
 
     };
+
+    function renderWidgetAction(req, moduleName, widgetName, widget, action, callback) {
+        var module = compound.hatch.modules[moduleName];
+        req.body.data = {
+            widgetId: widget.id,
+            templateWidget: false
+        }
+
+        var res = new http.ServerResponse({method: 'NOTHEAD'});
+
+        res.controllerName = widgetName.split('/')[0];
+        res.compound = module.compound;
+        res.req = req;
+        res.context = {
+            req: req,
+            res: res,
+            inAction: true
+        };
+        res.render = function (file, viewContext, next) { 
+            compound.app.render(file, viewContext, next || callback); 
+        };
+
+        module.compound.controllerBridge.callControllerAction(widgetName, action, req, res, callback);
+    }
 
     function inAppRequest(parent, url, data, callback) {
         var req = new http.IncomingMessage;
@@ -404,6 +405,7 @@ module.exports = function (compound, Page) {
         req.user = parent.user;
         req.group = parent.group;
         req.page = parent.page;
+        req.post = parent.post;
 
         // TODO: we need to set the cookies and session so that they can be 
         // accessed and set (if required) from each widget. This doesn't seem
@@ -415,7 +417,10 @@ module.exports = function (compound, Page) {
         req.method = 'POST';
         req.connection = {};
         req.url      = '/' + url;
-        req.headers  = { host: parent.headers.host };
+        req.headers  = { 
+            host: parent.headers.host,
+            'user-agent': parent.headers['user-agent']
+        };
 
         compound.app.handle(req, res);
     }

@@ -16,8 +16,11 @@
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
 
-var compound = require('compound');
+before(function init(c) {
+    c.locals.post = c.req.post || {};
+    c.next();
+});
 
-module.exports = function(c) {
-    return compound.createServer({root: __dirname});
-};
+action(function show(c) {
+    render();
+});

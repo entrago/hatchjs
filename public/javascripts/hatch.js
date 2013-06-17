@@ -3,16 +3,7 @@ var search = new SearchController();
 
 //pathTo is the client side routing function
 window.pathTo = function pathTo(action) {
-    var pageId = $('meta[name=pageId]:last').attr('content');
-    var groupId = $('meta[name=groupId]').attr('content');
-    var pageUrl = location.href.replace(/^https?:\/\//, '');
-    var url =  [
-        '/do/' + action, [
-            'pageId=' + encodeURIComponent(pageId),
-            'groupId=' + groupId
-        ].join('&')
-    ].join(action.match(/\?/) ? '&' : '?');
-    return url;
+    return (window.location.pathname.split('/do/')[0] + '/do/' + action).replace('//', '/');
 };
 
 //init everything on page load

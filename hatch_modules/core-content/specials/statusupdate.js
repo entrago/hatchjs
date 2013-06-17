@@ -16,8 +16,29 @@
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
 
-var compound = require('compound');
+exports.defaultPath = 'status/:id';
 
-module.exports = function(c) {
-    return compound.createServer({root: __dirname});
+exports.defaultPage = {
+    title: 'View status update',
+    grid: '01-one-column',
+    columns: [{size: 12, widgets: [1, 2]}, {size: 12, widgets: [3]}],
+    widgets: [
+        {id: 1, type: 'core-widgets/group-header'},
+        {id: 2, type: 'core-widgets/mainmenu'},
+        {id: 3, type: 'core-content/permalink-content'}
+    ]
 };
+
+exports.handler = function (c, done) {
+    if (parseInt(this.specialPageParams.id)) {
+        c.Content.find(this.specialPageParams.id, function (err, post) {
+            c.req.post = post;
+            done();
+        });
+    } else {
+        done();
+    }
+};
+
+exports.contentType = 'statusupdate';
+

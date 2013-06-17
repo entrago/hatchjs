@@ -676,7 +676,7 @@ module.exports = function (compound, User) {
     User.prototype.adminOf = function (groupId) {
         if (groupId instanceof Group) groupId = groupId.id;
         var m = this.getMembership(Number(groupId));
-        if (m && (m.role === 'admin' || m.role === 'owner')) {
+        if (m && (m.role === 'editor' || m.role === 'owner')) {
             return m;
         } else {
             return null;
@@ -868,5 +868,48 @@ module.exports = function (compound, User) {
         if (!found) {
             return callback(null, found);
         }
+    };
+
+    /**
+     * Populate all of the memberships with full group info for the specified
+     * list of users.
+     * 
+     * @param  {Array}    users    - list of users
+     * @param  {Function} callback - callback function
+     */
+    User.populateMemberships = function (users, callback) {
+        var groupIds = [];
+        var groupsHash = {};
+
+        users.forEach(function (user) {
+            user.memberships.forEach(function (membership) {
+                if (groupIds.indexOf(membership.groupId) === -1) {
+                    groupIds.push(membership.groupId.toString());
+                }
+            });
+        });
+
+        // if there are no memberships to populate, exit
+        if (groupIds.length === 0) {
+            return callback(null, users);
+        }
+
+        // load all of the matching groups
+        Group.all({ where: { id: { inq: groupIds }}}, function (err, groups) {
+            groups.forEach(function (err, index) { // WTF: this is weird
+                var group = groups[index];
+                if (group.id) {
+                    groupsHash[group.id.toString()] = group;
+                }
+            });
+
+            users.forEach(function (user) {
+                user.memberships.forEach(function (membership) {
+                    membership.group = groupsHash[membership.groupId.toString()];
+                });
+            });
+
+            callback(err, users);
+        });
     };
 };

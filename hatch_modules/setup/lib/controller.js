@@ -40,8 +40,7 @@ SetupController.prototype.setup = function(c) {
     var res = c.res;
 
     // standard application setup
-    var fields = ['username', 'email', 'password', 'confirm', 'name',
-        'url'];
+    var fields = ['username', 'email', 'password', 'confirm', 'name', 'url'];
 
     // validate
     for (var f in fields) {
@@ -65,7 +64,7 @@ SetupController.prototype.setup = function(c) {
     }
 
     // load the seed data and modify
-    var seeds = require('../seed.yml')[0];
+    var seeds = require(c.app.get('setupseed') || '../seed.yml')[0];
 
     seeds[0].Group.name = req.body.name;
     seeds[0].Group.url = req.body.url;

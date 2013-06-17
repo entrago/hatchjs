@@ -19,6 +19,7 @@
 module.exports = function (compound, Media) {
     Media.SIZES = ['32x0', '64x0', '128x0', '320x0'];
 
+    var Content = compound.models.Content;
     var request = require('request');
     var im = require('imagemagick');
     var async = require('async');
@@ -27,6 +28,36 @@ module.exports = function (compound, Media) {
     var fsTools = require('fs-tools');
     var mime = require('mime');
     var _ = require('underscore');
+
+    /**
+     * Before a media item is created, make sure the type is set.
+     * 
+     * @param  {Function} next - continuation function
+     * @param  {Object}   data - data to create with
+     */
+    Media.beforeCreate = function (next, data) {
+        if (!data.type) {
+            if (Media.isVideo(data.url)) {
+                data.type = 'video';
+            }
+            if (Media.isImage(data.url)) {
+                data.type = 'image';
+            }
+        }
+
+        next();
+    };
+
+    /**
+     * After a media item is updated, make sure to update the content records in
+     * which it is referenced as an attachment.
+     * 
+     * @param  {Function} next - continuation function
+     * @param  {Object    data - data to save 
+     */
+    Media.afterSave = function (next, data) {
+        this.updateContent(next);
+    };
 
     /**
      * Create a new media object with a URL of a file on the web. The file will
@@ -231,7 +262,7 @@ module.exports = function (compound, Media) {
     Media.prototype.getUrl = function (size) {
         var i;
 
-        if (!this.resized.length) {
+        if (!this.resized || !this.resized.length) {
             return this.url;
         }
 
@@ -240,7 +271,7 @@ module.exports = function (compound, Media) {
 
         // check for larger/equal media
         for (i=0; i < this.resized.length; i++) {
-            var resize = this.resized.items[i];
+            var resize = this.resized.items && this.resized.items[i] || this.resized[i];
             if (resize.width >= width && resize.height >= height) {
                 if (resize.url) {
                     return resize.url;
@@ -254,5 +285,95 @@ module.exports = function (compound, Media) {
         return this.url;
     };
 
-    
+    /**
+     * Get the media URL for the specified size. Will retrive the media equal to
+     * or greater than the specified size.
+     *
+     * @param  {Object} media - media object to get url for
+     * @param  {String} size  - media size to look for
+     * @return {String}       - URL for the resized media
+     */
+    Media.getUrl = function (media, size) {
+        return Media.prototype.getUrl.apply(media, [size]);
+    };
+
+    /**
+     * Assign multiple media items to a content post.
+     * 
+     * @param  {Array}    ids      - array of media ids
+     * @param  {Content}  post     - content item
+     * @param  {Function} callback - callback function
+     */
+    Media.assignToContentMulti = function (ids, post, callback) {
+        if (!ids || ids.length === 0) {
+            return callback(null, post);
+        }
+
+        // if we have full media json strings instead of ids, parse them to get ids
+        if (typeof ids[0] === 'string') {
+            ids = _.map(ids, function (json) {
+                return JSON.parse(json).id || json;
+            });
+        }
+
+        Media.all({ where: { id: { inq: ids }}}, function (err, items) {
+            items.forEach(function (media) {
+                media.assignToContent(post);
+            });
+
+            callback(err, post);
+        });
+    };
+
+    /**
+     * Assign this media item to a content entry.
+     * 
+     * @param  {Content} post - post to add this media to as an attachment
+     */
+    Media.prototype.assignToContent = function (post) {
+        var self = this;
+
+        if (!self.contentIds) {
+            self.contentIds = [];
+        }
+
+        // add a record of the content to this media item
+        if (self.contentIds.indexOf(post.id) === -1) {
+            self.contentIds.push(post.id);
+        }
+
+        if (!post.attachments) {
+            post.attachments = [];
+        }
+
+        // insert the media item in the same position it already was 
+        // or just add to the end of the array
+        var index = post.attachments.indexOf(_.findWhere(post.attachments, { id: self.id }));
+
+        if (index > -1) {
+            post.attachments[index] = self.toObject();
+        } else {
+            post.attachments.push(self.toObject());
+        }
+    };
+
+    /**
+     * Update all content records that this media item is already attached to.
+     * 
+     * @param  {Function} callback - callback function
+     */
+    Media.prototype.updateContent = function (callback) {
+        var self = this;
+
+        async.forEach(self.contentIds || [], function (id, done) {
+            Content.find(id, function (err, post) {
+                self.assignToContent(post);
+                post.save(done);
+            });
+        }, function (err) {
+            if (callback) {
+                callback(err);
+            }
+        })
+    };
 };
