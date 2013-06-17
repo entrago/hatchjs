@@ -21,9 +21,6 @@ describe('Group', function() {
                 should.exist(clone);
                 clone.url.should.equal('example.com/1602');
                 clone.homepage.url.should.equal('example.com/1602');
-                g.subgroups.map(function(x) {
-                    return x.path;
-                }).should.include(clone.path);
                 done();
             });
         });

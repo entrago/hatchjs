@@ -11,8 +11,6 @@ describe('Page', function() {
         Page = compound.models.Page;
     });
 
-    it('should render a page with 4 different widgets on it', function(done) {
-        
-    });
+    it('should render a page with 4 different widgets on it');
 
 });

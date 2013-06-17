@@ -256,8 +256,6 @@ module.exports = function (compound, Content) {
             });
         });
 
-        console.log('userIDs is : ' + userIds);
-
         if (userIds.length == 0) return callback(null, list);
 
         function findUser(users, id) {
