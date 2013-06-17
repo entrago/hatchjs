@@ -53,7 +53,6 @@ describe('Content', function() {
             post.like({ username: 'test_user', id: 1 }, function (err, post) {
                 post.likesTotal.should.equal(1);
                 post.likes.length.should.equal(1);
-                post.doesLike({ id: 1 }).should.be.ok;
                 done();
             });
         });
