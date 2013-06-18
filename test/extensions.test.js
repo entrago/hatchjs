@@ -186,6 +186,37 @@ describe('extensions /controller/', function() {
 
     });
 
+    describe('formatNumber', function() {
+        it('should format number', test(function(c) {
+            should.exist(c.formatNumber);
+            c.formatNumber(1234).should.equal('1.2k');
+            c.formatNumber(123456).should.equal('123.5k');
+            c.formatNumber(1234567).should.equal('1.2m');
+            c.formatNumber(1234567890).should.equal('1.2b');
+            c.formatNumber(543).should.equal(543);
+            c.next();
+        }));
+    });
+
+    describe('fromNow', function() {
+        it('should return time from now in words', test(function(c) {
+            should.exist(c.fromNow);
+            var day = 86400000;
+            c.fromNow(Date.now() - day).should.equal('a day ago');
+            c.fromNow(Date.now() - day * 2).should.equal('2 days ago');
+            c.next();
+        }));
+    });
+
+    describe('getUrl', function() {
+        it('should return url to media', test(function(c) {
+            should.exist(c.getUrl);
+            c.getUrl('str').should.equal('str');
+            c.getUrl({url: 'test'}).should.equal('test');
+            c.next();
+        }));
+    });
+
 });
 
 function test(fn) {
@@ -196,6 +227,7 @@ function test(fn) {
 }
 
 function TestController(){}
+
 TestController.prototype.action = function(c) {
     TestController.test.call(this, c);
 };
