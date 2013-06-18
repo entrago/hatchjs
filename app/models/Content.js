@@ -256,8 +256,6 @@ module.exports = function (compound, Content) {
             });
         });
 
-        console.log('userIDs is : ' + userIds);
-
         if (userIds.length == 0) return callback(null, list);
 
         function findUser(users, id) {
@@ -516,7 +514,7 @@ module.exports = function (compound, Content) {
     Content.updateComments = function (contentId, callback) {
         Content.find(contentId, function (err, post) {
             if (post) {
-                Comment.all({ where: { contentId: post.id }, limit: Content.CACHEDCOMMENTS }, function (err, comments) {
+                Comment.all({ where: { contentId: post.id }, limit: Content.CACHEDCOMMENTS, order: 'createdAt DESC' }, function (err, comments) {
                     post.commentsTotal = comments.countBeforeLimit;
                     post.comments.items = [];
 
