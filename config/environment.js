@@ -36,8 +36,6 @@ module.exports = function (compound) {
         }));
         app.use(express.methodOverride());
 
-        console.log('environment is ' + process.env.NODE_ENV);
-
         if(process.env.NODE_ENV != 'test'){
             app.use(require('express-mobile-agent'));
         }
