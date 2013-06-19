@@ -259,9 +259,10 @@ module.exports = function (compound, Content) {
         if (userIds.length == 0) return callback(null, list);
 
         function findUser(users, id) {
-            return _.find(users, function (user) {
+            var user = _.find(users, function (user) {
                 return user.id == id;
             });
+            return user && user.toPublicObject();
         }
 
         //load all of the users
