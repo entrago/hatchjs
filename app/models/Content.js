@@ -685,6 +685,9 @@ module.exports = function (compound, Content) {
             return callback(null, posts);
         }
 
+        //if the posts list is not a list, make it a list
+        if (!posts.length && posts.id) posts = [posts];
+
         Like.getLikeIds(user.id, function (err, ids) {
             posts.forEach(function (post) {
                 post.doesLike = ids.indexOf(post.id) > -1;
