@@ -520,7 +520,7 @@ module.exports = function (compound, Content) {
                     post.comments.items = [];
 
                     // reverse the comments so we can show latest at the end
-                    comments.reverse();
+                    comments = comments.reverse();
 
                     comments.forEach(function (comment) {
                         post.comments.push(comment.toObject());
