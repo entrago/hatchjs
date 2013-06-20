@@ -44,6 +44,31 @@ module.exports = function (compound, Group) {
     };
 
     /**
+     * Find a group for the specfied URL.
+     * 
+     * @param  {String}   url      - URL to search for
+     * @param  {Function} callback - callback function
+     */
+    Group.findByUrl = function (url, callback) {
+        function find (url, callback) {
+            Group.findOne({ where: { pageUrls: url }}, function (err, group) {
+                if (!group) {
+                    if (url.indexOf('/') > -1) {
+                        url = url.substring(0, url.lastIndexOf('/'));
+                        return find(url, callback);
+                    } else {
+                        return callback(err, group);
+                    }
+                } else {
+                    return callback(err, group);
+                }
+            });
+        }
+
+        find(url, callback);
+    };
+
+    /**
      * Update a group's URLs by getting the updated list from the pages within.
      * 
      * @param  {Group}    group    - group to update
