@@ -7,11 +7,13 @@ module.exports = function (compound) {
     var MemoryStore = express.session.MemoryStore;
     var RedisStore = require('connect-redis')(express);
     var isTest = app.set('env') === 'test';
-    var sessionStore = isTest ?
-        new MemoryStore :
-        new RedisStore({ttl: 86400 * 365});
 
     app.configure(function(){
+
+        var sessionStore = isTest ?
+            new MemoryStore :
+            new RedisStore(app.get('session-store') || {ttl: 86400 * 365});
+
         app.set('jsDirectory', '/javascripts/');
         app.set('cssDirectory', '/stylesheets/');
         app.set('cssEngine', 'stylus');
