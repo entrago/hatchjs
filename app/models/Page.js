@@ -301,12 +301,14 @@ module.exports = function (compound, Page) {
                 cols.push(html);
                 sizes.push(col.size);
             });
-            var gridHtml = Page.grids[self.grid || '02-two-columns'] || [''];
+
+            var grid = req.agent && req.agent.mobile ? ('m.' + self.grid) : self.grid;
+            var gridHtml = Page.grids[grid || self.grid || '02-two-columns'] || [''];
 
             callback(null, ejs.render(gridHtml[0], {
                 column: cols,
                 size: sizes,
-                filename: self.grid + (self.templateId || ''),
+                filename: grid + (self.templateId || ''),
                 cache: true
             }));
         }

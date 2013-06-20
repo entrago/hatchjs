@@ -259,9 +259,10 @@ module.exports = function (compound, Content) {
         if (userIds.length == 0) return callback(null, list);
 
         function findUser(users, id) {
-            return _.find(users, function (user) {
+            var user = _.find(users, function (user) {
                 return user.id == id;
             });
+            return user && user.toPublicObject();
         }
 
         //load all of the users
@@ -519,7 +520,7 @@ module.exports = function (compound, Content) {
                     post.comments.items = [];
 
                     // reverse the comments so we can show latest at the end
-                    comments.reverse();
+                    comments = comments.reverse();
 
                     comments.forEach(function (comment) {
                         post.comments.push(comment.toObject());
@@ -683,6 +684,9 @@ module.exports = function (compound, Content) {
         if (!user) {
             return callback(null, posts);
         }
+
+        //if the posts list is not a list, make it a list
+        if (!posts.length && posts.id) posts = [posts];
 
         Like.getLikeIds(user.id, function (err, ids) {
             posts.forEach(function (post) {

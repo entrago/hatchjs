@@ -269,14 +269,16 @@ module.exports = function (compound, Media) {
         var width = parseInt(size.split('x')[0]);
         var height = parseInt(size.split('x')[1] || 0);
 
-        // check for larger/equal media
-        for (i=0; i < this.resized.length; i++) {
-            var resize = this.resized.items && this.resized.items[i] || this.resized[i];
-            if (resize.width >= width && resize.height >= height) {
-                if (resize.url) {
-                    return resize.url;
-                } else {
-                    return this.url.split('/').slice(0, -1).join('/') + '/' + resize.filename;
+        if (width > 0 || height > 0) {
+            // check for larger/equal media
+            for (i=0; i < this.resized.length; i++) {
+                var resize = this.resized.items && this.resized.items[i] || this.resized[i];
+                if (resize.width >= width && resize.height >= height) {
+                    if (resize.url) {
+                        return resize.url;
+                    } else {
+                        return this.url.split('/').slice(0, -1).join('/') + '/' + resize.filename;
+                    }
                 }
             }
         }
