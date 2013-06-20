@@ -10,10 +10,6 @@ module.exports = function (compound) {
         app.set('cssEngine', 'stylus');
         // make sure you run `npm install browserify uglify-js`
         // app.enable('clientside');
-        app.use(express.bodyParser());
-        app.use(express.cookieParser('secret'));
-        app.use(express.session({secret: 'secret'}));
-        app.use(express.methodOverride());
         app.use(app.router);
     });
 
