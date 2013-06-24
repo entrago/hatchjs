@@ -706,7 +706,7 @@ module.exports = function (compound, Content) {
      * @param {Function} callback - callback
      */
     Content.allWithLikes = function (query, user, callback) {
-        var likeIds = null;
+        var likeIds = [];
         var posts = null;
 
         async.parallel([
@@ -717,6 +717,9 @@ module.exports = function (compound, Content) {
                 });
             },
             function (done) {
+                if (!user) {
+                    return done();
+                }
                 Like.getLikeIds(user.id, function (err, ids) {
                     likeIds = ids;
                     done();
