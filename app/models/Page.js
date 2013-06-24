@@ -306,6 +306,9 @@ module.exports = function (compound, Page) {
             var grid = req.agent && req.agent.mobile ? ('m.' + self.grid) : self.grid;
             var gridHtml = Page.grids[grid || self.grid || '02-two-columns'] || [''];
 
+            // log the total render time
+            console.log('RENDER [' + (new Date() - req.startedAt) + 'ms]');
+
             callback(null, ejs.render(gridHtml[0], {
                 column: cols,
                 size: sizes,
