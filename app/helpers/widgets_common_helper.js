@@ -11,5 +11,5 @@ exports.widgetAction = function (s, type) {
 };
 
 exports.widgetCoreAction = function (s) {
-    return [this.req.pagePath, 'do/admin/widget', this.locals.widget.id || 'NOWID', s].join('/');
+    return [this.req.pagePath, 'do/core-widgets/widget', this.locals.widget.id || 'NOWID', s].join('/');
 };

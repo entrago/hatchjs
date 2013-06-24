@@ -28,6 +28,7 @@ module.exports = ContentController;
 
 function ContentController(init) {
     Application.call(this, init);
+    init.before(setDateTimeFormat);
     init.before(loadTags);
     init.before(findContent);
     init.before(function (c) {
@@ -47,13 +48,16 @@ function loadTags(c) {
     });
 }
 
+function setDateTimeFormat (c) {
+    c.locals.datetimeformat = c.app.get('datetimeformat');
+    c.next();
+}
+
 // Render a content type input form which is defined in the contentType API
 function renderInputForm(c, next) {
     var type = c.locals.post.type;
     var contentType = c.compound.hatch.contentType.getContentType(type);
-
-    c.locals.datetimeformat = c.app.get('datetimeformat');
-
+    
     c.prepareViewContext();
     c.locals.editForm = c.renderContent(c.locals.post, 'editForm');
 
