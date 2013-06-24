@@ -17,7 +17,6 @@
 //
 
 module.exports = function (compound, Media) {
-    Media.SIZES = ['32x0', '64x0', '128x0', '320x0'];
 
     var Content = compound.models.Content;
     var request = require('request');

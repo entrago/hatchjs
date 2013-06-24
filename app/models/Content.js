@@ -23,6 +23,7 @@ module.exports = function (compound, Content) {
     var Page = compound.models.Page;
     var Comment = compound.models.Comment;
     var Like = compound.models.Like;
+    var Media = compound.models.Media;
 
     var Group = compound.models.Group;
     var redis = Content.schema.adapter;
@@ -281,6 +282,60 @@ module.exports = function (compound, Content) {
 
             callback(err, list);
         });
+    };
+
+    /**
+     * populates attachment field for backwards compatibility
+     *
+     */
+    Content.prototype.populateAttachment = function() {
+        //if post has no attachments, exit
+        if(!this.attachments || this.attachments.length === 0)
+            return
+
+        console.log('in populateAttachment');
+
+        var firstAttachment = this.attachments[0];
+        switch(this.type) {
+            case "video":
+                console.log('in video.. with attachments:');
+                console.log(this.attachments);
+                var videoAttachment = _.find(this.attachments, function(attachment) { return attachment.type === 'video'})
+                var imageAttachment = _.find(this.attachments, function(attachment) { return attachment.type === 'image'})
+                console.log(imageAttachment);
+                this.attachment = [{
+                    video: [{
+                        url: Media.getUrl(videoAttachment, '854x0')
+                    }],
+                    preview: imageAttachment.url
+                }]
+                break;
+            case "live":
+                this.attachment = {
+                    groupId: this.groupId,
+                    user1id: this.authorId,
+                    type: firstAttachment.type,
+                    id: firstAttachment.id,
+                    // stream1Id:
+                    // stream1Url:
+                    // outputUrl:
+                    // previewUrl:
+                    // status:
+                    // createdAt:
+                    // startTime:
+                };
+                break;
+
+            case "picture":
+                this.attachment = [{
+                    photo: {
+                        url: firstAttachment.url
+                    }
+                }];
+                break;
+            default:
+                console.log('couldnt find attachment type: '+firstAttachment.type)
+            }
     };
 
     /**
