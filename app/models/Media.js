@@ -145,7 +145,7 @@ module.exports = function (compound, Media) {
                 data.height = features.height;
 
                 // now resize the image
-                Media.resizeImage(data, function (err, data) {
+                Media.resizeImage(data, params.size, function (err, data) {
                     if (err) {
                         return callback(err);
                     } else {
@@ -207,49 +207,68 @@ module.exports = function (compound, Media) {
      * @param  {Object}   data     - media or media creation data
      * @param  {Function} callback - callback function
      */
-    Media.resizeImage = function (data, callback) {
+    Media.resizeImage = function (data, defaultSize, callback) {
         data.resized = [];
 
-        // if there are no sizes, continue
-        if (!Media.SIZES.length) {
-            return callback(null, data);
-        }
+        // if we have a default size, crop the original image to same location
+        if (defaultSize && defaultSize.indexOf('x') > -1) {
+            var width = parseInt(defaultSize.split('x')[0]);
+            var height = parseInt(defaultSize.split('x')[1] || 0);
 
-        async.forEach(Media.SIZES, function (size, done) {
-            var width = parseInt(size.split('x')[0]);
-            var height = parseInt(size.split('x')[1] || 0);
-
-            var resizeFilename = data.filename.split('.').slice(0, -1).join('.') +
-                '_' + size + '.' + data.filename.split('.').slice(-1)[0];
-
-            //resize and upload each file
-            im.resize({
+            im.crop({
                 srcPath: data.filename,
-                dstPath: resizeFilename,
+                dstPath: data.filename,
                 width: width,
                 height: height
             }, function (err, stdout, stderr) {
-                if (err) {
-                    return done(err);
-                } else {
-                    im.identify(resizeFilename, function (err, features) {
-                        data.resized.push({
-                            size: size,
-                            width: features.width,
-                            height: features.height,
-                            filename: resizeFilename.split('/').slice(-1)[0]
-                        });
-                        done();
-                    });
-                }
+                run();
             });
-        }, function (err) {
-            if (err) {
-                return callback(err);
-            } else {
+        } else {
+            run();
+        }
+
+        function run() {
+            // if there are no sizes, continue
+            if (!Media.SIZES.length) {
                 return callback(null, data);
             }
-        });
+
+            async.forEach(Media.SIZES, function (size, done) {
+                var width = parseInt(size.split('x')[0]);
+                var height = parseInt(size.split('x')[1] || 0);
+
+                var resizeFilename = data.filename.split('.').slice(0, -1).join('.') +
+                    '_' + size + '.' + data.filename.split('.').slice(-1)[0];
+
+                //resize and upload each file
+                im.resize({
+                    srcPath: data.filename,
+                    dstPath: resizeFilename,
+                    width: width,
+                    height: height
+                }, function (err, stdout, stderr) {
+                    if (err) {
+                        return done(err);
+                    } else {
+                        im.identify(resizeFilename, function (err, features) {
+                            data.resized.push({
+                                size: size,
+                                width: features.width,
+                                height: features.height,
+                                filename: resizeFilename.split('/').slice(-1)[0]
+                            });
+                            done();
+                        });
+                    }
+                });
+            }, function (err) {
+                if (err) {
+                    return callback(err);
+                } else {
+                    return callback(null, data);
+                }
+            });
+        }
     };
 
     /**
