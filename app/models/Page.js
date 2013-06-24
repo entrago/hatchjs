@@ -376,7 +376,7 @@ module.exports = function (compound, Page) {
         var req = {};
 
         // create a new 'request' from scratch and copy over all of the required properties from the parent request
-        ['user', 'group', 'page', 'post', 'cookies', 'session', 'compound', 'method', 'app', 'pagePath', 'agent']
+        ['user', 'group', 'page', 'post', 'cookies', 'session', 'compound', 'method', 'app', 'pagePath', 'locals', 'agent']
             .forEach(function (key) {
             req.__defineGetter__(key, function () { 
                 return parent[key]; 
