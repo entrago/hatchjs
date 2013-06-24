@@ -44,7 +44,13 @@ $(function () {
         var selector = $.map($(this).attr('data-update-content').split(':'), function (id) {
             return '[data-id=' + id + ']';
         }).join(' ');
-        $(selector).replaceWith(data);
+        var html = '';
+        if (typeof data === 'string') {
+            html = data;
+        } else {
+            html = data.res;
+        }
+        $(selector).replaceWith(html);
     });
 
     $(document).on('ajax:success', '.adjust', function (e, data) {
@@ -65,7 +71,7 @@ function widgetAction(handle, data) {
     var action = h.shift();
     var id = h.shift();
 
-    var path = ['/do/admin/widget', pageId, id, action].join('/');
+    var path = [location.pathname + 'do/admin/widget', id, action].join('/');
 
     if (data) {
         path += '?' + data;

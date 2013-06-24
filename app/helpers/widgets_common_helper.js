@@ -6,7 +6,7 @@ exports.__ = function (s) {
 exports._ = require('underscore');
 
 exports.widgetAction = function (s, type) {
-    console.log('DEPRECATED widgetAction helper, usr widgetCoreAction instead');
+    console.log('DEPRECATED widgetAction helper, use widgetCoreAction instead');
     return this.req.pagePage + '/do/' + (type || this.locals.widget.type).replace('/', '/widgets/') + '/' + s;
 };
 
