@@ -71,7 +71,7 @@ function widgetAction(handle, data) {
     var action = h.shift();
     var id = h.shift();
 
-    var path = [location.pathname + 'do/admin/widget', id, action].join('/');
+    var path = [location.pathname + 'do/core-widgets/widget', id, action].join('/');
 
     if (data) {
         path += '?' + data;
@@ -106,9 +106,30 @@ function send(action, data, response, done) {
     }, response);
 }
 
+function sendToWidget(action, data, response, done) {
+    if (typeof response === 'function') {
+        done = response;
+        response = null;
+    }
+    data[csrfParam] = csrfToken;
+
+    pageId = $('meta[name=pageId]:last').attr('content');
+
+    var pathname = window.location.pathname.split('/do/')[0];
+    if (pathname === '/') pathname = '';
+
+    var path = pathname + '/do/core-widget/' + action;
+
+    $.post(path, data, function(data) {
+        if (typeof done === 'function') {
+            done(data);
+        }
+    }, response);
+}
+
 function createWidget(type, col, row) {
     var name = type.split('/').pop();
-    send('widget', {addWidget: type}, 'json', function (data) {
+    sendToWidget(null, {addWidget: type}, 'json', function (data) {
         if (data.error) {
             $.noty({text: "<i class='icon-warning-sign'></i> " + data.error.message, type: "error"});
         } else {
@@ -224,7 +245,7 @@ function updateWidgetContent() {
     var $el = $(this);
     var $widget = $el.closest('.module');
     var widgetId = $widget.attr('data-id');
-    send('widget/' + widgetId, {
+    sendToWidget(widgetId, {
         _method: 'PUT',
         perform: 'update',
         'with': {
@@ -237,7 +258,7 @@ function updateWidgetContent() {
 
 function removeWidget($widget) {
     var widgetId = $widget.attr('data-id');
-    send('widget/' + widgetId, {
+    sendToWidget(widgetId, {
         _method: 'DELETE'
     }, function () {
         $.noty({text: "<i class='icon-ok'></i> Widget removed", type: "success"});
@@ -247,4 +268,3 @@ function removeWidget($widget) {
     });
     return false;
 }
-

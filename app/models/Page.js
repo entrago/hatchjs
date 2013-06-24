@@ -397,7 +397,7 @@ module.exports = function (compound, Page) {
         var res = new http.ServerResponse({method: 'NOTHEAD'});
 
         res.controllerName = widgetName.split('/')[0];
-        res.compound = module.compound;
+        res.compound = module && module.compound;
         res.req = req;
         res.context = {
             req: req,
@@ -408,7 +408,7 @@ module.exports = function (compound, Page) {
             compound.app.render(file, viewContext, next || callback); 
         };
 
-        module.compound.controllerBridge.callControllerAction(widgetName, action, req, res, callback);
+        module && module.compound.controllerBridge.callControllerAction(widgetName, action, req, res, callback);
     }
 
     function inAppRequest(parent, url, data, callback) {
