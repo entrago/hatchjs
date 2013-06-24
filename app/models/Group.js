@@ -21,6 +21,7 @@ var path = require('path');
 module.exports = function (compound, Group) {
 
     var Page = compound.models.Page;
+    var Content = compound.models.Content;
     var User = compound.models.User;
     var Content = compound.models.Content;
     var _ = require('underscore');
@@ -41,6 +42,37 @@ module.exports = function (compound, Group) {
             data.createdAt = new Date();
             next();
         }
+    };
+
+    /**
+     * Find a group for the specfied URL.
+     * 
+     * @param  {String}   url      - URL to search for
+     * @param  {Function} callback - callback function
+     */
+    Group.findByUrl = function (url, callback) {
+        function find (url, callback) {
+            Group.findOne({ where: { pageUrls: url }}, function (err, group) {
+                if (!group) {
+                    Content.findOne({ where: { url: url }}, function (err, post) {
+                        if (post) {
+                            return callback(err, null);
+                        } else {
+                            if (url.indexOf('/') > -1) {
+                                url = url.substring(0, url.lastIndexOf('/'));
+                                return find(url, callback);
+                            } else {
+                                return callback(err, group);
+                            }
+                        }
+                    });
+                } else {
+                    return callback(err, group);
+                }
+            });
+        }
+
+        find(url, callback);
     };
 
     /**
