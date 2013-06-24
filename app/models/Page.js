@@ -282,6 +282,7 @@ module.exports = function (compound, Page) {
             self.renderWidgetDirect(widget, req, function (err, html) {
                 if (!result[widget.id]) {
                     if (err) {
+                        console.log(err);
                         result[widget.id] = err;
                     } else {
                         result[widget.id] = html;
@@ -370,8 +371,24 @@ module.exports = function (compound, Page) {
 
     };
 
-    function renderWidgetAction(req, moduleName, widgetName, widget, action, callback) {
+    function renderWidgetAction(parent, moduleName, widgetName, widget, action, callback) {
         var module = compound.hatch.modules[moduleName];
+        var req = {};
+
+        // create a new 'request' from scratch and copy over all of the required properties from the parent request
+        ['user', 'group', 'page', 'post', 'cookies', 'session', 'compound', 'method', 'app', 'pagePath', 'agent']
+            .forEach(function (key) {
+            req.__defineGetter__(key, function () { 
+                return parent[key]; 
+            });
+        });
+
+        // copy the param function
+        req.param = parent.param;
+
+        req.params = {};
+        req.query = {};
+        req.body = {};
         req.body.data = {
             widgetId: widget.id,
             templateWidget: false
