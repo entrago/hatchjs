@@ -670,7 +670,7 @@ module.exports = function (compound, Content) {
             user.setMembershipState(post.groupId, 'blacklisted', function (err, user) {
                 post.destroy(callback);
             });
-        })
+        });
     };
 
     /**
@@ -691,6 +691,47 @@ module.exports = function (compound, Content) {
         Like.getLikeIds(user.id, function (err, ids) {
             posts.forEach(function (post) {
                 post.doesLike = ids.indexOf(post.id) > -1;
+            });
+
+            callback(err, posts);
+        });
+    };
+
+    /**
+     * Load content and set the the doesLike properties for a list of content 
+     * items for the specified user.
+     *
+     * @param {Object}   query    - query to run to find content
+     * @param {User}     user     - logged in user
+     * @param {Function} callback - callback
+     */
+    Content.allWithLikes = function (query, user, callback) {
+        var likeIds = [];
+        var posts = null;
+
+        async.parallel([
+            function (done) {
+                Content.all(query, function (err, results) {
+                    posts = results;
+                    done();
+                });
+            },
+            function (done) {
+                if (!user) {
+                    return done();
+                }
+                Like.getLikeIds(user.id, function (err, ids) {
+                    likeIds = ids;
+                    done();
+                });
+            }
+        ], function (err) {
+            if (err) {
+                return callback(err);
+            }
+
+            posts.forEach(function (post) {
+                post.doesLike = likeIds.indexOf(post.id) > -1;
             });
 
             callback(err, posts);

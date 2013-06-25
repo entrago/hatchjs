@@ -306,6 +306,10 @@ module.exports = function (compound, Page) {
             var grid = req.agent && req.agent.mobile ? ('m.' + self.grid) : self.grid;
             var gridHtml = Page.grids[grid || self.grid || '02-two-columns'] || [''];
 
+            // log the total render time
+            console.log('RENDER [' + (new Date() - req.startedAt) + 'ms]');
+            console.log('---------------');
+
             callback(null, ejs.render(gridHtml[0], {
                 column: cols,
                 size: sizes,
@@ -376,7 +380,7 @@ module.exports = function (compound, Page) {
         var req = {};
 
         // create a new 'request' from scratch and copy over all of the required properties from the parent request
-        ['user', 'group', 'page', 'post', 'cookies', 'session', 'compound', 'method', 'app', 'pagePath', 'agent']
+        ['user', 'group', 'page', 'post', 'cookies', 'session', 'compound', 'method', 'app', 'pagePath', 'agent', 'query']
             .forEach(function (key) {
             req.__defineGetter__(key, function () { 
                 return parent[key]; 
@@ -387,7 +391,6 @@ module.exports = function (compound, Page) {
         req.param = parent.param;
 
         req.params = {};
-        req.query = {};
         req.body = {};
         req.body.data = {
             widgetId: widget.id,

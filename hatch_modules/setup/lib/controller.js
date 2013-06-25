@@ -70,6 +70,7 @@ SetupController.prototype.setup = function(c) {
     seeds[0].Group.url = req.body.url;
     seeds[0].Group.homepage.url = req.body.url;
     seeds[0].Group.pagesCache[0].url = req.body.url;
+    seeds[0].Group.pageUrls[0] = req.body.url;
 
     seeds[1].Page.url = req.body.url;
 

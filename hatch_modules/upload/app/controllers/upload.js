@@ -37,10 +37,11 @@ function UploadController(init) {
 UploadController.prototype.upload = function (c) {
     var params = {
         groupId: c.req.group.id,
-        userId: c.req.user && c.req.user.id
+        userId: c.req.user && c.req.user.id,
+        size: c.req.param('size')
     };
 
-    var url = c.req.query.url || c.req.body.url;
+    var url = c.req.param('url');
 
     if (url) {
         c.Media.createWithUrl(url, params, callback)
