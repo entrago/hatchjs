@@ -308,6 +308,7 @@ module.exports = function (compound, Page) {
 
             // log the total render time
             console.log('RENDER [' + (new Date() - req.startedAt) + 'ms]');
+            console.log('---------------');
 
             callback(null, ejs.render(gridHtml[0], {
                 column: cols,

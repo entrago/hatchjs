@@ -15,9 +15,12 @@ PageController.prototype.show = function (c) {
     c.req.url = c.req.url.replace(/^\/|\/$/g, '');
 
     this.group.definePage(decodeURIComponent(c.req.url), c, function render(err, page) {
-        if (err || !page) {
+        if (err) {
             return c.next(err);
+        } else if (!page) {
+            return c.next(new c.compound.hatch.errors.NotFound(c.req, 'Group not found'));
         }
+
         c.req.page = page;
 
         page.renderHtml(c.req, function (err, html) {
