@@ -7,6 +7,5 @@ module.exports = function (compound) {
         app.enable('log actions');
         app.enable('show errors');
         app.enable('watch');
-        app.use(require('express').errorHandler({ dumpExceptions: true, showStack: true }));
     });
 };
