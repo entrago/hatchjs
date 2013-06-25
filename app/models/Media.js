@@ -195,7 +195,7 @@ module.exports = function (compound, Media) {
      */
     Media.isVideo = function (filename) {
         var ext = filename.split('.').slice(-1)[0].toLowerCase();
-        var videoExtensions = ['mp4', 'mov', 'flv', 'ogg', 'webm'];
+        var videoExtensions = ['mp4', 'mov', 'flv', 'ogg', 'webm', 'm3u8'];
 
         return videoExtensions.indexOf(ext) > -1;
     };
