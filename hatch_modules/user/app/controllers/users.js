@@ -55,10 +55,10 @@ UsersController.prototype.update = function(c) {
     //check passwords
     if(c.req.body.password) {
         if(user.type !== 'temporary' && user.password && User.calcSha(c.req.body.currentPassword) != user.password) {
-            return c.error({ message: 'Your current password is incorrect' });
+            return c.sendError({ message: 'Your current password is incorrect' });
         }
         if(c.req.body.password != c.req.body.confirmPassword) {
-            return c.error({ message: 'Your password and password confirmation do not match' });
+            return c.sendError({ message: 'Your password and password confirmation do not match' });
         }
     }
 
@@ -111,15 +111,39 @@ UsersController.prototype.update = function(c) {
     //change temporary user to registered user
     if(user.type === 'temporary') user.type = 'registered';
 
-    console.log(JSON.stringify(user));
-    console.log(user.fulltext);
-
     //finally save and return
     user.save(function() {
         c.send({
             status: 'success',
             icon: 'ok',
             message: 'Account details saved successfully'
+        });
+    });
+};
+
+UsersController.prototype.updatePassword = function (c) {
+    var user = c.req.user;
+
+    //check passwords
+    if(c.req.body.password) {
+        if(user.type !== 'temporary' && user.password && c.User.calcSha(c.req.body.currentPassword) != user.password) {
+            return c.sendError({ message: 'Your current password is incorrect' });
+        }
+        if(c.req.body.password != c.req.body.confirmPassword) {
+            return c.sendError({ message: 'Your password and password confirmation do not match' });
+        }
+    }
+
+    user.password = c.req.body.password;
+    user.save(function (err) {
+        if (err) {
+            return c.sendError(err);
+        }
+
+        c.send({
+            status: 'success',
+            icon: 'ok',
+            message: 'Password saved successfully'
         });
     });
 };
