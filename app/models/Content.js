@@ -23,6 +23,7 @@ module.exports = function (compound, Content) {
     var Page = compound.models.Page;
     var Comment = compound.models.Comment;
     var Like = compound.models.Like;
+    var Media = compound.models.Media;
 
     var Group = compound.models.Group;
     var redis = Content.schema.adapter;
@@ -282,6 +283,8 @@ module.exports = function (compound, Content) {
             callback(err, list);
         });
     };
+
+
 
     /**
      * gets the default permalink url

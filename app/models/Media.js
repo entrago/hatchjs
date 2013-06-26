@@ -17,7 +17,6 @@
 //
 
 module.exports = function (compound, Media) {
-    Media.SIZES = ['32x0', '64x0', '128x0', '320x0'];
 
     var Content = compound.models.Content;
     var request = require('request');
@@ -196,7 +195,7 @@ module.exports = function (compound, Media) {
      */
     Media.isVideo = function (filename) {
         var ext = filename.split('.').slice(-1)[0].toLowerCase();
-        var videoExtensions = ['mp4', 'mov', 'flv', 'ogg', 'webm'];
+        var videoExtensions = ['mp4', 'mov', 'flv', 'ogg', 'webm', 'm3u8'];
 
         return videoExtensions.indexOf(ext) > -1;
     };
