@@ -6,13 +6,14 @@ module.exports = function (compound) {
 
     var MemoryStore = express.session.MemoryStore;
     var RedisStore = require('connect-redis')(express);
-    var isTest = app.set('env') === 'test';
+    var env = app.get('env');
+    var isTest = env === 'test';
+    var dbConfig = require('./database')[env] || {};
 
-    app.configure(function(){
-
+    app.configure(function() {
         var sessionStore = isTest ?
             new MemoryStore :
-            new RedisStore(app.get('session-store') || {ttl: 86400 * 365});
+            new RedisStore({ttl: 86400 * 365, db: dbConfig.session && dbConfig.session.database});
 
         app.set('jsDirectory', '/javascripts/');
         app.set('cssDirectory', '/stylesheets/');
