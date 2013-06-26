@@ -282,13 +282,16 @@ module.exports = function (compound, Page) {
             self.renderWidgetDirect(widget, req, function (err, html) {
                 if (!result[widget.id]) {
                     if (err) {
-                        console.log(err);
-                        result[widget.id] = err;
+                        if (req.app.enabled('show errors')) {
+                            result[widget.id] = err.stack || err;
+                        } else {
+                            result[widget.id] = 'Error in widget rendering';
+                        }
                     } else {
                         result[widget.id] = html;
                     }
-                    next();
                 }
+                next();
             });
         }, done);
 
@@ -310,12 +313,17 @@ module.exports = function (compound, Page) {
             console.log('RENDER [' + (new Date() - req.startedAt) + 'ms]');
             console.log('---------------');
 
-            callback(null, ejs.render(gridHtml[0], {
-                column: cols,
-                size: sizes,
-                filename: grid + (self.templateId || ''),
-                cache: true
-            }));
+            try {
+                callback(null, ejs.render(gridHtml[0], {
+                    column: cols,
+                    size: sizes,
+                    filename: grid + (self.templateId || ''),
+                    cache: true
+                }));
+            } catch(e) {
+                console.log(e.stack);
+                callback(e);
+            }
         }
     };
 
@@ -377,19 +385,25 @@ module.exports = function (compound, Page) {
 
     function renderWidgetAction(parent, moduleName, widgetName, widget, action, callback) {
         var module = compound.hatch.modules[moduleName];
+        if (!module) {
+            return callback(new Error('Module ' + moduleName + ' not loaded'));
+        }
         var req = {};
 
         // create a new 'request' from scratch and copy over all of the required properties from the parent request
-        ['user', 'group', 'page', 'post', 'cookies', 'session', 'compound', 'method', 'app', 'pagePath', 'agent', 'query']
-            .forEach(function (key) {
-            req.__defineGetter__(key, function () { 
-                return parent[key]; 
+        [
+            'user', 'group', 'page', 'post', 'cookies', 'session',
+            'compound', 'method', 'app', 'pagePath', 'agent', 'query'
+        ].forEach(function (key) {
+            req.__defineGetter__(key, function() {
+                return parent[key];
             });
         });
 
         // copy the param function
         req.param = parent.param;
 
+        req.headers = {'user-agent': parent.headers['user-agent']};
         req.params = {};
         req.body = {};
         req.body.data = {
@@ -400,18 +414,28 @@ module.exports = function (compound, Page) {
         var res = new http.ServerResponse({method: 'NOTHEAD'});
 
         res.controllerName = widgetName.split('/')[0];
-        res.compound = module && module.compound;
+        res.compound = module.compound;
         res.req = req;
         res.context = {
             req: req,
             res: res,
             inAction: true
         };
-        res.render = function (file, viewContext, next) { 
-            compound.app.render(file, viewContext, next || callback); 
+        var endCalled = false;
+        res.render = function (file, viewContext, next) {
+            compound.app.render(file, viewContext, next || callback);
+        };
+        res.end = function(body) {
+            endCalled = true;
+            callback(null, body);
         };
 
-        module && module.compound.controllerBridge.callControllerAction(widgetName, action, req, res, callback);
+        module.compound.controllerBridge.callControllerAction(widgetName, action, req, res, function(err) {
+            if (!endCalled) {
+                endCalled = true;
+                callback(err);
+            }
+        });
     }
 
     function inAppRequest(parent, url, data, callback) {
@@ -474,7 +498,7 @@ module.exports = function (compound, Page) {
                 group.pagesCache = Page.tree(group.pagesCache);
                 group.save();
 
-                if(next) next();
+                if (next) next();
             });
         });
     };

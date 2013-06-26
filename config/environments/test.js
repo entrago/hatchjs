@@ -9,6 +9,7 @@ module.exports = function (compound) {
         app.enable('view cache');
         app.enable('model cache');
         app.enable('eval cache');
+        app.enable('show errors');
     });
 
 };

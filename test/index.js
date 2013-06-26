@@ -22,6 +22,9 @@ var app;
 before(function(done) {
     app = require('../')();
     app.compound.on('ready', function() {
+        app.compound.hatch.loadModule('core-widgets', __dirname + '/../hatch_modules/core-widgets');
+        app.compound.hatch.loadModule('stylesheet', __dirname + '/../hatch_modules/stylesheet');
+        app.compound.hatch.loadModule('user', __dirname + '/../hatch_modules/user');
         var schema = app.compound.orm._schemas[0];
         if (schema.connected) {
             done();
@@ -65,6 +68,7 @@ global.getClient = function(app) {
     function wrap(req) {
         return req
         .set('Host', 'example.com')
-        .set('Accept', 'application/json');
+        .set('Accept', 'application/json')
+        .set('User-Agent', 'mocha');
     }
 };

@@ -4,6 +4,7 @@ Group.seed ->
     path: ''
     name: 'Dev Group'
     subgroups: [{"path":"/extranet","id":2}]
+    pageUrls: [ 'example.com' ]
     pagesCache: [
       {"id":1,"title":"Dev Group","url":"example.com","order":null,"level":0,"parentId":null,"type":null,"hideFromNavigation":null},
       {"id":3, "title": "501 error", "type": "501", "hideFromNavigation": true}
