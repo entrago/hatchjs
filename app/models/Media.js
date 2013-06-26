@@ -77,7 +77,7 @@ module.exports = function (compound, Media) {
 
             // if we have a video encoder, run now
             if (Media.encodeVideo) { 
-                Media.encodeVideo(data, function (err, data) {
+                Media.encodeVideo(data, params, function (err, data) {
                     Media.create(data, callback);
                 });
             } else {
@@ -159,7 +159,7 @@ module.exports = function (compound, Media) {
         function upload(data) {
             // if there is a CDN upload function defined, upload and continue
             if (Media.uploadToCDN) { 
-                Media.uploadToCDN(data, function (err, data) {
+                Media.uploadToCDN(data, params, function (err, data) {
                     create(data);
                 });
             } else {

@@ -37,13 +37,14 @@ module.exports = function (compound, Media) {
      * set the Media.s3 settings object with your AWS credentials and S3 bucket.
      * See below for required parameters.
      * 
-     * @param  {Object}   data     - media creation data
-     * @param  {Function} callback - callback function
+     * @param  {Object}   data           - media creation data
+     * @param  {Object}   uploadParams   - additional params (optional)
+     * @param  {Function} callback       - callback function
      */
-    Media.uploadToS3 = function (data, callback) {
+    Media.uploadToS3 = function (data, uploadParams, callback) {
         var settings = Media.s3;
         var filename = data.filename.split('/').slice(-1)[0];
-        var path = settings.path && (settings.path.split('/')[0] + '/') || '';
+        var path = (settings.path && (settings.path.split('/')[0] + '/') || '') + (uploadParams.path ? (uploadParams.path + '/') : '');
 
         var client = knox.createClient({
             key: settings.key, 

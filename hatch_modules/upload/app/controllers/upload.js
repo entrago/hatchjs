@@ -38,7 +38,8 @@ UploadController.prototype.upload = function (c) {
     var params = {
         groupId: c.req.group.id,
         userId: c.req.user && c.req.user.id,
-        size: c.req.param('size')
+        size: c.req.param('size'),
+        path: c.req.param('path')
     };
 
     var url = c.req.param('url');
