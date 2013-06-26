@@ -5,7 +5,7 @@ var User = define('User', function () {
     property('type', String, {index: true});
     property('password', String);
     property('hasPassword', Boolean);
-    property('avatar', String);
+    property('avatar', JSON);
     property('name', String);
     property('firstname', String);
     property('lastname', String, {sort: true});
