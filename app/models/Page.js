@@ -406,6 +406,7 @@ module.exports = function (compound, Page) {
         req.headers = {'user-agent': parent.headers['user-agent']};
         req.params = {};
         req.body = {};
+        req.locals = {};
         req.body.data = {
             widgetId: widget.id,
             templateWidget: false

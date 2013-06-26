@@ -1,6 +1,7 @@
 exports.routes = function (map) {
     map.post('register.:format?', 'users#create');
     map.post('update', 'users#update');
+    map.post('updatepassword', 'users#updatePassword', {as: 'updatepassword'});
     map.get('join', 'users#join');
     map.get('join/:invitationCode?', 'users#join');
     map.post('reject', 'users#rejectInvitation', {as: 'rejectInvitation'});

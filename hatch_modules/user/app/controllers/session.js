@@ -52,10 +52,10 @@ SessionController.prototype.create = function(c) {
                     });
                 });
             } else {
-                c.send({ message: error });
+                c.sendError({ message: error });
             }
         } else {
-            c.send({ message: error });
+            c.sendError({ message: error });
         }
     }
 };

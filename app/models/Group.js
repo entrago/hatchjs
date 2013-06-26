@@ -154,6 +154,9 @@ module.exports = function (compound, Group) {
      * @param  {Function}      callback - callback function
      */
     Group.prototype.definePage = function definePage(url, c, callback) {
+        // remove trailing and leading slashes
+        url = url.replace(/^\/|\/$/g, '');
+    
         var group = this;
         var path = url.split('?')[0];
         var page = c.req.page || this.matchPage(path);

@@ -55,10 +55,10 @@ UsersController.prototype.update = function(c) {
     //check passwords
     if(c.req.body.password) {
         if(user.type !== 'temporary' && user.password && User.calcSha(c.req.body.currentPassword) != user.password) {
-            return c.error({ message: 'Your current password is incorrect' });
+            return c.sendError({ message: 'Your current password is incorrect' });
         }
         if(c.req.body.password != c.req.body.confirmPassword) {
-            return c.error({ message: 'Your password and password confirmation do not match' });
+            return c.sendError({ message: 'Your password and password confirmation do not match' });
         }
     }
 
@@ -72,6 +72,7 @@ UsersController.prototype.update = function(c) {
 
     if(!user.mailSettings) user.mailSettings = {};
 
+    /*
     //mail settings
     var mailTypes = c.api.mailer.getTypes();
     if(c.req.body.mailSettings) {
@@ -82,6 +83,7 @@ UsersController.prototype.update = function(c) {
             user.mailSettings[mailType] = checked;
         });
     }
+    */
 
     if(!user.otherFields) user.otherFields = {};
 
@@ -95,22 +97,19 @@ UsersController.prototype.update = function(c) {
     });
 
     //validate custom fields
-    if(!user.validateGroupProfileFields(c.group())) {
-        return c.error({ message: 'Please fill in all mandatory fields' });
+    if(!user.validateGroupProfileFields(c.req.group)) {
+        return c.sendError({ message: 'Please fill in all mandatory fields' });
     }
 
     if(c.req.body.password || (user.type === 'temporary' && !user.hasPassword)) user.password = c.req.body.password;
 
     //standard validation
     if(!user.isValid() && Object.keys(user.errors).length > 0) {
-        return c.error({ message: user.errors });
+        return c.sendError({ message: user.errors });
     }
 
     //change temporary user to registered user
     if(user.type === 'temporary') user.type = 'registered';
-
-    console.log(JSON.stringify(user));
-    console.log(user.fulltext);
 
     //finally save and return
     user.save(function() {
@@ -118,6 +117,33 @@ UsersController.prototype.update = function(c) {
             status: 'success',
             icon: 'ok',
             message: 'Account details saved successfully'
+        });
+    });
+};
+
+UsersController.prototype.updatePassword = function (c) {
+    var user = c.req.user;
+
+    //check passwords
+    if(c.req.body.password) {
+        if(user.type !== 'temporary' && user.password && c.User.calcSha(c.req.body.currentPassword) != user.password) {
+            return c.sendError({ message: 'Your current password is incorrect' });
+        }
+        if(c.req.body.password != c.req.body.confirmPassword) {
+            return c.sendError({ message: 'Your password and password confirmation do not match' });
+        }
+    }
+
+    user.password = c.req.body.password;
+    user.save(function (err) {
+        if (err) {
+            return c.sendError(err);
+        }
+
+        c.send({
+            status: 'success',
+            icon: 'ok',
+            message: 'Password saved successfully'
         });
     });
 };

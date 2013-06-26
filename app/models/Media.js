@@ -17,7 +17,6 @@
 //
 
 module.exports = function (compound, Media) {
-    Media.SIZES = ['32x0', '64x0', '128x0', '320x0'];
 
     var Content = compound.models.Content;
     var request = require('request');
@@ -78,7 +77,7 @@ module.exports = function (compound, Media) {
 
             // if we have a video encoder, run now
             if (Media.encodeVideo) { 
-                Media.encodeVideo(data, function (err, data) {
+                Media.encodeVideo(data, params, function (err, data) {
                     Media.create(data, callback);
                 });
             } else {
@@ -160,7 +159,7 @@ module.exports = function (compound, Media) {
         function upload(data) {
             // if there is a CDN upload function defined, upload and continue
             if (Media.uploadToCDN) { 
-                Media.uploadToCDN(data, function (err, data) {
+                Media.uploadToCDN(data, params, function (err, data) {
                     create(data);
                 });
             } else {
@@ -196,7 +195,7 @@ module.exports = function (compound, Media) {
      */
     Media.isVideo = function (filename) {
         var ext = filename.split('.').slice(-1)[0].toLowerCase();
-        var videoExtensions = ['mp4', 'mov', 'flv', 'ogg', 'webm'];
+        var videoExtensions = ['mp4', 'mov', 'flv', 'ogg', 'webm', 'm3u8'];
 
         return videoExtensions.indexOf(ext) > -1;
     };
