@@ -500,7 +500,7 @@ module.exports = function (compound, User) {
         var valid = true;
         var user = this;
 
-        group.profileFields().forEach(function(field) {
+        (group.profileFields || []).forEach(function(field) {
             if(field.mandatory && !(user.otherFields || [])[field.name]) valid = false;
         });
 

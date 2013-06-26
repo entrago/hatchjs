@@ -72,6 +72,7 @@ UsersController.prototype.update = function(c) {
 
     if(!user.mailSettings) user.mailSettings = {};
 
+    /*
     //mail settings
     var mailTypes = c.api.mailer.getTypes();
     if(c.req.body.mailSettings) {
@@ -82,6 +83,7 @@ UsersController.prototype.update = function(c) {
             user.mailSettings[mailType] = checked;
         });
     }
+    */
 
     if(!user.otherFields) user.otherFields = {};
 
@@ -95,15 +97,15 @@ UsersController.prototype.update = function(c) {
     });
 
     //validate custom fields
-    if(!user.validateGroupProfileFields(c.group())) {
-        return c.error({ message: 'Please fill in all mandatory fields' });
+    if(!user.validateGroupProfileFields(c.req.group)) {
+        return c.sendError({ message: 'Please fill in all mandatory fields' });
     }
 
     if(c.req.body.password || (user.type === 'temporary' && !user.hasPassword)) user.password = c.req.body.password;
 
     //standard validation
     if(!user.isValid() && Object.keys(user.errors).length > 0) {
-        return c.error({ message: user.errors });
+        return c.sendError({ message: user.errors });
     }
 
     //change temporary user to registered user
