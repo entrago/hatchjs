@@ -25,6 +25,15 @@ module.exports = WidgetController;
 
 function WidgetController(init) {
     init.before(findPageAndWidget);
+    init.before(requireAdmin, {only: ['create', 'configure', 'update', 'destroy', 'settitle', 'contrast' ] });
+}
+
+function requireAdmin(c) {
+    if (c.canEdit) {
+        c.next();
+    } else {
+        c.next(new c.errors.Forbidden('admin required'));
+    }
 }
 
 // finds the page that we are performing the action on
