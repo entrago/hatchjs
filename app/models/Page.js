@@ -335,6 +335,8 @@ module.exports = function (compound, Page) {
         return renderWidgetAction(req, widget, req.body.perform, req.body['with'], cb);
     };
 
+    Page.prototype.renderWidgetAction = renderWidgetAction;
+
     function renderWidgetAction(parentRequest, widget, action, params, callback) {
         var widgetId;
         if (typeof widget === 'object' && widget.id) {

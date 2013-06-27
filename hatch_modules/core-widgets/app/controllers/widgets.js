@@ -57,10 +57,11 @@ function findPageAndWidget(c) {
  * @param  {HttpContext} c - http context
  */
 WidgetController.prototype.__missingAction = function __missingAction(c) {
-    this.page.widgetAction(this.widget.id, c.requestedActionName, c.req.body, c.req, function (err, res) {
+    //this.page.widgetAction(this.widget.id, c.requestedActionName, c.req.body, c.req, function (err, res) {
+    this.page.renderWidgetAction(c.req, this.widget, c.requestedActionName, c.req.body, function (err, res) {
         if (typeof res === 'string') {
             c.send(res);
-        } else {
+        } else if (res) {
             c.send({
                 code: err ? 500 : 200,
                 res: res,
