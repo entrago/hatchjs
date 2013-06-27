@@ -5,7 +5,7 @@ Page.seed ->
     customUrl: null
     grid: '02-two-columns'
     columns: [{"size":"4","widgets":[1]},{"size":"6","widgets":[]},{"size":"6","widgets":[]}]
-    widgets: [{"id":1,"type":"core-widgets/static","settings":{"title":"Hello world", "content": "Click me to edit"}}]
+    widgets: [{"id":1,"type":"core-widgets/static","settings":{"title":"Hello world", "content": "Contents of single widget"}}]
     metaTitle: null
     metaDescription: null
     metaKeywords: null
@@ -22,9 +22,9 @@ Page.seed ->
     title: 'Extranet'
     url: 'example.com/extranet'
     customUrl: null
-    grid: null
-    columns: null
-    widgets: []
+    grid: '02-two-columns'
+    columns: [{"size":"4","widgets":[1,4]},{"size":"6","widgets":[3,2]}]
+    widgets: [{"id":1,"type":"core-widgets/group-header","settings":{"title":"Hello world", "content": "Widget 1"}}, {"id":2,"type":"core-widgets/static","settings":{"title":"Hello world", "content": "Widget 2"}}, {"id":3,"type":"core-widgets/static","settings":{"title":"Hello world", "content": "Widget 3"}}, {"id":4,"type":"core-widgets/static","settings":{"title":"Hello world", "content": "Widget 4"}}]
     metaTitle: null
     metaDescription: null
     metaKeywords: null

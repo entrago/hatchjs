@@ -70,8 +70,18 @@ exports.pageTitle = function () {
 };
 
 exports.getStylesheetPath = function () {
-    var req = this.req, group = req.group;
-    return this.res.app.enabled('static css') && group.cssUrl || this.pathFor('stylesheet').css(group.cssVersion || 0)
+    var req = this.req, group = req.group,
+    cssUrl = this.res.app.enabled('static css') && group.cssUrl;
+    if (cssUrl) {
+        return cssUrl;
+    } else {
+        var routes = this.pathFor('stylesheet');
+        if (routes.css) {
+            return routes.css(group.cssVersion || 0);
+        } else {
+            throw new Error('Module stylesheet is not loaded');
+        }
+    }
 };
 
 exports.formatNumber = function formatNumber(num) {

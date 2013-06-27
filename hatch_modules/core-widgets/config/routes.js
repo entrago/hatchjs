@@ -1,4 +1,8 @@
 exports.routes = function (map) {
+
+    map.resources('widgets', {path: 'widget'});
+    map.post('/widget', 'widgets#create');
+
     // wildcard to catch all other widget actions
     map.post('/widget/:widgetId/:action', 'widgets');
     map.put('/widget/:widgetId/:action', 'widgets');

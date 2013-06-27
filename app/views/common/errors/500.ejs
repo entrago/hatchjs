@@ -62,7 +62,7 @@
                 <a href="/">Click here to go back to the homepage of the site</a>
             </h2>
 
-            <% if (typeof err !== 'undefined') { %>
+            <% if (err) { %>
                 <pre><%- err.stack %></pre>
             <% } %>
         </div>
