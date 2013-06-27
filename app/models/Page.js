@@ -279,7 +279,7 @@ module.exports = function (compound, Page) {
         var result = {}, self = this;
 
         async.forEach(self.widgets.items, function (widget, next) {
-            self.renderWidgetDirect(widget, req, function (err, html) {
+            self.renderWidget(widget, req, function (err, html) {
                 if (!result[widget.id]) {
                     if (err) {
                         if (req.app.enabled('show errors')) {
@@ -327,29 +327,20 @@ module.exports = function (compound, Page) {
         }
     };
 
-    Page.prototype.renderWidgetDirect = function (widget, req, cb) {
-        var moduleName = widget.type.split('/')[0];
-        var widgetName = 'widgets/' + widget.type.split('/').slice(1).join('/');
-
-        return renderWidgetAction(req, moduleName, widgetName, widget, 'show', function (err, body) {
-            cb(err, body);
-        });
-    };
-
     Page.prototype.renderWidget = function (widget, req, cb) {
-        this.widgetAction(widget, 'show', null, req, cb);
+        return renderWidgetAction(req, widget, 'show', null, cb);
     };
 
-    Page.prototype.performWidgetAction = function(widgetId, req, cb) {
-        this.widgetAction(widgetId, req.body.perform, req.body['with'], req, cb);
+    Page.prototype.performWidgetAction = function(widget, req, cb) {
+        return renderWidgetAction(req, widget, req.body.perform, req.body['with'], cb);
     };
 
-    Page.prototype.widgetAction = function(widgetId, action, params, req, cb) {
-        var widget;
-        if (typeof widgetId === 'object' && widgetId.id) {
-            widget = widgetId;
+    function renderWidgetAction(parentRequest, widget, action, params, callback) {
+        var widgetId;
+        if (typeof widget === 'object' && widget.id) {
             widgetId = widget.id;
         } else {
+            widgetId = widget;
             widget = this.widgets[widgetId];
         }
         if (!widget) {
@@ -358,32 +349,8 @@ module.exports = function (compound, Page) {
         if (!widget.type) {
             return cb(new Error('Widget has no type specified'));
         }
-
-        var querystring = qs.stringify(req.query);
-        if (querystring) querystring = '?' + querystring;
-
-        var apiDomain = this.url.match(/^[^\/]+/)[0];
-        apiDomain = 'localhost:3000';
-        var url = [
-            //'http://' + apiDomain,
-            req.pagePath.replace(/^\/|\/$/g, ''),
-            'do',
-            widget.type.replace('/', '/widgets/'),
-            action + querystring].filter(Boolean).join('/');
-
-        var data = {
-            data: params,
-            widgetId: widgetId,
-            templateWidget: !!widget.templateWidget
-        };
-        
-        inAppRequest(req, url, { data: data }, function(err, res) {
-            cb(err, res);
-        });
-
-    };
-
-    function renderWidgetAction(parent, moduleName, widgetName, widget, action, callback) {
+        var moduleName = widget.type.split('/')[0];
+        var widgetName = 'widgets/' + widget.type.split('/').slice(1).join('/');
         var module = compound.hatch.modules[moduleName];
         if (!module) {
             return callback(new Error('Module ' + moduleName + ' not loaded'));
@@ -396,18 +363,19 @@ module.exports = function (compound, Page) {
             'compound', 'method', 'app', 'pagePath', 'agent', 'query'
         ].forEach(function (key) {
             req.__defineGetter__(key, function() {
-                return parent[key];
+                return parentRequest[key];
             });
         });
 
         // copy the param function
-        req.param = parent.param;
+        req.param = parentRequest.param;
 
-        req.headers = {'user-agent': parent.headers['user-agent']};
+        req.headers = {'user-agent': parentRequest.headers['user-agent']};
         req.params = {};
         req.body = {};
         req.locals = {};
         req.body.data = {
+            data: params,
             widgetId: widget.id,
             templateWidget: false
         }
@@ -437,39 +405,6 @@ module.exports = function (compound, Page) {
                 callback(err);
             }
         });
-    }
-
-    function inAppRequest(parent, url, data, callback) {
-        var req = new http.IncomingMessage;
-        var res = new http.ServerResponse({method: 'NOTHEAD'});
-
-        res.end = function(body) {
-            callback(null, body);
-        };
-
-        // set the entities associated with this request from the parent so that
-        // they don't have to be loaded again by ID
-        req.user = parent.user;
-        req.group = parent.group;
-        req.page = parent.page;
-        req.post = parent.post;
-
-        // TODO: we need to set the cookies and session so that they can be 
-        // accessed and set (if required) from each widget. This doesn't seem
-        // to be working but I cannot understand why
-        //req.cookies = parent.cookies;
-        //req.session = parent.session;
-
-        req.body = data;
-        req.method = 'POST';
-        req.connection = {};
-        req.url      = '/' + url;
-        req.headers  = { 
-            host: parent.headers.host,
-            'user-agent': parent.headers['user-agent']
-        };
-
-        compound.app.handle(req, res);
     }
 
     Page.prototype.pathname = function (req) {
