@@ -70,6 +70,11 @@ UsersController.prototype.update = function(c) {
     user.email = c.req.body.email;
     user.avatar = c.req.body.avatar;
 
+    // fix avatars which are saved as a string
+    if (typeof user.avatar === 'string' && user.avatar.indexOf('{') === 0) {
+        user.avatar = JSON.parse(user.avatar);
+    }
+
     if(!user.mailSettings) user.mailSettings = {};
 
     /*
