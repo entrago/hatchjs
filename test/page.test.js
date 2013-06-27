@@ -3,7 +3,7 @@ var should = require('./');
 var app, compound, Page;
 var async = require('async');
 
-describe.only('Page', function() {
+describe('Page', function() {
 
     before(function (done) {
         app = getApp(done);

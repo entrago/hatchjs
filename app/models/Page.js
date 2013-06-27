@@ -310,8 +310,8 @@ module.exports = function (compound, Page) {
             var gridHtml = Page.grids[grid || self.grid || '02-two-columns'] || [''];
 
             // log the total render time
-            console.log('RENDER [' + (new Date() - req.startedAt) + 'ms]');
-            console.log('---------------');
+            compound.log('RENDER [' + (new Date() - req.startedAt) + 'ms]');
+            compound.log('---------------');
 
             try {
                 callback(null, ejs.render(gridHtml[0], {
@@ -321,7 +321,7 @@ module.exports = function (compound, Page) {
                     cache: true
                 }));
             } catch(e) {
-                console.log(e.stack);
+                compound.log(e.stack);
                 callback(e);
             }
         }

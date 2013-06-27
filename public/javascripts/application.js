@@ -118,7 +118,10 @@ function sendToWidget(action, data, response, done) {
     var pathname = window.location.pathname.split('/do/')[0];
     if (pathname === '/') pathname = '';
 
-    var path = pathname + '/do/core-widget/' + action;
+    var path = pathname + '/do/core-widgets/widget';
+    if (action) {
+        path += '/' + action;
+    }
 
     $.post(path, data, function(data) {
         if (typeof done === 'function') {
