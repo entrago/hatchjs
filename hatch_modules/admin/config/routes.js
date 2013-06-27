@@ -1,7 +1,7 @@
 exports.routes = function (map) {
 
     map.camelCaseHelperNames = true;
-    map.root('pages#index');
+    map.root('content#index');
     
     map.collection(function (group) {
         group.get('group/:tab?', 'group#settings', {as: 'group'});
