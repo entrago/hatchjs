@@ -404,7 +404,9 @@ module.exports = function (compound, Page) {
         module.compound.controllerBridge.callControllerAction(widgetName, action, req, res, function(err) {
             if (!endCalled) {
                 endCalled = true;
-                callback(err);
+                if (err) {
+                    callback(err);
+                }
             }
         });
     }
