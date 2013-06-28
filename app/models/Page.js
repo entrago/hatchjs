@@ -372,6 +372,7 @@ module.exports = function (compound, Page) {
         // copy the param function
         req.param = parentRequest.param;
 
+        req.url = '/widget/' + widget.type;
         req.headers = {'user-agent': parentRequest.headers['user-agent']};
         req.params = {};
         req.body = {};
@@ -380,7 +381,7 @@ module.exports = function (compound, Page) {
             data: params,
             widgetId: widget.id,
             templateWidget: false
-        }
+        };
 
         var res = new http.ServerResponse({method: 'NOTHEAD'});
 
