@@ -28,6 +28,8 @@ module.exports = function (compound, Media) {
     var mime = require('mime');
     var _ = require('underscore');
 
+    Media.SIZES = ['64', '128', '320', '640'];
+
     /**
      * Before a media item is created, make sure the type is set.
      * 
