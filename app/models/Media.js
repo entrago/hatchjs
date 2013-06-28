@@ -78,8 +78,8 @@ module.exports = function (compound, Media) {
             data = _.extend(data, params);
 
             // if we have a video encoder, run now
-            if (Media.encodeVideo) { 
-                Media.encodeVideo(data, params, function (err, data) {
+            if (Media.encodeVideo && !params.skipEncode) {
+                Media.encodeVideo(data, function (err, data) {
                     Media.create(data, callback);
                 });
             } else {
@@ -200,6 +200,19 @@ module.exports = function (compound, Media) {
         var videoExtensions = ['mp4', 'mov', 'flv', 'ogg', 'webm', 'm3u8'];
 
         return videoExtensions.indexOf(ext) > -1;
+    };
+
+     /**
+     * Work out whether a file is a stream.
+     *
+     * @param  {String}  filename - filename to check
+     * @return {Boolean}
+     */
+    Media.isStream = function (filename) {
+        var ext = filename.split('.').slice(-1)[0].toLowerCase();
+        var streamExtensions = ['m3u8'];
+
+        return streamExtensions.indexOf(ext) > -1;
     };
 
     /**
