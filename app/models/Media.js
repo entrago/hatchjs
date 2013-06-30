@@ -70,7 +70,7 @@ module.exports = function (compound, Media) {
      */
     Media.createWithUrl = function (url, params, callback) {
         var uploadPath = compound.app.get('upload path');
-        var filename = path.join(uploadPath, new Date().getTime() + '-' + url.split('/').slice(-1)[0]);
+        var filename = path.join(uploadPath, new Date().getTime() + '-' + slugify(url.split('/').slice(-1)[0]));
 
         // videos we just create directly with the url
         if (Media.isVideo(filename)) {
@@ -104,7 +104,7 @@ module.exports = function (compound, Media) {
     Media.createWithFiles = function (files, params, callback) {
         var uploadPath = compound.app.get('upload path');
         var file = files[Object.keys(files)[0]];
-        var filename = file.name;
+        var filename = slugify(file.name);
         var filePath = file.path.split('/').slice(0, -1).join('/');
 
         // move the file to the upload path if it's not already there
@@ -411,4 +411,13 @@ module.exports = function (compound, Media) {
             }
         })
     };
+
+
+    function slugify(text) {
+        text = text.toLowerCase();
+        text = text.replace(/[^-a-zA-Z0-9\.\s]+/ig, '');
+        text = text.replace(/-/gi, "_");
+        text = text.replace(/\s/gi, "-");
+        return text;
+    }
 };
