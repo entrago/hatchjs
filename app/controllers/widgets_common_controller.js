@@ -20,7 +20,8 @@ before('init env', function (c) {
         }
         locals.page = page;
         var wc = req.body.data.templateWidget ? 'templateWidgets' : 'widgets';
-        locals.widget = page[wc][req.body.data.widgetId];
+        var id = parseInt(req.body.data.widgetId, 10);
+        locals.widget = page[wc].find(id, 'id');
 
         if (locals.widget) {
             locals.widget.settings = locals.widget.settings || {};

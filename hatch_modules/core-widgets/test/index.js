@@ -3,6 +3,19 @@ var supertest = require('supertest');
 
 module.exports = require('should');
 
+process.env.NODE_ENV = 'test';
+
+if (!process.env.TRAVIS) {
+    var semicov = require('semicov');
+    if (typeof __cov === 'undefined') {
+        process.on('exit', function () {
+            semicov.report();
+        });
+    }
+
+    semicov.init(['lib', 'app'], 'Hatch.js Core-Widgets Module');
+}
+
 var app, dashboard, cw;
 
 before(function(done) {
