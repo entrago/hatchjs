@@ -56,7 +56,7 @@ module.exports = function (compound, Group) {
                 if (!group) {
                     Content.findOne({ where: { url: url }}, function (err, post) {
                         if (post) {
-                            return callback(err, null);
+                            return callback(err, null, post);
                         } else {
                             if (url.indexOf('/') > -1) {
                                 url = url.substring(0, url.lastIndexOf('/'));
