@@ -79,7 +79,7 @@ WidgetController.prototype.__missingAction = function __missingAction(c) {
 WidgetController.prototype.create = function(c) {
     var page = this.page;
     var type = c.body.addWidget;
-    
+
     var widget = page.widgets.push({
         type: type, 
         settings: {}
@@ -88,6 +88,7 @@ WidgetController.prototype.create = function(c) {
     // save the new widget, render and add to the page
     widget.save(function () {
         page.renderWidget(widget, c.req, function (err, html) {
+            console.log(html);
             c.send({
                 code: err ? 500 : 200,
                 html: html,

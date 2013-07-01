@@ -20,6 +20,7 @@ module.exports = function (compound) {
         app.set('cssEngine', 'stylus');
         app.set('upload path', app.root + '/public/upload');
         app.set('fillMissingTranslations', 'yaml');
+        app.set('seeds', app.root + '/db/seeds/');
 
         // date and time formats
         app.set('dateformat', 'DD/MM/YYYY');

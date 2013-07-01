@@ -28,6 +28,8 @@ module.exports = function (compound, Media) {
     var mime = require('mime');
     var _ = require('underscore');
 
+    Media.SIZES = ['64', '128', '320', '640'];
+
     /**
      * Before a media item is created, make sure the type is set.
      * 
@@ -68,7 +70,7 @@ module.exports = function (compound, Media) {
      */
     Media.createWithUrl = function (url, params, callback) {
         var uploadPath = compound.app.get('upload path');
-        var filename = path.join(uploadPath, new Date().getTime() + '-' + url.split('/').slice(-1)[0]);
+        var filename = path.join(uploadPath, new Date().getTime() + '-' + slugify(url.split('/').slice(-1)[0]));
 
         // videos we just create directly with the url
         if (Media.isVideo(filename)) {
@@ -76,8 +78,8 @@ module.exports = function (compound, Media) {
             data = _.extend(data, params);
 
             // if we have a video encoder, run now
-            if (Media.encodeVideo) { 
-                Media.encodeVideo(data, params, function (err, data) {
+            if (Media.encodeVideo && !params.skipEncode) {
+                Media.encodeVideo(data, function (err, data) {
                     Media.create(data, callback);
                 });
             } else {
@@ -102,7 +104,7 @@ module.exports = function (compound, Media) {
     Media.createWithFiles = function (files, params, callback) {
         var uploadPath = compound.app.get('upload path');
         var file = files[Object.keys(files)[0]];
-        var filename = file.name;
+        var filename = slugify(file.name);
         var filePath = file.path.split('/').slice(0, -1).join('/');
 
         // move the file to the upload path if it's not already there
@@ -198,6 +200,19 @@ module.exports = function (compound, Media) {
         var videoExtensions = ['mp4', 'mov', 'flv', 'ogg', 'webm', 'm3u8'];
 
         return videoExtensions.indexOf(ext) > -1;
+    };
+
+     /**
+     * Work out whether a file is a stream.
+     *
+     * @param  {String}  filename - filename to check
+     * @return {Boolean}
+     */
+    Media.isStream = function (filename) {
+        var ext = filename.split('.').slice(-1)[0].toLowerCase();
+        var streamExtensions = ['m3u8'];
+
+        return streamExtensions.indexOf(ext) > -1;
     };
 
     /**
@@ -396,4 +411,13 @@ module.exports = function (compound, Media) {
             }
         })
     };
+
+
+    function slugify(text) {
+        text = text.toLowerCase();
+        text = text.replace(/[^-a-zA-Z0-9\.\s]+/ig, '');
+        text = text.replace(/-/gi, "_");
+        text = text.replace(/\s/gi, "-");
+        return text;
+    }
 };
