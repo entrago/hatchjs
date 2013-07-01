@@ -23,10 +23,9 @@ var compound = require('compound');
 
 module.exports = function (c) {
     var module = this;
-    c.on('models', function() {
-        var User = c.model('user');
-        User.defineProperty('twitterId',  { type: String, index: true });
-    });
+
+    var User = c.model('user');
+    User.defineProperty('twitterId',  { type: String, index: true });
 
     // module.api.content.registerContentType('twitter', __dirname + '/content/twitter');
 
