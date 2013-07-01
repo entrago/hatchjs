@@ -502,9 +502,11 @@ module.exports = function (compound, Group) {
      * @return {Module}      - module
      */
     Group.prototype.getModule = function(name) {
-        return _.find(this.modules.items, function(module) {
-            return module && module.name == name;
-        });
+        var module = this.modules.find(name, 'name');
+        if(!module){
+            console.log("WARNING: couldn't get module: "+name+'. Is it enabled?');
+        }
+        return module;
     };
 
     /**
