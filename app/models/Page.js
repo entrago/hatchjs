@@ -527,5 +527,22 @@ module.exports = function (compound, Page) {
         }
     };
 
+
+    /**
+     * Remove widgets which are not part of the columns from this page.
+     */
+    Page.prototype.removeRedundantWidgets = function () {
+        var ids = [];
+        this.columns.forEach(function (col) {
+            col.widgets.forEach(function (id) {
+                ids.push(id);
+            });
+        });
+
+        this.widgets.items = _.reject(this.widgets.items, function(widget) {
+            return ids.indexOf(widget.id) === -1;
+        });
+    };
+
 };
 

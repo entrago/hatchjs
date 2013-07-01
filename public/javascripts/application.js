@@ -227,7 +227,9 @@ function updateWidgetsOrder(hideNotification) {
     var res = [];
     $('.column').each(function () {
         var size = $(this).attr('class').match(/span(\d\d?)/)[1];
-        var moduleList = $(this).hasClass("module-list") ? this : $("> .module-list:first-child", this);
+        var moduleList = $(this).hasClass("module-list") ? this : $(".module-list:first-child", this);
+
+        console.log(moduleList)
 
         var mods = [];
         $(moduleList).find('> .module').each(function () {

@@ -31,6 +31,7 @@ TwitterAuthController.prototype.auth = function twitterAuth(c) {
     c.consumer().getOAuthRequestToken(
         function (err, token, secret) {
             if (err) {
+                console.log(err);
                 return c.next(new c.RequestTokenError(err));
             }
             c.req.session.twitterOauthRequestToken = token;
@@ -51,16 +52,19 @@ TwitterAuthController.prototype.callback = function twitterCallback(c) {
         c.req.query.oauth_verifier,
         function (err, token, secret) {
             if (err) {
+                console.log('Twitter auth error');
+                console.log(err);
                 return c.next(err);
             }
             c.req.session.twitterAccess = token;
             c.req.session.twitterSecret = secret;
             c.consumer().get(
-                'http://api.twitter.com/1/account/verify_credentials.json',
+                'http://api.twitter.com/1.1/account/verify_credentials.json',
                 token,
                 secret,
                 function (err, profile, response) {
                     if (err) {
+                        console.log(err);
                         return c.next(err);
                     }
 
@@ -87,7 +91,7 @@ TwitterAuthController.prototype.callback = function twitterCallback(c) {
 function consumer(c) {
     var gm = c.req.group.modules.find('auth-twitter', 'name');
     if (!gm) {
-        return c.next(new Error('The auth-facebook module is not enable in this group'));
+        return c.next(new Error('The auth-twitter module is not enable in this group'));
     }
     var contract = gm.contract;
     c.consumer = function consumer() {
