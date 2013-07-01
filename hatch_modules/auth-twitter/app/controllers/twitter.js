@@ -87,7 +87,7 @@ TwitterAuthController.prototype.callback = function twitterCallback(c) {
 function consumer(c) {
     var gm = c.req.group.modules.find('auth-twitter', 'name');
     if (!gm) {
-        return c.next(new Error('The auth-facebook module is not enable in this group'));
+        return c.next(new Error('The auth-twitter module is not enable in this group'));
     }
     var contract = gm.contract;
     c.consumer = function consumer() {
