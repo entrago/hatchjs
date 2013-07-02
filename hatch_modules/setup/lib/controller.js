@@ -78,8 +78,6 @@ SetupController.prototype.setup = function(c) {
     seeds[2].User.email = req.body.email;
     seeds[2].User.password = req.body.password;
 
-    console.log(seeds[0].Group);
-
     // create the group and administrator user
     (function next(seeds) {
         var seed = seeds.shift();
