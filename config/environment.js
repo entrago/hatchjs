@@ -40,9 +40,7 @@ module.exports = function (compound) {
         }));
         app.use(express.methodOverride());
 
-        if (process.env.NODE_ENV !== 'test') {
-            app.use(require('express-mobile-agent'));
-        }
+        app.use(require('express-mobile-agent'));
         app.use(hatch.middleware.rewrite(compound));
         app.use('/do', hatch.mediator);
         app.use(hatch.middleware.hatch(compound));
