@@ -20,6 +20,9 @@ var User = define('User', function () {
     property('fulltext', String, {fulltext: true});
     property('tags', [], {index: true, fulltext: true});
     property('tagNames', String, {sort: true});
+    property('facebookId', String, {index: true});
+    property('linkedinId', String, {index: true});
+    property('twitterId', String, {index: true});
 
     // group membership indexes
     property('membershipGroupId', JSON, {index: true});

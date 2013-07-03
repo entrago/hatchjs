@@ -107,14 +107,22 @@ module.exports = function (compound, Group) {
     Group.prototype.getSetting = function (name) {
         var moduleName = name.split('.')[0];
         var setting = name.split('.')[1];
-
         var module = this.getModule(moduleName);
 
         if (!module) {
             return null;
         }
 
-        return module.contract[setting];
+        var result = module.contract[setting];
+        if (!result) {
+            var defaultModule = compound.app.get(moduleName);
+            if(!defaultModule) {
+                return null;
+            }
+            result = defaultModule[setting];
+        }
+
+        return result;
     };
 
     /**
