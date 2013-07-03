@@ -39,7 +39,7 @@ Page.seed ->
 Page.seed ->
     id: 3
     title: '501'
-    url: 'example.com'
+    url: 'example.com/new'
     customUrl: null
     grid: '02-two-columns'
     columns: [{"size":"4","widgets":[1]},{"size":"6","widgets":[]},{"size":"6","widgets":[]}]

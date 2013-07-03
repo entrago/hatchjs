@@ -56,7 +56,7 @@ module.exports = function (compound, Group) {
                 if (!group) {
                     Content.findOne({ where: { url: url }}, function (err, post) {
                         if (post) {
-                            return callback(err, null);
+                            return callback(err, null, post);
                         } else {
                             if (url.indexOf('/') > -1) {
                                 url = url.substring(0, url.lastIndexOf('/'));
@@ -95,6 +95,26 @@ module.exports = function (compound, Group) {
      */
     Group.getter.path = function () {
         return this._url && this._url.replace(/[^\/]+/, '');
+    };
+
+    /**
+     * Get the value of a setting within a module in this group.
+     * 
+     * @param  {String} name - full dot-notation setting name - e.g. 
+     *                         core-settings.settingName
+     * @return {String}
+     */
+    Group.prototype.getSetting = function (name) {
+        var moduleName = name.split('.')[0];
+        var setting = name.split('.')[1];
+
+        var module = this.getModule(moduleName);
+
+        if (!module) {
+            return null;
+        }
+
+        return module.contract[setting];
     };
 
     /**

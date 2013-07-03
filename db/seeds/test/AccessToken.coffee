@@ -4,6 +4,6 @@ AccessToken.seed ->
     token: 'letmein'
 
 AccessToken.seed ->
-    id: 1
-    userId: 1
+    id: 2
+    userId: 2
     token: 'daddyhome'

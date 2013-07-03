@@ -4,12 +4,13 @@ function UsersController() {}
 
 UsersController.prototype.create = function(c) {
     var User = c.User;
-    var user = new User();
+    var user = c.req.user || new User();
 
     user.username = c.body.username;
     user.email = c.body.email;
     user.password = c.body.password;
     user.hasPassword = c.body.hasPassword;
+    user.type = 'registered';
 
     //validation
     if (c.body.terms !== 'accepted') {

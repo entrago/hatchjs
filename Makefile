@@ -63,4 +63,51 @@ safe-update: gst-clean
 pr: push
 	open "https://github.com/$(REPO)/pull/new/marcusgreenwood:master...$(GITBRANCH)"
 
+# MAN DOCS
+
+CLI_MAN = $(shell find doc/cli -name '*.md' \
+               |sed 's|.md|.1|g' \
+               |sed 's|doc/cli/|man/|g' )
+
+API_MAN = $(shell find doc/api -name '*.md' \
+               |sed 's|.md|.3|g' \
+               |sed 's|doc/api/|man/|g' )
+
+CLI_WEB = $(shell find doc/cli -name '*.md' \
+               |sed 's|.md|.1.html|g' \
+               |sed 's|doc/cli/|man/html/|g' )
+
+API_WEB = $(shell find doc/api -name '*.md' \
+               |sed 's|.md|.3.html|g' \
+               |sed 's|doc/api/|man/html/|g' ) \
+
+man/%.1: doc/cli/%.md scripts/doc.sh
+	@[ -d man ] || mkdir man
+	scripts/doc.sh $< $@
+
+man/%.3: doc/api/%.md scripts/doc.sh
+	@[ -d man ] || mkdir man
+	scripts/doc.sh $< $@
+
+man/html/%.3.html: doc/api/%.md scripts/doc.sh doc/footer.html
+	@[ -d man/html ] || mkdir -p man/html
+	scripts/doc.sh $< $@
+
+man/html/%.1.html: doc/cli/%.md scripts/doc.sh
+	@[ -d man/html ] || mkdir -p man/html
+	scripts/doc.sh $< $@
+
+man/html/changelog.3.html: CHANGELOG.md scripts/doc.sh
+	scripts/doc.sh $< $@
+
+MAN = $(API_MAN) $(CLI_MAN)
+HTML: $(API_WEB) $(CLI_WEB)
+
+web: $(HTML)
+man: $(MAN)
+
+all: $(MAN) $(HTML)
+
+build: man
+
 .PHONY: test doc

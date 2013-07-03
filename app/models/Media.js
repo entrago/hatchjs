@@ -79,7 +79,7 @@ module.exports = function (compound, Media) {
 
             // if we have a video encoder, run now
             if (Media.encodeVideo && !params.skipEncode) {
-                Media.encodeVideo(data, function (err, data) {
+                Media.encodeVideo(data, {}, function (err, data) {
                     Media.create(data, callback);
                 });
             } else {

@@ -129,6 +129,7 @@ PageController.prototype.updateGrid = function(c) {
  */
 PageController.prototype.updateColumns = function(c) {
     c.req.page.columns = JSON.parse(c.body.widgets);
+    c.req.page.removeRedundantWidgets();
     c.req.page.save(function (err) {
         c.send('ok');
     });
