@@ -17,7 +17,8 @@ coverage.html
 .settings
 doc
 
-public/upload
+public/upload/*
+!public/upload/*.keep
 coverage
 deps
 public/javascripts/cache*

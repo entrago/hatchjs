@@ -98,6 +98,26 @@ module.exports = function (compound, Group) {
     };
 
     /**
+     * Get the value of a setting within a module in this group.
+     * 
+     * @param  {String} name - full dot-notation setting name - e.g. 
+     *                         core-settings.settingName
+     * @return {String}
+     */
+    Group.prototype.getSetting = function (name) {
+        var moduleName = name.split('.')[0];
+        var setting = name.split('.')[1];
+
+        var module = this.getModule(moduleName);
+
+        if (!module) {
+            return null;
+        }
+
+        return module.contract[setting];
+    };
+
+    /**
      * Find page by it's relative path
      *
      * @param {String} pathname - relative page path with no domain or group
