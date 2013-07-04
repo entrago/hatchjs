@@ -124,15 +124,6 @@ module.exports = function (compound, Content) {
     };
 
     /**
-     * Get the total likes - total dislikes
-     *
-     * @return {[Number]}
-     */
-    Content.getter.likesTotal = function () {
-        return (this.likes || []).length - (this.dislikes || []).length;
-    };
-
-    /**
      * Before content is saved, make sure all automatic tag filters are applied
      *
      * @param  {Function} done [continuation function]
@@ -164,7 +155,7 @@ module.exports = function (compound, Content) {
      */
     Content.generateUrl = function (data, group, done) {
         if (!data.url) {
-            var slug = slugify(data.title || (data.createdAt || new Date(0)).getTime().toString());
+            var slug = slugify(data.title || new Date(data.createdAt || new Date(0)).getTime().toString());
             data.url = (group.homepage.url + '/' + slug).replace('//', '/');
 
             //check for duplicate pages and content in parallel
@@ -181,7 +172,7 @@ module.exports = function (compound, Content) {
                 }
             ], function (err, results) {
                 if (results[0].length > 0 || results[1].length > 0) {
-                    data.url += '-' + (data.createdAt || new Date(0)).getTime();
+                    data.url += '-' + new Date(data.createdAt || new Date(0)).getTime();
                 }
 
                 return done();
@@ -267,16 +258,16 @@ module.exports = function (compound, Content) {
         }
 
         //load all of the users
-        User.all({ where: {id: userIds }}, function (err, users) {
+        User.all({ where: {id: {inq: userIds }}}, function (err, users) {
             list.forEach(function (post) {
-                post.author = findUser(users, post.authorId);
+                post.author = findUser(users, post.authorId) || post.author;
 
                 (post.likes || []).forEach(function (like) {
                     like.user = findUser(users, like.userId);
                 });
 
                 (post.comments || []).forEach(function (comment) {
-                    comment.author = findUser(users, comment.userId);
+                    comment.author = findUser(users, comment.userId) || comment.author;
                 });
             });
 
@@ -547,7 +538,10 @@ module.exports = function (compound, Content) {
     Content.updateLikes = function (contentId, callback) {
         Content.find(contentId, function (err, post) {
             if (!post) {
-                throw new Error('Could not find content.id == ' + contentId);
+                if (callback) {
+                    callback();
+                }
+                return;
             }
 
             Like.all({ where: { contentId: contentId }, limit: Content.CACHEDLIKES }, function (err, likes) {
@@ -595,7 +589,7 @@ module.exports = function (compound, Content) {
             } else {
                 doesLike = true;
                 Like.create({
-                    userId: user.id,
+                    userId: user.id || user,
                     contentId: self.id,
                     groupId: self.groupId
                 }, done);
