@@ -251,9 +251,12 @@ module.exports = function (compound, Stylesheet) {
         // when everything is done, compile the stylesheet and save
         function done() {
             self.less = {};
+            self.name = name;
             self.less.variables = variables;
             self.less.bootswatch = bootswatch;
             self.less.custom = '/* put your custom css here */';
+
+            console.log('Theme set to ' + name);
 
             // compile the stylesheet to a file
             self.saveAndCompile(callback);

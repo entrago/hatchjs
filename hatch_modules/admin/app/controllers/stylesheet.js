@@ -24,7 +24,7 @@ function StylesheetController(init) {
 
 // finds the stylesheet for the current group
 function findStylesheet (c) {
-    c.Stylesheet.findOne({ groupId: c.req.group.id }, function (err, stylesheet) {
+    c.Stylesheet.findOne({ where: { groupId: c.req.group.id }}, function (err, stylesheet) {
         c.stylesheet = stylesheet;
         c.next();
     });

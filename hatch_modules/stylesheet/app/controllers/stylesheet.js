@@ -39,18 +39,18 @@ StylesheetController.prototype.css = function (c) {
     var css = null;
     
     // get the stylesheet object
-    c.Stylesheet.all({ where: { groupId: c.req.group.id }}, function (err, stylesheets) {
+    c.Stylesheet.findOne({ where: { groupId: c.req.group.id }}, function (err, stylesheet) {
         // load the default stylesheet if none is found
-        if (stylesheets.length === 0) {
-            var stylesheet = new c.Stylesheet();
+        if (!stylesheet) {
+            console.log('Stylesheet: not found. Setting default theme');
+
+            stylesheet = new c.Stylesheet();
             stylesheet.groupId = c.req.group.id;
             stylesheet.version = 0;
             stylesheet.setTheme('default', function () {
                 output(stylesheet.css);
             });
         } else {
-            var stylesheet = stylesheets[0];
-
             if (stylesheet.less && (stylesheet.lastUpdate < c.Stylesheet.lastUpdate || typeof stylesheet.lastUpdate === 'undefined')) {
                 console.log("Stylesheet: out of date stylesheet - recompiling");
 
