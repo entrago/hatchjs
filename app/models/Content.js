@@ -704,6 +704,7 @@ module.exports = function (compound, Content) {
      */
     Content.allWithLikes = function (query, user, callback) {
         var likeIds = [];
+        var likedPosts = [];
         var posts = null;
 
         async.parallel([
@@ -729,9 +730,12 @@ module.exports = function (compound, Content) {
 
             posts.forEach(function (post) {
                 post.doesLike = likeIds.indexOf(post.id) > -1;
+                if(post.doesLike) {
+                    likedPosts.push(post);
+                }
             });
 
-            callback(err, posts);
+            callback(err, likedPosts);
         });
     };
 };
