@@ -731,7 +731,7 @@ module.exports = function (compound, Content) {
                 post.doesLike = likeIds.indexOf(post.id) > -1;
             });
 
-            callback(err, post);
+            callback(err, posts);
         });
     };
 };
