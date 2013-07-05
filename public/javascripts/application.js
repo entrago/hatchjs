@@ -98,6 +98,9 @@ function send(action, data, response, done) {
     if (pathname === '/') pathname = '';
 
     var path = pathname + '/do/admin/' + action;
+    if (action.indexOf('core-widgets') > -1)  {
+        path = pathname + '/do/' + action;
+    }
 
     $.post(path, data, function (data) {
         if (typeof done === 'function') {

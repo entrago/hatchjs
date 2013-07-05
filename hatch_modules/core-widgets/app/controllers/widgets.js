@@ -160,6 +160,7 @@ WidgetController.prototype.destroy = function(c) {
 WidgetController.prototype.settings = function(c) {
     this.widgetCore = c.compound.hatch.widget.getWidget(this.widget.type);
     var widget = this.widget;
+    var self = this;
 
     this.visibility = [
           { icon: 'mobile-phone', class: 'success', name: 'All devices', value: 'visible-all', description: 'This widget can be viewed on all devices'},
@@ -176,15 +177,20 @@ WidgetController.prototype.settings = function(c) {
         ];
     this.privacy.selected = _.find(this.privacy, function(p) { return p.value == (widget.settings && widget.settings.privacy || 'public') });
 
-    var settings = this.widgetCore.info.settings;
-    if (settings && settings.custom) {
-        this.page.widgetAction(this.widget.id, 'settings', null, c.req, function (e, settings) {
-            c.send(settings);
-        });
-    } else {
-        this.inlineEditAllowed = this.widget.inlineEditAllowed;
-        c.render({layout:false});
-    }
+    // load the tags for the whole group
+    c.Tag.all({ where: { groupId: c.req.group.id }}, function (err, tags) {
+        c.req.group.tags = tags;
+   
+        var settings = self.widgetCore.info.settings;
+        if (settings && settings.custom) {
+            self.page.widgetAction(self.widget.id, 'settings', null, c.req, function (e, settings) {
+                c.send(settings);
+            });
+        } else {
+            self.inlineEditAllowed = self.widget.inlineEditAllowed;
+            c.render({layout:false});
+        }
+    });
 };
 
 /**
@@ -195,6 +201,9 @@ WidgetController.prototype.settings = function(c) {
 WidgetController.prototype.configure = function(c) {
     var settings = this.widget.settings;
     Object.keys(c.body).forEach(function(key) {
+        settings[key] = c.body[key];
+    });
+    Object.keys(settings).forEach(function(key) {
         settings[key] = c.body[key];
     });
     this.widget.save(function () {
