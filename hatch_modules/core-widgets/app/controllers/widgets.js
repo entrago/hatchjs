@@ -116,7 +116,7 @@ WidgetController.prototype.render = function(c) {
  * @param  {ControllerContext} c - compound controller context
  */
 WidgetController.prototype.update = function(c) {
-    var widgetId = parseInt(c.req.params.widgetId, 10);
+    var widgetId = parseInt(c.req.params.widgetId || c.req.params.id, 10);
     this.page.performWidgetAction(widgetId, c.req, function (err, res) {
         c.send({
             code: err ? 500 : 200,
@@ -218,9 +218,13 @@ WidgetController.prototype.configure = function(c) {
  * @param  {ControllerContext} c - compound controller context
  */
 WidgetController.prototype.contrast = function(c) {
-    var map = { 0: 1, 1: 2, 2: 0 };
+    var modes = 6;
     var settings = this.widget.settings;
-    settings.contrastMode = map[(settings.contrastMode || 0)];
+    settings.contrastMode = (settings.contrastMode || 0) +1;
+    if (settings.contrastMode > modes) {
+        settings.contrastMode = 0;
+    }
+
     this.widget.save(function() {
         // TODO: normalize widget response [API]
         c.send('ok');
