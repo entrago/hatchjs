@@ -316,6 +316,7 @@ module.exports = function (compound, Page) {
             try {
                 callback(null, ejs.render(gridHtml[0], {
                     column: cols,
+                    page: self,
                     size: sizes,
                     filename: grid + (self.templateId || ''),
                     cache: true
@@ -344,10 +345,10 @@ module.exports = function (compound, Page) {
             widget = this.widgets[widgetId];
         }
         if (!widget) {
-            return cb(new Error('Widget id=' + widgetId + ' not found'));
+            return callback(new Error('Widget id=' + widgetId + ' not found'));
         }
         if (!widget.type) {
-            return cb(new Error('Widget has no type specified'));
+            return callback(new Error('Widget has no type specified'));
         }
         var moduleName = widget.type.split('/')[0];
         var widgetName = 'widgets/' + widget.type.split('/').slice(1).join('/');
