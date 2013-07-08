@@ -14,7 +14,7 @@ UsersController.prototype.create = function(c) {
 
     //validation
     if (c.body.terms !== 'accepted') {
-        return c.send({ message: 'Please accept the terms and conditions'});
+        return c.sendError({ message: 'Please accept the terms and conditions'});
     }
 
     //check for any more required custom fields
@@ -26,7 +26,7 @@ UsersController.prototype.create = function(c) {
         //save to database and continue
         user.save(function(err, user) {
             if (err) {
-                c.send({ message: user.errors });
+                c.sendError({ message: user.errors });
             } else {
                 //get the newly created user
                 User.all({where: { username: user.username }}, function (err, users) {
