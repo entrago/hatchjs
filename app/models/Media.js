@@ -40,9 +40,12 @@ module.exports = function (compound, Media) {
         if (!data.type) {
             if (Media.isVideo(data.url)) {
                 data.type = 'video';
-            }
-            if (Media.isImage(data.url)) {
+            } else if (Media.isImage(data.url)) {
                 data.type = 'image';
+            } else if (Media.isDocument(data.url)) {
+                data.type = 'doc';
+            } else {
+                data.type = 'file';
             }
         }
 
@@ -200,6 +203,19 @@ module.exports = function (compound, Media) {
         var videoExtensions = ['mp4', 'mov', 'flv', 'ogg', 'webm', 'm3u8'];
 
         return videoExtensions.indexOf(ext) > -1;
+    };
+
+    /**
+     * Work out whether a file is a document.
+     * 
+     * @param  {String}  filename - filename to check
+     * @return {Boolean}          
+     */
+    Media.isDocument = function (filename) {
+        var ext = filename.split('.').slice(-1)[0].toLowerCase();
+        var docExtensions = ['pdf', 'doc', 'docx', 'rtf'];
+
+        return docExtensions.indexOf(ext) > -1;
     };
 
      /**
@@ -412,6 +428,24 @@ module.exports = function (compound, Media) {
         })
     };
 
+    /**
+     * Get the local filename for a media object so that we can do local
+     * operations on the file.
+     * 
+     * @param  {Media}    media    - media object
+     * @param  {Function} callback - callback function
+     */
+    Media.getLocalFilename = function (media, callback) {
+        if (media.url.indexOf('/upload') === 0) {
+            callback(null, path.join(compound.app.get('upload path'), media.url.replace('/upload', '')));
+        } else {
+            // download the file to local disk and return the filename
+            var filename = compound.app.get('upload path') + '/tmp-' + new Date().getTime() + media.url.split('/').slice(-1)[0];
+            request.get(url, function (err, resp, body) {
+                callback(err, filename);
+            }).pipe(fs.createWriteStream(filename));
+        }
+    };
 
     function slugify(text) {
         text = text.toLowerCase();
