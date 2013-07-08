@@ -70,7 +70,7 @@ $(document).ready(function() {
     });
 
     //ajax modals
-    $("a[data-toggle=modal]").on('click', function (e) {
+    $(document).on('click', "a[data-toggle=modal]", function (e) {
         target = $(this).attr('data-target');
         url = $(this).attr('href');
         if(url.indexOf('#') == -1) {

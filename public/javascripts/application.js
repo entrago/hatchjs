@@ -17,7 +17,7 @@ $(function () {
 
     $(document).on('contents-updated', '.inline-edit', updateWidgetContent);
 
-    $('.module-controls > .delete').on('click', function (e) {
+    $(document).on('click', '.module-controls > .delete', function (e) {
         e.stopPropagation();
         var $module = $(this).closest('.module');
         removeWidget($module);
@@ -71,7 +71,7 @@ function widgetAction(handle, data) {
     var action = h.shift();
     var id = h.shift();
 
-    var path = [location.pathname + 'do/core-widgets/widget', id, action].join('/');
+    var path = [location.pathname + '/do/core-widgets/widget', id, action].join('/').replace('//', '/');
 
     if (data) {
         path += '?' + data;
