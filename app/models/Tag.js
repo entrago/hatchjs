@@ -123,16 +123,23 @@ module.exports = function (compound, Tag) {
             Tag.find(tagId, function (err, tag) {
                 // if the tag was not found, create it
                 if (!tag && typeof tagId === 'string') {
-                    var tag = {
-                        title: tagId,
-                        groupId: obj.groupId,
-                        type: data.tagModelName || obj.tagModelName || obj.constructor.modelName,
-                        sortOrder: 'id DESC'
-                    };
+                    // search for a tag with the same title and group
+                    Tag.findOne({ where: { title: tagId, groupId: obj.groupId }}, function (err, tag) {
+                        if (tag) {
+                            pushTag(tag);
+                        } else {
+                            var tag = {
+                                title: tagId,
+                                groupId: obj.groupId,
+                                type: data.tagModelName || obj.tagModelName || obj.constructor.modelName,
+                                sortOrder: 'id DESC'
+                            };
 
-                    Tag.create(tag, function (err, tag) {
-                        pushTag(tag);
-                    });
+                            Tag.create(tag, function (err, tag) {
+                                pushTag(tag);
+                            });
+                        }
+                    })
                 } else if(tag) {
                     pushTag(tag);
                 } else {
