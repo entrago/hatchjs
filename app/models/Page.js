@@ -307,7 +307,7 @@ module.exports = function (compound, Page) {
             });
 
             var grid = req.agent && req.agent.mobile ? ('m.' + self.grid) : self.grid;
-            var gridHtml = Page.grids[grid || self.grid || '02-two-columns'] || [''];
+            var gridHtml = Page.grids[grid] || Page.grids[self.grid] || Page.grids['02-two-columns'] || [''];
 
             // log the total render time
             compound.log('RENDER [' + (new Date() - req.startedAt) + 'ms]');
@@ -433,6 +433,7 @@ module.exports = function (compound, Page) {
                     group.pagesCache.push(page.toMinimalObject());
                     if (group.homepage && group.homepage.id == page.id) {
                         group.homepage = page.toMinimalObject();
+                        group.url = group.homepage.url;
                     }
                 });
                 group.pagesCache = Page.tree(group.pagesCache);
