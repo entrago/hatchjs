@@ -135,7 +135,19 @@ module.exports = function (compound, Content) {
 
         data.updatedAt = new Date();
 
-        //get the group and check all tag filters
+        // fix the attachments
+        if (data.attachments) {
+            data.attachments = data.attachments.map(function (media) {
+                if (typeof media === 'string') return JSON.parse(media);
+                else return media;
+            });
+        }
+
+        if (data.previewImage && typeof data.previewImage === 'string' && data.previewImage.indexOf('{') === 0) {
+            data.previewImage = JSON.parse(data.previewImage);
+        }
+
+        // get the group and check all tag filters
         Group.find(data.groupId, function (err, group) {
             if (!group) {
                 return done();
@@ -237,14 +249,14 @@ module.exports = function (compound, Content) {
         if (!list.length && list.id) list = [list];
 
         list.forEach(function (post) {
-            if (userIds.indexOf(post.authorId) == -1) userIds.push(post.authorId);
+            if (post.authorId && userIds.indexOf(post.authorId) == -1) userIds.push(post.authorId);
 
             (post.likes || []).forEach(function (like) {
-                if (userIds.indexOf(like.userId) == -1) userIds.push(like.userId);
+                if (like.userId && userIds.indexOf(like.userId) == -1) userIds.push(like.userId);
             });
 
             (post.comments || []).forEach(function (comment) {
-                if (userIds.indexOf(comment.userId) == -1) userIds.push(comment.userId);
+                if (comment.userId && userIds.indexOf(comment.userId) == -1) userIds.push(comment.userId);
             });
         });
 
@@ -258,7 +270,7 @@ module.exports = function (compound, Content) {
         }
 
         //load all of the users
-        User.all({ where: {id: {inq: userIds }}}, function (err, users) {
+        User.all({ where: { id: { inq: userIds }}}, function (err, users) {
             list.forEach(function (post) {
                 post.author = findUser(users, post.authorId) || post.author;
 
