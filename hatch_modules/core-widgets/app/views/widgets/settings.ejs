@@ -1,4 +1,5 @@
 <form action="<%- widgetCoreAction('configure') %>" method="POST" data-remote="true" data-widget-action="render:<%- widget.id %>" class="form-horizontal widget-settings-form">
+  <input type="hidden" name="contrastMode" value="<%- widget.settings.contrastMode %>">
   <div class="modal wide" id="modal-settings">
     <div class="modal-header">
       <a class="close" data-dismiss="modal">×</a>
