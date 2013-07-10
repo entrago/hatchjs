@@ -81,7 +81,7 @@ module.exports = function (compound, AccessToken) {
         
         token.userId = userId;
         token.clientId = clientId;
-        token.score = JSON.parse(scope || '{}');
+        token.scope = JSON.parse(scope || '{}');
         token.expiryDate = expiryDate;
         token.token = compound.hatch.crypto.generateRandomString(256);
 

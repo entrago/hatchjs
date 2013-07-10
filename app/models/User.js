@@ -361,6 +361,9 @@ module.exports = function (compound, User) {
             cond[field] = data[field];
         });
 
+        console.log('Authenticate user with:');
+        console.log(cond);
+
         User.findOne({ where: cond }, function (err, user) {
             if (user) {
                 // update user details and return

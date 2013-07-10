@@ -368,6 +368,12 @@ module.exports = function (compound, Tag) {
      */
     Tag.prototype.updateCount = function (callback) {
         var tag = this;
+        if (!this.type) {
+            if (callback) {
+                callback();
+            }
+            return;
+        }
     
         compound.model(this.type, false).count({ tags: tag.id }, function (err, count) {
             tag.count = count;
