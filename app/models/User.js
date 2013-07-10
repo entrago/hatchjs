@@ -366,6 +366,9 @@ module.exports = function (compound, User) {
 
         User.findOne({ where: cond }, function (err, user) {
             if (user) {
+                // don't allow it to update username
+                delete data.username;
+
                 // update user details and return
                 user.updateAttributes(data, callback);
             } else {
