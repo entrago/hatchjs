@@ -1,0 +1,11 @@
+title: Basic authentication
+description: Adds basic authentication plain-text username/password to this group
+icon: lock
+settings:
+  fields:
+    username: 
+      title: Username
+      type: text
+    password:
+      title: Password
+      type: text
