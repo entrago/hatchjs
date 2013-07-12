@@ -531,9 +531,6 @@ module.exports = function (compound, Group) {
      */
     Group.prototype.getModule = function(name) {
         var module = this.modules.find(name, 'name');
-        if(!module){
-            console.log("WARNING: couldn't get module: "+name+'. Is it enabled?');
-        }
         return module;
     };
 
