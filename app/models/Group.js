@@ -507,6 +507,10 @@ module.exports = function (compound, Group) {
                     page.url = page.url.replace(oldUrl, url);
                     page.url = page.url.replace('//', '/');
 
+                    if (page.url.lastIndexOf('/') === page.url.length) {
+                        page.url = page.url.substring(0, page.url.length - 1);
+                    }
+
                     console.log('new url = ' + page.url);
 
                     page.save(next);
