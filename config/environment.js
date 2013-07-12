@@ -8,7 +8,7 @@ module.exports = function (compound) {
     var RedisStore = require('connect-redis')(express);
     var env = app.get('env');
     var isTest = env === 'test';
-    var dbConfig = require('./database')[env] || {};
+    var dbConfig = require(process.env.DB_CONFIG || './database')[env] || {};
 
     app.configure(function() {
         var sessionStore = isTest ?
