@@ -26,6 +26,7 @@ module.exports = function (compound) {
         app.set('dateformat', 'DD/MM/YYYY');
         app.set('timeformat', 'HH:mm:ss');
         app.set('datetimeformat', app.get('dateformat') + ' ' + app.get('timeformat'));
+        app.set('csrf secret', '~aJlsk029p2$3Hka8*2+$');
 
         compound.injectMiddlewareAt(2, hatch.middleware.timeLogger(compound));
 
@@ -41,6 +42,7 @@ module.exports = function (compound) {
         app.use(express.methodOverride());
 
         app.use(require('express-mobile-agent'));
+        app.use(hatch.middleware.csrf(compound));
         app.use(hatch.middleware.rewrite(compound));
         app.use('/do', hatch.mediator);
         app.use(hatch.middleware.hatch(compound));
