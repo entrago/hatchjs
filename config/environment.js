@@ -13,7 +13,13 @@ module.exports = function (compound) {
     app.configure(function() {
         var sessionStore = isTest ?
             new MemoryStore :
-            new RedisStore({ttl: 86400 * 365, db: dbConfig.session && dbConfig.session.database});
+            new RedisStore({
+                ttl: 86400 * 365, 
+                db: dbConfig.session && dbConfig.session.database,
+                host: dbConfig.session && dbConfig.session.host,
+                port: dbConfig.session && dbConfig.session.port,
+                password: dbConfig.session && dbConfig.session.password
+            });
 
         app.set('jsDirectory', '/javascripts/');
         app.set('cssDirectory', '/stylesheets/');
