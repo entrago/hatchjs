@@ -18,7 +18,7 @@ module.exports = function (compound) {
                 db: dbConfig.session && dbConfig.session.database,
                 host: dbConfig.session && dbConfig.session.host,
                 port: dbConfig.session && dbConfig.session.port,
-                password: dbConfig.session && dbConfig.session.password
+                pass: dbConfig.session && dbConfig.session.password
             });
 
         app.set('jsDirectory', '/javascripts/');
