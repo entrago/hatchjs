@@ -20,7 +20,7 @@ PageController.prototype.show = function (c) {
 
         c.req.page = page;
 
-        c.compound.hatch.hooks.hook(c, 'page.show', { page: page }, function () {
+        c.compound.hatch.hooks.hook(c, 'page.show', { page: page, req: c.req }, function () {
             page.renderHtml(c.req, function (err, html) {
                 if (err) {
                     return c.next(err);
