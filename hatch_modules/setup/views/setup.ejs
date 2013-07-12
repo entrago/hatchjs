@@ -3,11 +3,11 @@
   <head>
     <meta charset="utf-8">
     <title>Hatch.js application setup</title>
-    <meta name="csrf-token" content="<%- req.session._csrf %>" />
 
     <link href="/stylesheets/theme-cerulean.css" rel="stylesheet">
 
     <%- javascriptIncludeTag(javascripts()) %>
+    <%- csrfMetaTag() %>
   </head>
 
   <body>
@@ -15,9 +15,7 @@
     <div class="navbar navbar-inverse">
       <div class="navbar-inner">
         <div class="container">
-            <a class="brand" href="#">
-                Application setup
-            </a>
+            <a class="brand" href="#">Application setup</a>
         </div>
       </div>
     </div>
@@ -39,8 +37,8 @@
 
         <div class="tab-content">
             <div class="tab-pane active" id="new">
+                <%- formTagBegin({method: 'POST', remote:true}) %>
 
-                <form class="form-horizontal" action="/" method="post" data-remote="true">
                     <h3>Administrator details</h3>
 
                     <div class="control-group">
@@ -93,7 +91,7 @@
                         <button type="reset" class="btn">Reset</button>
                     </div>
 
-                </form>
+                <%- formTagEnd() %>
 
             </div>
             <div class="tab-pane" id="restore">
