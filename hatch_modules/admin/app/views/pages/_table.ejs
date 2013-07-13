@@ -16,7 +16,7 @@
         <td>
             <%- linkTo('Edit', pathTo.editPage(page.id), {class: '' }) %>
             &nbsp;
-            <%- linkTo('<i class="icon-remove"></i>', pathTo.page(), {remote: true, method: 'delete', rel: 'tooltip', 'data-original-title': t('pages.help.delete'), rel: 'delete-page'}) %>
+            <%- linkTo('<i class="icon-remove"></i>', pathTo.deletePage(page.id), {remote: true, method: 'delete', rel: 'tooltip', 'data-original-title': t('pages.help.delete'), rel: 'delete-page'}) %>
         </td>
     </tr>
 <% }); %>

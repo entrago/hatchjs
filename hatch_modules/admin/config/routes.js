@@ -85,6 +85,7 @@ exports.routes = function (map) {
             pages.get('edit/:id', '#edit', {as: 'editPage'});
         });
         page.put('reorder.:format?', 'pages#updateOrder');
+        page.del('destroy', 'pages#destroy', {as: 'deletePage'});
     });
 
     map.post('/page/columns', 'page#updateColumns');
