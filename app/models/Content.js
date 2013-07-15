@@ -268,7 +268,7 @@ module.exports = function (compound, Content) {
             });
 
             (post.comments || []).forEach(function (comment) {
-                if (comment.userId && userIds.indexOf(comment.userId) == -1) userIds.push(comment.userId);
+                if (comment.authorId && userIds.indexOf(comment.authorId) == -1) userIds.push(comment.authorId);
             });
         });
 
@@ -291,7 +291,7 @@ module.exports = function (compound, Content) {
                 });
 
                 (post.comments || []).forEach(function (comment) {
-                    comment.author = findUser(users, comment.userId) || comment.author;
+                    comment.author = findUser(users, comment.authorId) || comment.author;
                 });
             });
 
