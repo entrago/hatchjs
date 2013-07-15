@@ -7,7 +7,7 @@
         $('form[data-remote=true]').each(function() {
             var f = $(this);
             var action = f.attr('action');
-            if (!action.split('?')[0].match(/\.json$/)) {
+            if (action && !action.split('?')[0].match(/\.json$/)) {
                 f.attr('action', action + '.json');
             }
             f.attr('data-type', 'json');
