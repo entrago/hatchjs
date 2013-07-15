@@ -76,6 +76,18 @@ module.exports = function (compound, Content) {
     };
 
     /**
+     * Get the first attachment of the specified type.
+     * 
+     * @param  {String} type - attachment type
+     * @return {Media}
+     */
+    Content.prototype.getAttachment = function (type) {
+        return _.find(this.attachments, function (media) {
+            return media.type === type;
+        });
+    };
+
+    /**
      * Get whether this content has been flagged.
      *
      * @return {Boolean}
