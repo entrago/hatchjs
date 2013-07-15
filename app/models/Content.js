@@ -150,8 +150,11 @@ module.exports = function (compound, Content) {
         // fix the attachments
         if (data.attachments) {
             data.attachments = data.attachments.map(function (media) {
-                if (typeof media === 'string') return JSON.parse(media);
-                else return media;
+                if (typeof media === 'string') {
+                    return JSON.parse(media);
+                } else {
+                    return media;
+                }
             });
         }
 
