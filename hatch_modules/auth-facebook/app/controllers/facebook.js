@@ -78,7 +78,7 @@ FacebookAuthController.prototype.callback = function facebookCallback(c) {
 
                         var provider = { 
                             name: 'facebook', 
-                            idFields: 'facebookId' 
+                            idFields: 'email' 
                         };
 
                         c.User.authenticate(provider, data, c);

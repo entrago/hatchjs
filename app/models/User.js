@@ -361,8 +361,15 @@ module.exports = function (compound, User) {
             cond[field] = data[field];
         });
 
+        console.log('Authenticate user with:');
+        console.log(cond);
+
         User.findOne({ where: cond }, function (err, user) {
             if (user) {
+                // don't allow it to update username or email
+                delete data.username;
+                delete data.email;
+
                 // update user details and return
                 user.updateAttributes(data, callback);
             } else {
@@ -833,7 +840,7 @@ module.exports = function (compound, User) {
         });
 
         // non-members or not-accepted members - return false
-        if(!membership || membership.state !== 'accepted') {
+        if(!membership || (membership.state !== 'accepted' && membership.state !== 'approved')) {
             return callback(null, false);
         }
         // special case for 'view' permission - only need to be a member

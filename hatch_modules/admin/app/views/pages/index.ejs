@@ -159,6 +159,7 @@
         var el = this;
         if(confirm("Are you sure you wish to delete this page?")) {
             $.ajax(this.href, {
+                method: 'DELETE',
                 success: function() {
                     //redraw the page tree
                     $("#pages-table tbody").load('<%- pathTo.renderTree() %>');

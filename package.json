@@ -46,7 +46,8 @@
     "ntwitter": ">0",
     "oauth": ">0",
     "express-mobile-agent": "0.0.1",
-    "dox": "~0.4.3"
+    "dox": "~0.4.3",
+    "textract": "latest"
   },
   "devDependencies": {
     "mocha": "1.8.1",

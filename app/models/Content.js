@@ -76,6 +76,18 @@ module.exports = function (compound, Content) {
     };
 
     /**
+     * Get the first attachment of the specified type.
+     * 
+     * @param  {String} type - attachment type
+     * @return {Media}
+     */
+    Content.prototype.getAttachment = function (type) {
+        return _.find(this.attachments, function (media) {
+            return media.type === type;
+        });
+    };
+
+    /**
      * Get whether this content has been flagged.
      *
      * @return {Boolean}
@@ -135,7 +147,19 @@ module.exports = function (compound, Content) {
 
         data.updatedAt = new Date();
 
-        //get the group and check all tag filters
+        // fix the attachments
+        if (data.attachments) {
+            data.attachments = data.attachments.map(function (media) {
+                if (typeof media === 'string') return JSON.parse(media);
+                else return media;
+            });
+        }
+
+        if (data.previewImage && typeof data.previewImage === 'string' && data.previewImage.indexOf('{') === 0) {
+            data.previewImage = JSON.parse(data.previewImage);
+        }
+
+        // get the group and check all tag filters
         Group.find(data.groupId, function (err, group) {
             if (!group) {
                 return done();
@@ -237,14 +261,14 @@ module.exports = function (compound, Content) {
         if (!list.length && list.id) list = [list];
 
         list.forEach(function (post) {
-            if (userIds.indexOf(post.authorId) == -1) userIds.push(post.authorId);
+            if (post.authorId && userIds.indexOf(post.authorId) == -1) userIds.push(post.authorId);
 
             (post.likes || []).forEach(function (like) {
-                if (userIds.indexOf(like.userId) == -1) userIds.push(like.userId);
+                if (like.userId && userIds.indexOf(like.userId) == -1) userIds.push(like.userId);
             });
 
             (post.comments || []).forEach(function (comment) {
-                if (userIds.indexOf(comment.userId) == -1) userIds.push(comment.userId);
+                if (comment.authorId && userIds.indexOf(comment.authorId) == -1) userIds.push(comment.authorId);
             });
         });
 
@@ -258,7 +282,7 @@ module.exports = function (compound, Content) {
         }
 
         //load all of the users
-        User.all({ where: {id: {inq: userIds }}}, function (err, users) {
+        User.all({ where: { id: { inq: userIds }}}, function (err, users) {
             list.forEach(function (post) {
                 post.author = findUser(users, post.authorId) || post.author;
 
@@ -267,7 +291,7 @@ module.exports = function (compound, Content) {
                 });
 
                 (post.comments || []).forEach(function (comment) {
-                    comment.author = findUser(users, comment.userId) || comment.author;
+                    comment.author = findUser(users, comment.authorId) || comment.author;
                 });
             });
 

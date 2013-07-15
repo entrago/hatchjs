@@ -143,7 +143,7 @@ var Content = define('Content', function () {
     property('title', String, { sort: true });
     property('text', String, { sort: true });
     property('excerpt', String);
-    property('previewImage', String);
+    property('previewImage', JSON);
     property('attachments', JSON);
     property('poll', JSON);
     property('location', JSON);

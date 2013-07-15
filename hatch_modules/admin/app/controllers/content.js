@@ -41,7 +41,7 @@ require('util').inherits(ContentController, Application);
 
 // Load the content tags for this group to display on the left navigation
 function loadTags(c) {
-    c.Tag.all({ where: { groupIdByType: c.req.group.id + '-Content' }, limit: 5 }, function (err, tags) {
+    c.Tag.all({ where: { groupIdByType: c.req.group.id + '-Content' }}, function (err, tags) {
         delete tags.countBeforeLimit;
         c.locals.tags = tags;
         c.next();

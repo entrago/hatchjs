@@ -46,18 +46,9 @@ exports.buildForm = function buildForm(form, data) {
             var html = '<select id="tags" name="tags[]" multiple="multiple" class="chzn-select-create" data-placeholder="' + c.__('Enter tags...') + '">';
 
             (c.req.group.tags || []).forEach(function(tag) {
-                html += '<option' + (val.indexOf(tag.name) > -1 ? ' selected="selected"':'') + '>' + tag.name + '</option>';
-            });
-
-            html += '</select>';
-            return html;
-        },
-        productTags: function(name, params) {
-            var val = data.hasOwnProperty(name) ? data[name] : [];
-            var html = '<select id="tags" name="tags[]" multiple="multiple" class="chzn-select-create" data-placeholder="' + c.__('Enter tags...') + '">';
-
-            (c.req.group.productTags || []).forEach(function(tag) {
-                html += '<option' + (val.indexOf(tag.name) > -1 ? ' selected="selected"':'') + '>' + tag.name + '</option>';
+                if (!params.tagType || params.tagType === tag.type) {
+                    html += '<option value="' + tag.id + '" ' + (val.indexOf(tag.id) > -1 ? ' selected="selected"':'') + '>' + tag.title + '</option>';
+                }
             });
 
             html += '</select>';
@@ -113,5 +104,5 @@ exports.buildForm = function buildForm(form, data) {
 }
 
 exports.widgetCoreAction = function (s) {
-    return [this.req.pagePath, 'do/admin/widget', this.locals.widget.id || 'NOWID', s].join('/');
+    return [this.req.pagePath, 'do/core-widgets/widget', this.locals.widget.id || 'NOWID', s].join('/');
 };

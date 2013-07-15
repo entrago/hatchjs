@@ -20,17 +20,6 @@ SessionController.prototype.create = function(c) {
 
         var message = false;
         if (user && !err) {
-            // if the user has an import password, change their password and allow them to login
-            if (User.verifyPassword('_import_', user.password)) {
-                user.password = c.body.password;
-                user.save(function() {
-                    c.req.session.userId = user.id;
-                    c.send({user: user, message: message});
-                });
-
-                return;
-            }
-
             // standard password verification
             if (User.verifyPassword(c.body.password, user.password)) {
                 compound.hatch.hooks.hook(c, 'User.beforeLogin', { user: user }, function() {

@@ -116,7 +116,7 @@ WidgetController.prototype.render = function(c) {
  * @param  {ControllerContext} c - compound controller context
  */
 WidgetController.prototype.update = function(c) {
-    var widgetId = parseInt(c.req.params.widgetId, 10);
+    var widgetId = parseInt(c.req.params.widgetId || c.req.params.id, 10);
     this.page.performWidgetAction(widgetId, c.req, function (err, res) {
         c.send({
             code: err ? 500 : 200,
@@ -160,6 +160,7 @@ WidgetController.prototype.destroy = function(c) {
 WidgetController.prototype.settings = function(c) {
     this.widgetCore = c.compound.hatch.widget.getWidget(this.widget.type);
     var widget = this.widget;
+    var self = this;
 
     this.visibility = [
           { icon: 'mobile-phone', class: 'success', name: 'All devices', value: 'visible-all', description: 'This widget can be viewed on all devices'},
@@ -176,15 +177,20 @@ WidgetController.prototype.settings = function(c) {
         ];
     this.privacy.selected = _.find(this.privacy, function(p) { return p.value == (widget.settings && widget.settings.privacy || 'public') });
 
-    var settings = this.widgetCore.info.settings;
-    if (settings && settings.custom) {
-        this.page.widgetAction(this.widget.id, 'settings', null, c.req, function (e, settings) {
-            c.send(settings);
-        });
-    } else {
-        this.inlineEditAllowed = this.widget.inlineEditAllowed;
-        c.render({layout:false});
-    }
+    // load the tags for the whole group
+    c.Tag.all({ where: { groupId: c.req.group.id }}, function (err, tags) {
+        c.req.group.tags = tags;
+   
+        var settings = self.widgetCore.info.settings;
+        if (settings && settings.custom) {
+            self.page.widgetAction(self.widget.id, 'settings', null, c.req, function (e, settings) {
+                c.send(settings);
+            });
+        } else {
+            self.inlineEditAllowed = self.widget.inlineEditAllowed;
+            c.render({layout:false});
+        }
+    });
 };
 
 /**
@@ -195,6 +201,9 @@ WidgetController.prototype.settings = function(c) {
 WidgetController.prototype.configure = function(c) {
     var settings = this.widget.settings;
     Object.keys(c.body).forEach(function(key) {
+        settings[key] = c.body[key];
+    });
+    Object.keys(settings).forEach(function(key) {
         settings[key] = c.body[key];
     });
     this.widget.save(function () {
@@ -209,9 +218,13 @@ WidgetController.prototype.configure = function(c) {
  * @param  {ControllerContext} c - compound controller context
  */
 WidgetController.prototype.contrast = function(c) {
-    var map = { 0: 1, 1: 2, 2: 0 };
+    var modes = 6;
     var settings = this.widget.settings;
-    settings.contrastMode = map[(settings.contrastMode || 0)];
+    settings.contrastMode = (settings.contrastMode || 0) +1;
+    if (settings.contrastMode > modes) {
+        settings.contrastMode = 0;
+    }
+
     this.widget.save(function() {
         // TODO: normalize widget response [API]
         c.send('ok');

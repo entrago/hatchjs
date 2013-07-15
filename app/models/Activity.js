@@ -59,6 +59,20 @@ module.exports = function (compound, Activity) {
                     }
                 }
             };
+
+            var afterDestroy = model.afterDestroy;
+            model.afterDestroy = function (done, obj) {
+                var self = this;
+                Activity.destroyActivity(obj || self, model.modelName, next);
+
+                function next() {
+                    if (afterDestroy) {
+                        afterDestroy.call(self, done, obj);
+                    } else {
+                        done();
+                    }
+                }
+            };
         });
     });
 
@@ -83,5 +97,22 @@ module.exports = function (compound, Activity) {
         };
 
         Activity.create(activity, callback);
+    };
+
+    /**
+     * Delete the activity associated with the specified object and type. 
+     * 
+     * @param  {Object}   obj      - object being deleted
+     * @param  {String}   type     - object type
+     * @param  {Function} callback - callback function
+     */
+    Activity.destroyActivity = function (obj, type, callback) {
+        Activity.findOne({ where: { objectId: obj.id, type: type }}, function (err, activity) {
+            if (activity) {
+                activity.destroy(callback);
+            } else if (callback) {
+                callback();
+            }
+        });
     };
 };

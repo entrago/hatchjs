@@ -321,6 +321,7 @@
                             <select id="theme-select">
                                 <option value="">Select theme</option>
                                 @model.themes.forEach(function(theme) {
+                                    @{ if(theme.hidden) return; }
                                     <option value="@theme.name" data-thumbnail="@theme.thumbnail">@theme.title</option>
                                 })
                             </select>

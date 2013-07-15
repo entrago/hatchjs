@@ -25,7 +25,7 @@ InlineEditController.prototype.init = function() {
                 var $widget = el.closest('.module');
                 var widgetId = $widget.attr('data-id');
 
-                send('widget/' + widgetId + '/settitle', {
+                send('core-widgets/widget/' + widgetId + '/settitle', {
                     _method: 'PUT',
                     title: title
                 }, function (data) {

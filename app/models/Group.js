@@ -487,9 +487,12 @@ module.exports = function (compound, Group) {
         var group = this;
         var oldUrl = group.homepage.url;
 
+        if (oldUrl.indexOf('/') === oldUrl.length) {
+            oldUrl = oldUrl.substring(0, oldUrl.length -1);
+        }
+
         //fix the url
         if(url.indexOf('http') > -1) url = url.substring(url.indexOf('//') + 2);
-        if(url.lastIndexOf('/') != url.length) url += '/';
         
         //validate the new url
         Page.all({ where: { url: url }}, function(err, pages) {
@@ -504,11 +507,8 @@ module.exports = function (compound, Group) {
                     page.url = page.url.replace(oldUrl, url);
                     page.url = page.url.replace('//', '/');
 
-                    if (page.url.indexOf('/') == -1) {
-                        page.url += '/';
-                    } else if (page.url.split('/') > 2 &&
-                    page.url.lastIndexOf('/') == page.url.length -1) {
-                        page.url = page.url.substring(0, page.url.length -1);
+                    if (page.url.lastIndexOf('/') === page.url.length) {
+                        page.url = page.url.substring(0, page.url.length - 1);
                     }
 
                     console.log('new url = ' + page.url);
@@ -531,9 +531,6 @@ module.exports = function (compound, Group) {
      */
     Group.prototype.getModule = function(name) {
         var module = this.modules.find(name, 'name');
-        if(!module){
-            console.log("WARNING: couldn't get module: "+name+'. Is it enabled?');
-        }
         return module;
     };
 

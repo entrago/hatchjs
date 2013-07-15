@@ -9,7 +9,7 @@
             <% group.pagesCache.forEach(function (p) { %>
               <% if (/true/.test(p.hideFromNavigation)) return; %>
               <% if ((p.type === 'page' || !p.type) && (p.level === 0 || p.level === 1)) { %>
-              <li class="<%= p.id == page.id ? 'active' : '' %>">
+              <li class="<%- p.id == page.id ? 'active' : '' %>">
                 <%- linkTo(p.title, '//' + p.url) %>
               </li>
               <% } %>

@@ -8,12 +8,18 @@ module.exports = function (compound) {
     var RedisStore = require('connect-redis')(express);
     var env = app.get('env');
     var isTest = env === 'test';
-    var dbConfig = require('./database')[env] || {};
+    var dbConfig = require(process.env.DB_CONFIG || './database')[env] || {};
 
     app.configure(function() {
         var sessionStore = isTest ?
             new MemoryStore :
-            new RedisStore({ttl: 86400 * 365, db: dbConfig.session && dbConfig.session.database});
+            new RedisStore({
+                ttl: 86400 * 365, 
+                db: dbConfig.session && dbConfig.session.database,
+                host: dbConfig.session && dbConfig.session.host,
+                port: dbConfig.session && dbConfig.session.port,
+                pass: dbConfig.session && dbConfig.session.password
+            });
 
         app.set('jsDirectory', '/javascripts/');
         app.set('cssDirectory', '/stylesheets/');

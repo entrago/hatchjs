@@ -307,7 +307,7 @@ module.exports = function (compound, Page) {
             });
 
             var grid = req.agent && req.agent.mobile ? ('m.' + self.grid) : self.grid;
-            var gridHtml = Page.grids[grid || self.grid || '02-two-columns'] || [''];
+            var gridHtml = Page.grids[grid] || Page.grids[self.grid] || Page.grids['02-two-columns'] || [''];
 
             // log the total render time
             compound.log('RENDER [' + (new Date() - req.startedAt) + 'ms]');
@@ -316,6 +316,7 @@ module.exports = function (compound, Page) {
             try {
                 callback(null, ejs.render(gridHtml[0], {
                     column: cols,
+                    page: self,
                     size: sizes,
                     filename: grid + (self.templateId || ''),
                     cache: true
@@ -344,10 +345,10 @@ module.exports = function (compound, Page) {
             widget = this.widgets[widgetId];
         }
         if (!widget) {
-            return cb(new Error('Widget id=' + widgetId + ' not found'));
+            return callback(new Error('Widget id=' + widgetId + ' not found'));
         }
         if (!widget.type) {
-            return cb(new Error('Widget has no type specified'));
+            return callback(new Error('Widget has no type specified'));
         }
         var moduleName = widget.type.split('/')[0];
         var widgetName = 'widgets/' + widget.type.split('/').slice(1).join('/');
@@ -432,6 +433,7 @@ module.exports = function (compound, Page) {
                     group.pagesCache.push(page.toMinimalObject());
                     if (group.homepage && group.homepage.id == page.id) {
                         group.homepage = page.toMinimalObject();
+                        group.url = group.homepage.url;
                     }
                 });
                 group.pagesCache = Page.tree(group.pagesCache);

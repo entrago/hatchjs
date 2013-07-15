@@ -32,7 +32,7 @@ function PagesController(init) {
 // find the page by its id
 function findPage(c) {
     var locals = this;
-    c.Page.find(c.req.params.id || c.req.body.id, function (err, page) {
+    c.Page.find(c.req.params.id || c.req.params.page_id || c.req.body.id, function (err, page) {
         locals.page = page;
         c.next();
     });
@@ -208,8 +208,8 @@ PagesController.prototype.create = function(c) {
  * @param  {HttpContext} c - http context
  */
 PagesController.prototype.destroy = function(c) {
-    c.page.destroyPage(function() {
-        c.redirect(c.pathTo.group_pages(c.req.group));
+    this.page.destroyPage(function() {
+        c.send('ok');
     });
 };
 

@@ -3,7 +3,7 @@ exports.__ = function (s) {
     return s;
 };
 
-exports._ = require('underscore');
+//exports._ = require('underscore');
 
 exports.widgetAction = function (s, type) {
     console.log('DEPRECATED widgetAction helper, use widgetCoreAction instead');
