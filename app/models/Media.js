@@ -311,13 +311,25 @@ module.exports = function (compound, Media) {
     Media.prototype.getUrl = function (size) {
         var i;
 
-        if (!this.resized || !this.resized.length) {
+        if (!this.resized || !this.resized.length || this.resized === undefined) {
             return this.url;
         }
 
         var width = parseInt(size.split('x')[0]);
         var height = parseInt(size.split('x')[1] || 0);
-        var sortedResized = _.sortBy(this.resized, 'width');
+        var sortedResized;
+
+        if(Array.isArray(this.resized)) {
+            sortedResized = _.sortBy(this.resized, 'width');   
+        } else {
+            if(Array.isArray(this.resized.items)) {
+                sortedResized = _.sortBy(this.resized.items, 'width');    
+            } else {
+                return this.url;
+            }
+        }
+
+        
 
         if (width > 0 || height > 0) {
             // check for larger/equal media
