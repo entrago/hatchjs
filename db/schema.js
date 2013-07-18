@@ -37,7 +37,9 @@ var User = define('User', function () {
     set('defaultSort', 'username');
 });
 
-User.schema.adapter.defineFulltextIndex('User', 'fulltext');
+if (User.schema.adapter.defineFulltextIndex) {
+    User.schema.adapter.defineFulltextIndex('User', 'fulltext');
+}
 
 var AccessToken = define('AccessToken', function () {
     property('userId', Number, {index: true});
@@ -177,7 +179,9 @@ var Content = define('Content', function () {
     set('defaultSort', 'createdAt DESC');
 });
 
-Content.schema.adapter.defineFulltextIndex('Content', 'fulltext');
+if (Content.schema.adapter.defineFulltextIndex) {
+    Content.schema.adapter.defineFulltextIndex('Content', 'fulltext');
+}
 
 var ContentFeedItem = define('ContentFeedItem', function () {
     property('userId', Number, {index: true });

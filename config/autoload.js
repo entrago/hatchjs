@@ -4,7 +4,8 @@ module.exports = function (compound) {
         require('jugglingdb'),
         require('seedjs'),
         require('co-assets-compiler'),
-        require('co-mailer')
+        require('co-mailer'),
+        require('co-docs')
     ];
 };
 
