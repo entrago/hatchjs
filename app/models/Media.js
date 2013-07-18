@@ -145,6 +145,15 @@ module.exports = function (compound, Media) {
         if (Media.isImage(filename)) {
             // but first work out the original image dimension
             im.identify(filename, function (err, features) {
+                if(err){
+                    console.log('Error trying to im.identify '+ filename);
+                    console.log(err);
+                    return callback(err);
+                } 
+                if(!features){
+                    console.log('Error: could not im.identify '+filename);
+                    return callback(new Error('Error: could not im.identify '+filename));
+                }
                 data.width = features.width;
                 data.height = features.height;
 
