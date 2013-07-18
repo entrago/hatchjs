@@ -1,3 +1,9 @@
+<% if (err.req) { %>
 <pre>
-<%- err.stack %>
+Headers: <%- JSON.stringify(err.req.headers) %>
+</pre>
+URL: <%- err.req.url %>
+<% } %>
+<pre>
+<%- err.stack || err %>
 </pre>
