@@ -311,17 +311,30 @@ module.exports = function (compound, Media) {
     Media.prototype.getUrl = function (size) {
         var i;
 
-        if (!this.resized || !this.resized.length) {
+        if (!this.resized || !this.resized.length || this.resized === undefined) {
             return this.url;
         }
 
         var width = parseInt(size.split('x')[0]);
         var height = parseInt(size.split('x')[1] || 0);
+        var sortedResized;
+
+        if(Array.isArray(this.resized)) {
+            sortedResized = _.sortBy(this.resized, 'width');   
+        } else {
+            if(Array.isArray(this.resized.items)) {
+                sortedResized = _.sortBy(this.resized.items, 'width');    
+            } else {
+                return this.url;
+            }
+        }
+
+        
 
         if (width > 0 || height > 0) {
             // check for larger/equal media
-            for (i=0; i < this.resized.length; i++) {
-                var resize = this.resized.items && this.resized.items[i] || this.resized[i];
+            for (i=0; i < sortedResized.length; i++) {
+                var resize = sortedResized.items && sortedResized.items[i] || sortedResized[i];
                 if (resize.width >= width && resize.height >= height) {
                     if (resize.url) {
                         return resize.url;

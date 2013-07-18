@@ -83,6 +83,7 @@ module.exports = function (compound, Group) {
      */
     Group.updatePageUrls = function (group, callback) {
         Page.all({ where: { groupId: group.id }}, function (err, pages) {
+            pages = _.filter(pages, function (page) { return page != null && page.url; });
             group.pageUrls = _.pluck(pages, 'url');
             callback();
         });
