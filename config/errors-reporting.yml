@@ -1,0 +1,13 @@
+development:
+  mail:
+    subject: 'Dev Error: '
+    email: 'mail@localhost'
+  jabber: off
+production:
+  mail:
+    subject: 'Hatch Error: '
+    email: 'rpm1602@gmail.com'
+  jabber: off
+test:
+  mail: off
+  jabber: off

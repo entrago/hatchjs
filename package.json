@@ -45,7 +45,7 @@
     "yaml-js": ">0",
     "ntwitter": ">0",
     "oauth": ">0",
-    "express-mobile-agent": "0.0.1",
+    "express-mobile-agent": "https://github.com/cjroebuck/express-mobile-agent/tarball/master",
     "dox": "~0.4.3",
     "textract": "latest"
   },

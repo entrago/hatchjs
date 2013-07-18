@@ -11,6 +11,7 @@ module.exports = function (compound) {
     var dbConfig = require(process.env.DB_CONFIG || './database')[env] || {};
 
     app.configure(function() {
+        app.set('errors-reporting', require(__dirname + '/errors-reporting.yml')[0][env]);
         var sessionStore = isTest ?
             new MemoryStore :
             new RedisStore({
