@@ -15,6 +15,7 @@
 // 
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
+load('widgets/common');
 
 before(function init(c, params, callback) {
     this.req = req;

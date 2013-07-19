@@ -15,6 +15,7 @@
 // 
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
+load('widgets/common');
 
 action(function settings() {
     if (!this.widget.settings.numberOfPages) {
