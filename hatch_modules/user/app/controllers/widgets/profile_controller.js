@@ -27,7 +27,7 @@ before(function init(c) {
 
     locals.user = c.req.selectedUser || c.req.user || new User;
     locals.user.isFollowed = _.find(c.req.user && c.req.user.ifollow || [], function(id) { return id == c.locals.user.id; });
-    locals.profileFields = _.filter(group.profileFields(), function(field) { return field.privacy == 'public'; });
+    locals.profileFields = _.filter(group.profileFields, function(field) { return field.privacy == 'public'; });
 
     locals.numberOfFriends = (c.req.selectedUser && c.req.selectedUser.ifollow || []).length;
 

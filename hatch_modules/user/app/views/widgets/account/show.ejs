@@ -3,7 +3,7 @@
 <% } %>
 
 <% if(req.user) { %>
-    <%- formTag({action:pathTo.update(), remote: true, method: 'post', class: 'form form-horizontal', id: 'accountForm' }) %>
+    <%- formTagBegin({action:pathTo.update(), remote: true, method: 'post', class: 'form form-horizontal', id: 'accountForm' }) %>
         <% if(req.user.type != "temporary") { %>
             <div class="control-group">
                 <label class="control-label" for="username"><%- __('Username') %></label>
@@ -85,7 +85,7 @@
 
         <% if(req.group.customProfileFields && req.group.customProfileFields.length > 0) { %>
             <hr/>
-            <% req.group.profileFields().forEach(function(field) {
+            <% req.group.profileFields.forEach(function(field) {
                 var value = req.user.otherFields ? req.user.otherFields[field.name] : '';
                 field.name = 'custom-' + field.name;
                 %>
@@ -144,7 +144,7 @@
             </div>
         <% } %>
 
-    </form>
+    <%- formTagEnd() %>
 
     <script type="text/javascript">
         $(document).ready(function() {

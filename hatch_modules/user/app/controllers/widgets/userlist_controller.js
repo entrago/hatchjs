@@ -74,7 +74,7 @@ before(function init(c) {
     runQuery(cond);
 
     function runQuery(cond) {
-        c.locals.profileFields = c.locals._.filter(group.profileFields(), function(field) { return field.privacy == 'public'; });
+        c.locals.profileFields = c.locals._.filter(group.profileFields, function(field) { return field.privacy == 'public'; });
 
         // check for invalid query condition
         if(Object.keys(cond).length === 0 || (typeof cond.id != 'undefined' && (cond.id == null || cond.id.length == 0))) {

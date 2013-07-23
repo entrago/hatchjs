@@ -95,6 +95,7 @@ var Group = define('Group', function () {
     property('cssUrl', String);
     property('googleAnalyticsId', String);
     property('customProfileFields', []);
+    property('profileFields', []);
     property('tags', [], {index: true});
     property('importStreams', JSON);
     property('createdAt', Date, {sort: true});
