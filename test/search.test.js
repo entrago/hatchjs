@@ -68,4 +68,29 @@ describe('API/search', function() {
         }
     });
 
+    it('should reindex search data on save', function(done) {
+        Content.create({title: 'Tattam', text: 'Hame', createdAt: new Date}, function (err, c) {
+            should.not.exist(err);
+            setTimeout(function() {
+                Content.all({fulltext: 'Tattam'}, function (err, data) {
+                    should.not.exist(err);
+                    data.should.have.lengthOf(1);
+                    c.title = 'Manana';
+                    c.save(function(err) {
+                        should.not.exist(err);
+                        setTimeout(function() {
+                            Content.all({fulltext: 'Tattam'}, function (err, data) {
+                                data.should.have.lengthOf(0);
+                                Content.all({fulltext: 'Manana'}, function (err, data) {
+                                    data.should.have.lengthOf(1);
+                                    done();
+                                });
+                            });
+                        }, 500);
+                    });
+                });
+            }, 500);
+        });
+    });
+
 });
