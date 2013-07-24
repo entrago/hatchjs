@@ -17,14 +17,9 @@
 //
 load('widgets/common');
 
-var _ = require('underscore');
-
-exports.init = function (c, params, callback) {
-    var group = c.group();
-
-    c.locals.user = c.req.selectedUser || c.req.user;
-    c.locals.token = c.req.token;
-
-    callback();
-};
+before(function init(c) {
+    this.user = c.req.selectedUser || c.req.user;
+    this.token = c.req.token;
+    c.next();
+});
 

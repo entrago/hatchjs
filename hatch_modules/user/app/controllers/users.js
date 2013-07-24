@@ -230,7 +230,7 @@ UsersController.prototype.resetPasswordChange = function(c) {
     var ResetPassword = c.ResetPassword;
 
     if(c.req.body.password != c.req.body.confirmPassword) {
-        return c.error({ message: 'Your password and password confirmation do not match' });
+        return c.send({status: 'error', message: 'Your password and password confirmation do not match' });
     }
 
     ResetPassword.auth(c.req.body.token, function (err, user) {
@@ -245,7 +245,7 @@ UsersController.prototype.resetPasswordChange = function(c) {
                 });
             });
         } else {
-            c.error({ message: "Please enter a valid password"});
+            c.send({status: 'error', message: "Please enter a valid password"});
         }
     });
 };

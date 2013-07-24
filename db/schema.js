@@ -299,3 +299,8 @@ var Cache = define('Cache', function () {
     property('pageAndKey', String, {index: true});
     property('text', String);
 });
+
+var ResetPassword = define('ResetPassword', function() {
+    property('createdAt', Date);
+    property('token', { type: String, index: true });
+});

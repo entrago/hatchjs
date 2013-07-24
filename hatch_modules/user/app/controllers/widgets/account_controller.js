@@ -17,7 +17,7 @@
 //
 load('widgets/common');
 
-before(function init(c, params, callback) {
+before(function init(c) {
     this.req = req;
     c.req._ = this._;
 

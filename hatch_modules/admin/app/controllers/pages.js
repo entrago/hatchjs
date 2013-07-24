@@ -150,7 +150,7 @@ PagesController.prototype.newSpecial = function(c) {
     this.type = c.req.params.type;
     this.page = new c.Page;
     this.pageName = 'new-special' + (this.type ? '-' + this.type : '');
-    c.render('newSpecial');
+    c.render('newspecial');
 };
 
 /**

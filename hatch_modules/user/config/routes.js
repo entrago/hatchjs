@@ -5,8 +5,8 @@ exports.routes = function (map) {
     map.get('join', 'users#join');
     map.get('join/:invitationCode?', 'users#join');
     map.post('reject', 'users#rejectInvitation', {as: 'rejectInvitation'});
-    map.post('resetpassword', 'users#resetPassword', {as: 'resetPassword'});
-    map.post('resetpasswordchange', 'users#resetPasswordChange', {as: 'resetPasswordChange'});
+    map.post('resetpassword.:format?', 'users#resetPassword', {as: 'resetPassword'});
+    map.post('resetpasswordchange.:format?', 'users#resetPasswordChange', {as: 'resetPasswordChange'});
     map.get('hovercard/:id', 'users#hovercard', {as: 'hovercard'});
 
     map.get('logout', 'session#destroy');
