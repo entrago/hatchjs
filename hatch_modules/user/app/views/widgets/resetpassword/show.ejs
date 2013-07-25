@@ -4,7 +4,7 @@
 
 <% if (user) { %>
 
-<%- formTagBegin({action: pathTo.resetPasswordChange, method: 'post', class: 'form-horizontal', id: 'resetPasswordForm', remote: true }) %>
+<%- formTagBegin({action: pathTo.changePassword, method: 'post', class: 'form-horizontal', id: 'resetPasswordForm', remote: true }) %>
     <input type="hidden" name="token" value="<%- token %>" />
 
     <div class="control-group">

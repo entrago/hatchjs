@@ -36,10 +36,9 @@ module.exports = function (compound, AccessToken) {
         }
 
         AccessToken.findOne({where: {token: token }}, function (err, accessToken) {
-            if (err)
+            if (err) {
                 callback(err);
-
-            else if (accessToken !== null && accessToken.userId !== undefined) {
+            } else if (accessToken !== null && accessToken.userId !== undefined) {
 
                 User.find(accessToken.userId, function (err, user) {
                     if (err) {
