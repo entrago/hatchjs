@@ -127,32 +127,27 @@ module.exports = function (compound, Group) {
     };
 
     /**
-     * Find page by it's relative path
+     * Find special page by it's relative path
      *
      * @param {String} pathname - relative page path with no domain or group
      * path, it could not start with '/'. for root page it just blank string.
      *
      * @returns Object or Page
      */
-    Group.prototype.matchPage = function (pathname) {
+    Group.prototype.matchSpecialPage = function (pathname) {
         var group = this;
         var fullPagePath = path.join(this.url.match(/^[^\/]+/)[0], pathname);
         fullPagePath = fullPagePath.replace(/\/$/, '').split('?')[0];
         var found = null;
         this.pagesCache.forEach(function (page) {
-            // match regular page
-            if (page.type === 'page' || !page.type) {
-                if (page.url === fullPagePath) {
-                    found = page;
-                }
-            }
-            // match special page
-            else {
+            if (page.type !== 'page') {
                 var sp = compound.hatch.page.get(page.type);
                 if (sp && sp.matchRoute) {
                     var p = sp.matchRoute(group, pathname);
                     if (p) {
                         found = page;
+                        found.handler = sp.handler;
+                        found.specialPageParams = p;
                     }
                 }
             }
@@ -188,13 +183,12 @@ module.exports = function (compound, Group) {
     
         var group = this;
         var path = url.split('?')[0];
-        var page = c.req.page || this.matchPage(path);
+        var page = c.req.page || this.matchSpecialPage(path);
 
         // special page out of this group (sp.defaultPage)
-        if (page && page.type !== 'page' && !page.id) {
-            if (page.handler) {
-                return page.handler(c, gotPage.bind(this, null, page));
-            }
+        if (page && page.type !== 'page') {
+            var handler = page.handler;
+            c.req.specialPageParams = page.specialPageParams;
         }
 
         if (!page) {
@@ -219,7 +213,13 @@ module.exports = function (compound, Group) {
 
             // store the page in the request
             c.req.page = page;
-            callback(err, page);
+            if (handler) {
+                handler(c, function() {
+                    callback(err, page);
+                });
+            } else {
+                callback(err, page);
+            }
         }
     }
 
