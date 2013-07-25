@@ -229,10 +229,6 @@ UsersController.prototype.resetPassword = function resetPassword(c) {
 UsersController.prototype.resetPasswordChange = function(c) {
     var ResetPassword = c.ResetPassword;
 
-    if(c.req.body.password != c.req.body.confirmPassword) {
-        return c.send({status: 'error', message: 'Your password and password confirmation do not match' });
-    }
-
     ResetPassword.auth(c.req.body.token, function (err, user) {
         if(err) return c.error({ message: err.message });
 
