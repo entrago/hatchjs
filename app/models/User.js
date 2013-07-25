@@ -217,7 +217,9 @@ module.exports = function (compound, User) {
         //send a notification email and create a notification at the same time
         async.parallel([
             function(done) {
-                compound.mailer.send('user/' + type, user, compound);
+                if (compound.structure.views['mail/user/' + type]) {
+                    compound.mailer.send('user/' + type, user, compound);
+                }
                 done();
             },
             function(done) {
