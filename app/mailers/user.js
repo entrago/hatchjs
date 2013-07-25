@@ -6,9 +6,11 @@ exports.registration = function(user) {
     });
 };
 
-exports.resetpassword = function(user, compound) {
+exports.resetpassword = function(user, compound, params) {
     this.locals.user = user;
-    this.locals.resetPasswordUrl = 'http://localhost:3000/reset-password';
+    var sp = compound.hatch.page.get('resetpassword');
+    this.locals.resetPasswordUrl = sp.path(params.group, {fullPath: true, token: params.token});
+    console.log(this.locals.resetPasswordUrl);
     this.send({
         to: user.email
     }, console.log);
