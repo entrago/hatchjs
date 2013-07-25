@@ -16,7 +16,7 @@
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
 
-exports.defaultPath = 'resetpassword/:token';
+exports.defaultPath = 'reset-password/:token';
 
 exports.defaultPage = {
     title: 'Reset password',
@@ -30,16 +30,17 @@ exports.defaultPage = {
 };
 
 exports.handler = function (env, done) {
+    console.log('CALLED HANDLER');
     // get the reset password
     var token = env.req.specialPageParams && env.req.specialPageParams.token || env.req.query && env.req.query.token;
 
     if (token) {
         env.ResetPassword.findOne({ where: { token: token }}, function(err, rp) {
             // get the user
-            if(rp) {
+            if (rp) {
                 env.User.findOne({ where: { id: rp.userId }}, function(err, user) {
-                    env.req.selectedUser = user;
-                    env.req.token = token;
+                    env.req.user = user;
+                    env.req.params.token = token;
 
                     done();
                 })

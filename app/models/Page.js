@@ -361,7 +361,7 @@ module.exports = function (compound, Page) {
         // create a new 'request' from scratch and copy over all of the required properties from the parent request
         [
             'user', 'group', 'page', 'post', 'cookies', 'session',
-            'compound', 'method', 'app', 'pagePath', 'agent', 'query'
+            'compound', 'method', 'app', 'pagePath', 'agent', 'query', 'params'
         ].forEach(function (key) {
             req.__defineGetter__(key, function() {
                 return parentRequest[key];
@@ -373,7 +373,7 @@ module.exports = function (compound, Page) {
 
         req.url = '/widget/' + widget.type;
         req.headers = {'user-agent': parentRequest.headers['user-agent']};
-        req.params = {};
+        // req.params = {};
         req.body = {};
         req.locals = {};
         req.body.data = {

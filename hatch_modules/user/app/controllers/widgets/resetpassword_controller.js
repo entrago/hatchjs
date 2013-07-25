@@ -19,7 +19,7 @@ load('widgets/common');
 
 before(function init(c) {
     this.user = c.req.selectedUser || c.req.user;
-    this.token = c.req.token;
+    this.token = c.req.params.token;
     c.next();
 });
 

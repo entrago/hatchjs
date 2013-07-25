@@ -48,10 +48,6 @@ module.exports = function(compound, ResetPassword) {
         this.token = crypto.createHash('sha1').update(Math.random().toString()).digest('hex');
     };
 
-    ResetPassword.prototype.resetLink = function () {
-        return 'http://localhost:3000/' + 'reset-password/' + this.token
-    };
-
     ResetPassword.auth = function (token, cb) {
         ResetPassword.findOne({token: token}, function (err, rp) {
             if (err) return cb(err);
