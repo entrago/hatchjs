@@ -355,7 +355,7 @@ UsersController.prototype.sendMessage = function(c) {
             //load each user
             c.User.find(userId, function (err, user) {
                 //send the message via email
-                user.notify('message', { subject: subject, message: body });
+                user.notify('message', {groupId: c.req.group.id, subject: subject, message: body });
 
                 done();
             });
