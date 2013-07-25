@@ -224,9 +224,12 @@ module.exports = function (compound, User) {
             },
             function(done) {
                 if (compound.hatch.notification.isDefined(type)) {
+                    console.log('create hatch notification', type);
                     compound.hatch.notification.create(type, user, params || [], done);
+                } else {
+                    console.log('hatch notification', type, 'is not defined');
+                    done();
                 }
-                else done();
             }
         ], function(err, results) {
             if(callback) {
