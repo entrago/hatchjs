@@ -64,4 +64,19 @@ module.exports = function(compound, ResetPassword) {
         });
     };
 
+    ResetPassword.prototype.changePassword = function(token, password, cb) {
+        if (!password) {
+            return cb(new Error('Password required'));
+        }
+        if (!token) {
+            return cb(new Error('Token required'));
+        }
+        ResetPassword.auth(token, function (err, user) {
+            if (err || !user) {
+                return cb(err || new Error('Token invalid or expired'));
+            }
+            user.updateAttribute('password', c.body.password, cb);
+        });
+    };
+
 };
