@@ -32,12 +32,16 @@ module.exports = function (compound, AccessToken) {
 
         // if there is no token present, just continue
         if (!token) {
-            throw new Error('No access token given');
+            callback(new Error('No access token given'));
         }
 
-        AccessToken.findOne({where: {token: token }}, function (err, token) {
-            if (token) {
-                User.find(token.userId, function (err, user) {
+        AccessToken.findOne({where: {token: token }}, function (err, accessToken) {
+            if (err)
+                callback(err);
+
+            else if (accessToken !== null && accessToken.userId !== undefined) {
+
+                User.find(accessToken.userId, function (err, user) {
                     if (err) {
                         return callback(err);
                     }
@@ -45,13 +49,14 @@ module.exports = function (compound, AccessToken) {
                     if (!user) {
                         return callback(new Error('User in access token not found'));
                     }
-                    if (!token.isTokenValid()) {
+                    if (!accessToken.isTokenValid()) {
                         return callback(new Error('Access token is invalid'));
                     }
 
                     callback(null, user);
                 });
-            } else {
+            }
+            else {
                 callback();
             }
         });
