@@ -144,7 +144,7 @@ function findContent (c) {
  */
 ContentController.prototype.index = function index(c) {
     c.req.session.adminSection = 'content';
-    this.filterBy = c.req.query.filterBy || c.req.params.filterBy;
+    this.filterBy = c.req.query.filterBy || c.req.params.filterBy || 'all';
     var suffix = 'string' === typeof this.filterBy ? '-' + this.filterBy : '';
     this.pageName = 'content' + suffix;
 
