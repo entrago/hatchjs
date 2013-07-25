@@ -1392,7 +1392,7 @@ body.navbar-fixed{padding-top:50px;}
 .navbar-top .navbar-inner{border-radius:0;}
 .header-container{padding-top:20px;margin-bottom:15px;}.header-container .module:last-child{margin-bottom:-15px;}
 footer{margin-bottom:15px;}
-.modal.wide{width:700px;margin:-250px 0 0 -350px;}
+.modal.wide{width:700px;}
 .navbar-fixed-top{z-index:2;}
 .input-append *{vertical-align:top;}
 .input-append.color i{display:block;height:18px;width:18px;}
