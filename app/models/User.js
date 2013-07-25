@@ -212,13 +212,13 @@ module.exports = function (compound, User) {
         }
 
         //make sure user is part of the parameters
-        if(!params.user) params.user = user;
+        if (!params.user) params.user = user;
 
         //send a notification email and create a notification at the same time
         async.parallel([
             function(done) {
-                if (compound.structure.views['mail/user/' + type]) {
-                    compound.mailer.send('user/' + type, user, compound);
+                if (compound.structure.views['mail/user/' + type + '.html']) {
+                    compound.mailer.send('user/' + type, user, compound, params);
                 }
                 done();
             },
@@ -546,7 +546,7 @@ module.exports = function (compound, User) {
     User.prototype.resetPassword = function (c, callback) {
         var user = this;
         compound.models.ResetPassword.upgrade(this, function (err, rp) {
-            user.notify('resetpassword', _.extend({ token: rp.token }, c));
+            user.notify('resetpassword', { token: rp.token, group: c.req.group });
             if (callback) {
                 callback();
             }
