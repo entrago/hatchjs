@@ -29,7 +29,6 @@ describe('Page', function() {
             Page.find(2, function(err, page) {
                 var url = page.url.replace(/example.com\/?/, '/');
                 getClient(app).get(url).end(function(err, res) {
-                    console.log
                     res.text.should.include('No group header has been set. Double-click to edit.');
                     res.text.should.include('Widget 2');
                     res.text.should.include('Widget 3');

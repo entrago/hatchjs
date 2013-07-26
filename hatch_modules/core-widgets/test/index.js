@@ -22,16 +22,18 @@ before(function(done) {
     app = require('../../../')();
     app.enable('quiet');
     app.compound.on('ready', function() {
-        setTimeout(done, 5000);
         // app.compound.hatch.loadModule('core-widgets', require('path').dirname(require.resolve('hatch-compound/hatch_modules/core-widgets')));
         app.compound.hatch.loadModule('core-widgets', __dirname + '/..');
         cw = app.compound.hatch.modules['core-widgets'];
+        done();
     });
 });
 
 module.exports.getApp = function(done) {
-    var schema = app.compound.models.User.schema;
-    delete schema.log;
+    var schema = app.compound.orm._schemas[0];
+    schema.adapter.logger = function(x) { return function() {
+        // console.log(x);
+    }; };
     schema.adapter.client.flushdb(function() {
         var seed = new Seed(cw.compound);
         seed.on('complete', function() {

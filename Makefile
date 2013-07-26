@@ -4,12 +4,15 @@ TESTER = ./node_modules/.bin/mocha
 OPTS = --ignore-leaks -t 15000
 TESTS = test/*.test.js
 
+
 test:
 	$(TESTER) $(OPTS) $(TESTS)
 test-verbose:
 	$(TESTER) $(OPTS) --reporter spec $(TESTS)
 testing:
 	$(TESTER) $(OPTS) --watch $(TESTS)
+test-all: test
+	$(MAKE) -C hatch_modules/core-widgets
 
 ## WORKFLOW
 

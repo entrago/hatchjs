@@ -25,7 +25,6 @@ describe('WidgetsController', function() {
             addWidget: 'core-widgets/static',
         }, function(err, res) {
             res.statusCode.should.equal(200);
-            res.text.should.include('<h2>Static content</h2>');
             res.text.should.include('Content not set. Double-click to edit.');
             done();
         });
