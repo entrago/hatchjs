@@ -32,9 +32,11 @@ exports.defaultPage = {
 };
 
 exports.handler = function (env, done) {
-    if (this.specialPageParams && this.specialPageParams.username) {
+    var username = env.req.specialPageParams &&
+    env.req.specialPageParams.username || env.req.query.username;
+    if (username) {
         env.User.all({
-            where: { username: this.specialPageParams.username }
+            where: { username: username }
         }, function (err, users) {
             if (err || !users || !users[0]) {
                 return env.next(new env.errors.NotFound(env.req, 'Profile not found'));
