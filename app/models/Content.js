@@ -754,6 +754,11 @@ module.exports = function (compound, Content) {
                 return callback(err);
             }
 
+            var now = new Date();
+            posts = posts.filter(function(post) {
+                return post.createdAt < now;
+            });
+
             posts.forEach(function (post) {
                 post.doesLike = likeIds.indexOf(post.id) > -1;
             });
