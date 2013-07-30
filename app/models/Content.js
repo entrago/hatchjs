@@ -721,6 +721,26 @@ module.exports = function (compound, Content) {
         });
     };
 
+    var allContent = Content.all;
+    Content.all = function all(query, cb) {
+        allContent.call(Content, query, function(err, posts) {
+            if (err) {
+                return cb(err, posts);
+            }
+            var futurePosts = 0;
+            if (!query || !query.future) {
+                futurePosts = posts.length;
+                var now = new Date();
+                posts = posts && posts.filter(function(post) {
+                    return post.createdAt < now;
+                });
+                futurePosts -= posts.length;
+            }
+            posts.futurePosts = futurePosts;
+            cb(err, posts);
+        });
+    };
+
     /**
      * Load content and set the the doesLike properties for a list of content 
      * items for the specified user.
@@ -753,11 +773,6 @@ module.exports = function (compound, Content) {
             if (err) {
                 return callback(err);
             }
-
-            var now = new Date();
-            posts = posts.filter(function(post) {
-                return post.createdAt < now;
-            });
 
             posts.forEach(function (post) {
                 post.doesLike = likeIds.indexOf(post.id) > -1;
