@@ -77,7 +77,7 @@ function loadContent(c, callback) {
             cond = {
                 tags: filterBy
             }
-        } else {
+        } else if (filterBy !== 'all') {
             cond.type = filterBy;
         }
     }
