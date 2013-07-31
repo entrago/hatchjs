@@ -23,14 +23,14 @@ var moment = require('moment');
 var crypto = require('crypto');
 
 module.exports = function (compound, User) {
-    var unsafeChars = /[^-_\.a-z0-9]+/gi;
+    var unsafeChars = /[^-_\.a-z0-9A-Z]+/g;
     var Group = compound.models.Group;
 
     User.validatesPresenceOf('username', {message: 'Please enter a username'});
     User.validatesPresenceOf('email', {message: 'Please enter an email address'});
     User.validatesPresenceOf('password', {message: 'Please enter a password'});
     User.validatesLengthOf('origPassword', {min: 6, allowNull: true});
-    User.validatesFormatOf('username', {with: unsafeChars, message: 'Username only can contain latin letters, digits, and -_. characters', allowBlank: true});
+    User.validatesFormatOf('username', {with: /^[-_\.a-z0-9]+$/i, message: 'Username only can contain latin letters, digits, and -_. characters', allowBlank: true});
     User.validatesFormatOf('email', {with: /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/i, message: 'Invalid email address', allowBlank: true});
     User.validatesUniquenessOf('email', {message: 'This email address is taken'});
     User.validatesUniquenessOf('username', {message: 'This username is taken'});
