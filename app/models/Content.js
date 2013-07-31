@@ -735,9 +735,11 @@ module.exports = function (compound, Content) {
             if (!query || !query.future) {
                 futurePosts = posts.length;
                 var now = new Date();
+                var countBeforeLimit = posts && posts.countBeforeLimit;
                 posts = posts && posts.filter(function(post) {
                     return post.createdAt < now;
                 });
+                posts.countBeforeLimit = countBeforeLimit;
                 futurePosts -= posts.length;
             }
             posts.futurePosts = futurePosts;
