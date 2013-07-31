@@ -70,7 +70,7 @@ FacebookAuthController.prototype.callback = function facebookCallback(c) {
                         profile = JSON.parse(profile);
                         
                         var data = {
-                            username: profile.username,
+                            username: profile.first_name+profile.last_name,
                             displayName: profile.name,
                             email: profile.email,
                             facebookId: profile.id
