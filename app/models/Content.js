@@ -723,8 +723,11 @@ module.exports = function (compound, Content) {
 
     var allContent = Content.all;
     Content.all = function all(query, cb) {
+        if (typeof query === 'function') {
+            cb = query;
+            query = null;
+        }
         allContent.call(Content, query, function(err, posts) {
-            console.log(query);
             if (err) {
                 return cb(err, posts);
             }
