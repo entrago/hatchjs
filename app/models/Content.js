@@ -731,6 +731,9 @@ module.exports = function (compound, Content) {
             if (err) {
                 return cb(err, posts);
             }
+            if (query) {
+                delete query.skip;
+            }
             var futurePosts = 0;
             if (!query || !query.future) {
                 futurePosts = posts.length;
@@ -741,9 +744,28 @@ module.exports = function (compound, Content) {
                 });
                 posts.countBeforeLimit = countBeforeLimit;
                 futurePosts -= posts.length;
+                if (futurePosts > 0 && query && query.limit) {
+                    query.offset = (query.offset || 0) + query.limit;
+                    query.limit = futurePosts;
+                    console.log(query);
+                    Content.all(query, function(err, morePosts) {
+                        if (err) {
+                            return cb(err, morePosts);
+                        }
+                        posts.futurePosts += morePosts.futurePosts;
+                        morePosts.forEach(function(post) {
+                            posts.push(post);
+                        });
+                        cb(err, posts);
+                    });
+                } else {
+                    posts.futurePosts = futurePosts;
+                    cb(err, posts);
+                }
+            } else {
+                posts.futurePosts = futurePosts;
+                cb(err, posts);
             }
-            posts.futurePosts = futurePosts;
-            cb(err, posts);
         });
     };
 
