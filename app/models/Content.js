@@ -738,6 +738,7 @@ module.exports = function (compound, Content) {
             if (!query || !query.future) {
                 futurePosts = posts.length;
                 var now = new Date();
+                console.log(posts.countBeforeLimit);
                 var countBeforeLimit = posts && posts.countBeforeLimit;
                 posts = posts && posts.filter(function(post) {
                     return post.createdAt < now;
