@@ -94,6 +94,10 @@ en:
       sendMessage: Please enter a subject and message
       invite: Please enter some email addresses or usernames to invite
       fieldName: Please enter a field name
+  comment:
+    actions:
+      destroy: Delete
+      destroyConfirm: Are you sure you wish to delete this comment?
   content:
     actions:
       common: Actions

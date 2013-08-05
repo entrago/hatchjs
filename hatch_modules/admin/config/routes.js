@@ -37,6 +37,7 @@ exports.routes = function (map) {
             items.get('moderation/load', 'moderation#load', {as: 'loadModeration'})
             items.get('moderation/:type.:format?', 'moderation#index', {as: 'moderation'})
             items.get('moderation/ids', 'moderation#ids', {as: 'moderationIds'})
+            items.del('moderation/comment/:commentId', 'moderation#destroyComment', {as: 'destroyComment'});
         });
     });
 

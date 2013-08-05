@@ -152,3 +152,19 @@ ModerationController.prototype.ids = function ids(c) {
         });
     });
 };
+
+ModerationController.prototype.destroyComment = function(c) {
+    c.Comment.find(c.params.commentId, function(err, comment) {
+        if (err || !comment) {
+            c.sendError(err || new Error('No commment'));
+        } else {
+            comment.destroy(function(err) {
+                if (err) {
+                    c.sendError(err);
+                } else {
+                    c.send({message: 'Comment deleted'});
+                }
+            });
+        }
+    });
+};

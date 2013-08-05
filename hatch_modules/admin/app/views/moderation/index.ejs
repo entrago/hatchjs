@@ -205,7 +205,7 @@
                         var html = '<div class="pull-right">';
 
                         html += '<a href="<%- pathTo.content %>/' + content.id + '/unflag" data-remote="true" data-success="Unflagged" rel="tooltip" title="Unflag"><i class="icon-ok"></i></a>';
-                        html += ' &nbsp;<a href="<%- pathTo.content %>/' + content.id + '" data-remote="true" data-method="DELETE" data-confirm="<%= t('content.actions.destroyConfirm') %>" rel="tooltip" title="<%- t('content.actions.destroy') %>" data-success="<%= t('content.actions.destroyed') %>"><i class="icon-remove"></i></a>';
+                        html += ' &nbsp;<a href="<%- pathTo.destroyComment("' + content.id + '") %>" data-remote="true" data-method="DELETE" data-confirm="<%= t('comment.actions.destroyConfirm') %>" rel="tooltip" title="<%- t('comment.actions.destroy') %>"><i class="icon-remove"></i></a>';
                         html += ' &nbsp;<a href="<%- pathTo.content %>/' + content.id + '/ban" rel="tooltip" title="Delete and blacklist author"><i class="icon-ban-circle"></i></a>';
 
                         html += '</div>';
