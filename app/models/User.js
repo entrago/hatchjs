@@ -375,6 +375,12 @@ module.exports = function (compound, User) {
                 // don't allow it to update username or email
                 delete data.username;
                 delete data.email;
+                
+                // don't update the user avatar if they already have one which 
+                // isn't the default avatar
+                if (user.avatar && user.avatar !== '/img/default-profile-pic.png') {
+                    delete data.avatar;
+                }
 
                 // update user details and return
                 user.updateAttributes(data, callback);
