@@ -736,23 +736,28 @@ module.exports = function (compound, Content) {
                 delete query.skip;
             }
             var futurePosts = 0;
+            var futurePostsTotal = 0;
             if (!query || !query.future) {
                 futurePosts = posts.length;
                 var now = new Date();
-                console.log(posts.countBeforeLimit);
                 var countBeforeLimit = posts && posts.countBeforeLimit;
                 posts = posts && posts.filter(function(post) {
                     return post.createdAt < now;
                 });
                 posts.countBeforeLimit = countBeforeLimit;
                 futurePosts -= posts.length;
+                futurePostsTotal = futurePosts;
+
                 if (futurePosts > 0 && query && query.limit) {
                     query.offset = (query.offset || 0) + query.limit;
                     query.limit = futurePosts;
-                    console.log(query);
                     Content.all(query, function(err, morePosts) {
                         if (err) {
                             return cb(err, morePosts);
+                        }
+
+                        if (!posts.futurePosts) { 
+                            posts.futurePosts = futurePostsTotal;
                         }
                         posts.futurePosts += morePosts.futurePosts;
                         morePosts.forEach(function(post) {
@@ -761,11 +766,11 @@ module.exports = function (compound, Content) {
                         cb(err, posts);
                     });
                 } else {
-                    posts.futurePosts = futurePosts;
+                    posts.futurePosts = futurePostsTotal;
                     cb(err, posts);
                 }
             } else {
-                posts.futurePosts = futurePosts;
+                posts.futurePosts = futurePostsTotal;
                 cb(err, posts);
             }
         });
