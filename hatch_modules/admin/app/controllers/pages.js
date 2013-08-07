@@ -173,6 +173,14 @@ PagesController.prototype.create = function(c) {
         {type: 'core-widgets/group-header', id: 1},
         {type: 'core-widgets/mainmenu', id: 2}
     ];
+    
+    var defaultPage = c.compound.hatch.page.get('default').defaultPage;
+
+    if (defaultPage) {
+        c.body.grid = defaultPage.grid;
+        c.body.columns = defaultPage.columns;
+        c.body.widgets = defaultPage.widgets;
+    }
 
     //c.Tag.assignTagsForObject(c.req.body, c.req.body.tags, function () {
         Page.createPage(c.body, function (err, page) {
