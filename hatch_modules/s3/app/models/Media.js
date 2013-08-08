@@ -74,8 +74,15 @@ module.exports = function (compound, Media) {
                 
                 // delete the original file
                 fs.unlink(filename);
-                done();
+                
+                if (!data.saveBeforeUpload) {
+                    done();
+                }
             });
+
+            if (data.saveBeforeUpload) {
+                done();
+            }
         }, function (err) {
             if (err) {
                 return callback(err);
