@@ -53,6 +53,21 @@ module.exports = function (compound, Media) {
     };
 
     /**
+     * Before a media item is saved, replace spaces from data.url with %20 so as not to change the url.
+     * 
+     * @param  {Function} next - continuation function
+     * @param  {Object}   data - data to create with
+     */
+    Media.beforeSave = function (next, data) {
+        
+        if (data.url.indexOf(' ') >= 0) {
+            data.url = data.url.replace(/ /g, '%20');
+        }
+
+        next();
+    };
+
+    /**
      * After a media item is updated, make sure to update the content records in
      * which it is referenced as an attachment.
      * 
@@ -92,6 +107,12 @@ module.exports = function (compound, Media) {
         // other files we download first and then re-upload 
         else {
             request.get(url, function (err, resp, body) {
+                if(err) {
+                    console.log('Error downloading '+url);
+                    console.log(err);
+                    return callback(err);
+                }
+                console.log('creating with filename: '+filename);
                 Media.createWithFilename(filename, params, callback);
             }).pipe(fs.createWriteStream(filename));
         }
