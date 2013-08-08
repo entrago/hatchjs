@@ -60,10 +60,8 @@ module.exports = function (compound, Page) {
      * @param  {Function} next [continuation function]
      */
     Page.afterSave = function(next) {
-        //after we save a template, make sure to update the group so that the template cache is updated
-        if(this.type !== 'page') {
-            Page.updateGroup(this.groupId);
-        }
+        //after we save a page, update the group to make sure pagesCache is regenerated
+        Page.updateGroup(this.groupId);
 
         next();
     };
