@@ -89,32 +89,44 @@ module.exports = function (compound, Media) {
     Media.createWithUrl = function (url, params, callback) {
         var uploadPath = compound.app.get('upload path');
         var filename = path.join(uploadPath, new Date().getTime() + '-' + slugify(url.split('/').slice(-1)[0]));
-
-        // videos we just create directly with the url
-        if (Media.isVideo(filename)) {
-            var data = { url: url };
-            data = _.extend(data, params);
-
-            // if we have a video encoder, run now
-            if (Media.encodeVideo && !params.skipEncode) {
-                Media.encodeVideo(data, {}, function (err, data) {
-                    Media.create(data, callback);
-                });
+        
+        // check for the existing file
+        Media.findOne({ where: { originalUrl: url }}, function (err, media) {
+            if (media) {
+                callback(null, media);
             } else {
-                Media.create(data, callback);
+                params.originalUrl = url;
+                create();
             }
-        } 
-        // other files we download first and then re-upload 
-        else {
-            request.get(url, function (err, resp, body) {
-                if(err) {
-                    console.log('Error downloading '+url);
-                    console.log(err);
-                    return callback(err);
+        });
+
+        function create() {
+            // videos we just create directly with the url
+            if (Media.isVideo(filename)) {
+                var data = { url: url };
+                data = _.extend(data, params);
+    
+                // if we have a video encoder, run now
+                if (Media.encodeVideo && !params.skipEncode) {
+                    Media.encodeVideo(data, {}, function (err, data) {
+                        Media.create(data, callback);
+                    });
+                } else {
+                    Media.create(data, callback);
                 }
-                console.log('creating with filename: '+filename);
-                Media.createWithFilename(filename, params, callback);
-            }).pipe(fs.createWriteStream(filename));
+            } 
+            // other files we download first and then re-upload 
+            else {
+                request.get(url, function (err, resp, body) {
+                    if(err) {
+                        console.log('Error downloading '+url);
+                        console.log(err);
+                        return callback(err);
+                    }
+                    console.log('creating with filename: '+filename);
+                    Media.createWithFilename(filename, params, callback);
+                }).pipe(fs.createWriteStream(filename));
+            }
         }
     };
 
