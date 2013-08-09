@@ -1,4 +1,3 @@
-
 var User = define('User', function () {
     property('username', String, {index: true, sort: true, fulltext: true});
     property('email', String, {index: true, sort: true, fulltext: true});
@@ -235,6 +234,7 @@ var Media = define('Media', function () {
     property('contentIds', JSON);
     property('createdAt', Date);
     property('url', String);
+    property('originalUrl', String, {index: true});
     property('width', Number);
     property('height', Number);
     property('resized', []);
