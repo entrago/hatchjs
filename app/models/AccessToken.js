@@ -46,10 +46,12 @@ module.exports = function (compound, AccessToken) {
                     }
                     // validate the token
                     if (!user) {
-                        return callback(new Error('User in access token not found'));
+                        console.log('User in access token ' + accessToken.id + ' not found');
+                        return callback();
                     }
                     if (!accessToken.isTokenValid()) {
-                        return callback(new Error('Access token is invalid'));
+                        console.log('Access token ' + accessToken.id + ' was invalid');
+                        return callback();
                     }
 
                     callback(null, user);
