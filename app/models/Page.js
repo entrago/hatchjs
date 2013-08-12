@@ -60,7 +60,7 @@ module.exports = function (compound, Page) {
      * @param  {Function} next [continuation function]
      */
     Page.afterSave = function(next) {
-        //after we save a page, update the group to make sure pagesCache is regenerated
+        // after we save a template, make sure to update the group so that the template cache is updated
         Page.updateGroup(this.groupId);
 
         next();
@@ -525,6 +525,27 @@ module.exports = function (compound, Page) {
                 }
             });
         }
+    };
+
+    /**
+     * Remove a widget by specifying it's id
+     * 
+     * @param  {Number} widgetId - id of widget to remove
+     */
+    Page.prototype.removeWidget = function (widgetId, callback) {
+        // remove from the cols
+        this.columns.forEach(function (col) {
+            col.widgets = _.reject(col.widgets, function (id) {
+                return id == widgetId;
+            });
+        });
+
+        // remove the widget
+        this.widgets.items = _.reject(this.widgets.items, function(widget) {
+            return widget.id == widgetId;
+        });
+
+        this.save(callback);
     };
 
 

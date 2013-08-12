@@ -99,6 +99,21 @@ WidgetController.prototype.create = function(c) {
 };
 
 /**
+ * Remove a widget from the page.
+ * 
+ * @param  {HttpContext} c - http context
+ */
+WidgetController.prototype.remove = function (c) {
+    var page = this.page;
+    page.removeWidget(c.req.params.widgetId, function (err) {
+        c.send({
+            status: 'success',
+            message: 'widget removed successfully'
+        });
+    });
+};
+
+/**
  * Render a widget
  * //TODO: move this to core lib
  *
