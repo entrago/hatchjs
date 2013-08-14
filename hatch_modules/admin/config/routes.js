@@ -93,6 +93,7 @@ exports.routes = function (map) {
     map.post('/page/grid', 'page#updateGrid');
     map.post('/page/image', 'page#image');
     map.post('/page/link', 'page#link');
+    map.post('/page/editconsole', 'page#editconsole', {as: 'editconsole'});
 
     map.post('/stylesheet/theme', 'stylesheet#setTheme');
     map.post('/stylesheet/setrules', 'stylesheet#setRules');
