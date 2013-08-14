@@ -86,19 +86,26 @@ function loadMembers(c, next) {
     var offset = parseInt(c.req.query.iDisplayStart || c.req.query.offset || 0, 10);
     var orderBy = c.req.query.iSortCol_0 > 0 ? (colNames[c.req.query.iSortCol_0] + ' ' + c.req.query.sSortDir_0.toUpperCase()) : 'username';
     var search = c.req.query.sSearch || c.req.body.search;
+    var onlyKeys = c.req.query.onlyKeys;
 
     var query = {
         where: cond, 
         fulltext: search, 
         order: orderBy, 
         offset: offset, 
-        limit: limit
+        limit: limit,
+        onlyKeys: onlyKeys
     };
 
     // first get the total count of all members and then run the
     c.User.count({ membershipGroupId: c.req.group.id }, function (err, count) {
         c.User.all(query, function (err, members) {
-            setMemberships(members);
+
+            if (!onlyKeys) {
+                setMemberships(members);
+            }
+
+            
 
             c.locals.members = members;
             c.locals.allMembersCount = count;
@@ -157,10 +164,11 @@ UsersController.prototype.ids = function ids(c) {
 
     // make sure we get all users
     c.req.query.limit = 1000000;
+    c.req.query.onlyKeys = true;
 
     loadMembers(c, function(err, members) {
         c.send({
-            ids: _.pluck(members, 'id')
+            ids: members
         });
     });
 };
@@ -339,34 +347,24 @@ UsersController.prototype.sendMessage = function(c) {
         });
     }
 
-    // are we sending to ALL users or a selected subset?
-    if (selectedUsers.length === 0) {
-        c.User.all({ where: { membershipGroupId: c.req.group.id }}, function (err, users) {
-            selectedUsers = _.pluck(users, 'id');
-            send();
-        });
-    } else {
-        send();
+    var cond = { membershipGroupId: c.req.group.id };
+
+    if (selectedUsers.length > 0) {
+        cond = { id: { inq: selectedUsers }};
     }
 
-    function send() {
-        //sends message to each selected user
-        async.forEach(selectedUsers, function(userId, done) {
-            //load each user
-            c.User.find(userId, function (err, user) {
-                //send the message via email
-                user.notify('message', {groupId: c.req.group.id, subject: subject, message: body });
-
-                done();
-            });
-        }, function() {
-            c.send({
-                message: c.t(['users.help.messageSent', selectedUsers.length]),
-                status: 'success',
-                icon: 'ok'
-            });
+    //sends message to each selected user
+    c.User.iterate({ batchSize: 500, where: cond }, function (user, next) {
+        //send the message via email
+        user.notify('message', {groupId: c.req.group.id, subject: subject, message: body });
+        next();
+    }, function (err) {
+        c.send({
+            message: c.t(['users.help.messageSent', selectedUsers.length || 'all']),
+            status: 'success',
+            icon: 'ok'
         });
-    }
+    });
 };
 
 /**

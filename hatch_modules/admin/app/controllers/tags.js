@@ -217,20 +217,15 @@ TagController.prototype.add = function (c) {
     var self = this;
     var model = c[this.modelName];
 
-    c.req.body.ids.forEach(function (id) {
-        model.find(id, function (err, obj) {
-            if (!obj) {
-                return;
-            }
-            self.theTag.add(obj, function (err) {
-                obj.save();
-            });
+    model.iterate({ batchSize: 500, where: { id: { inq: c.req.body.ids }}}, function (obj, next) {
+        self.theTag.add(obj, function (err) {
+            obj.save(next);
         });
-    });
-
-    c.send({
-        status: 'success',
-        message: c.t('models.Tag.messages.added')
+    }, function () {
+        c.send({
+            status: 'success',
+            message: c.t('models.Tag.messages.added')
+        });
     });
 };
 
@@ -243,19 +238,14 @@ TagController.prototype.remove = function (c) {
     var self = this;
     var model = c[this.modelName];
 
-    c.req.body.ids.forEach(function (id) {
-        model.find(id, function (err, obj) {
-            if (!obj) {
-                return;
-            }
-            self.theTag.remove(obj, function (err) {
-                obj.save();
-            });
+    model.iterate({ batchSize: 500, where: { id: { inq: c.req.body.ids }}}, function (obj, next) {
+        self.theTag.remove(obj, function (err) {
+            obj.save(next);
         });
-    });
-
-    c.send({
-        status: 'success',
-        message: c.t('models.Tag.messages.removed')
+    }, function () {
+        c.send({
+            status: 'success',
+            message: c.t('models.Tag.messages.removed')
+        });
     });
 };
