@@ -93,8 +93,10 @@ module.exports = function (compound, Media) {
         // check for the existing file
         Media.findOne({ where: { originalUrl: url }}, function (err, media) {
             if (media) {
+                console.log('re-using media object with id and url:', media.id, url);
                 callback(null, media);
             } else {
+                console.log('creating media object for url', url);
                 params.originalUrl = url;
                 create();
             }
@@ -470,17 +472,49 @@ module.exports = function (compound, Media) {
      */
     Media.prototype.updateContent = function (callback) {
         var self = this;
+        var missingContentIds = [];
 
         async.forEach(self.contentIds || [], function (id, done) {
             Content.find(id, function (err, post) {
+                if (err) {
+                    console.log('error finding content with id:',id);
+                    return done(err);
+                }
+                if (!post) {
+                    console.log("didn't find content with id: "+id+" going to remove from Media.contentIds for Media object", self.id);
+                    
+                    // add to temp array, we will remove from the media object and re-save the media at the end
+                    missingContentIds.push(id);
+                    return done();
+                }
                 self.assignToContent(post);
                 post.save(done);
             });
         }, function (err) {
-            if (callback) {
-                callback(err);
+            if(err) {
+                callback && callback(err);
             }
-        })
+            // Find and remove id from contentIds
+            if(missingContentIds.length > 0) {
+                console.log('missing content ids: '+missingContentIds);
+                console.log('contentIds: '+self.contentIds);
+                var newContentIds = _.difference(self.contentIds, missingContentIds);
+                console.log('new contentIds: '+newContentIds);
+                self.contentIds = newContentIds;
+                self.save(function(err, saved_media) {
+                    if(err) {
+                        console.log('error saving media');
+                        return done(err);
+                    }
+                    console.log('updated media ' + self.id + ' after removing contentIds: '+missingContentIds);
+                    if(callback) {
+                        callback();
+                    }
+                });
+            } else {
+                callback && callback();
+            }
+        });
     };
 
     /**
