@@ -242,6 +242,10 @@ en:
       metaDescription: '% description'
       noTemplate: No template
       specialPageType: Special page type
+      privacy: Privacy
+      public: Public
+      community: Community
+      private: Private
     help:
       noSpecialPages: No special pages have been defined for this group yet
       areYouSureDelete: 'Are you sure you wish to delete this page?'

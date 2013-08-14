@@ -80,6 +80,17 @@
         </div>
     </div>
 
+    <div class="control-group">
+        <label for="privacy" class="control-label"><%- t('pages.labels.privacy') %></label>
+        <div class="controls">
+            <select id="privacy" name="privacy">
+                <option value="public" <%- page.privacy === 'public' ? 'selected="selected"':'' %>><%- t('pages.labels.public') %></option>
+                <option value="community" <%- page.privacy === 'community' ? 'selected="selected"':'' %>><%- t('pages.labels.community') %></option>
+                <option value="private" <%- page.privacy === 'private' ? 'selected="selected"':'' %>><%- t('pages.labels.private') %></option>
+            </select>
+        </div>
+    </div>
+
     <hr/>
 
     <div class="control-group">
