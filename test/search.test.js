@@ -1,7 +1,7 @@
 var should = require('./');
 var app, compound, Content;
 
-describe.only('API/search', function() {
+describe('API/search', function() {
 
     before(function(done) {
         var db = 9;

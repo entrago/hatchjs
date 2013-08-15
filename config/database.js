@@ -10,7 +10,7 @@ module.exports =
     { "driver":   "redis-hq"
     , "prefix":   "test"
     , "database": 1
-    , "fulltext": {driver: 'solr', database: 5}
+    , "fulltext": {driver: 'reds', database: 5}
     , "session": {database: 10}
     }
   , "production":
