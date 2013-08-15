@@ -75,7 +75,7 @@ module.exports = function(compound, ResetPassword) {
             if (err || !user) {
                 return cb(err || new Error('Token invalid or expired'));
             }
-            user.updateAttribute('password', c.body.password, cb);
+            user.updateAttribute('password', password, cb);
         });
     };
 

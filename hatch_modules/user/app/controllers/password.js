@@ -36,15 +36,17 @@ PasswordController.prototype.request = function resetPassword(c) {
  * @param token - OTP to lookup user.
  */
 PasswordController.prototype.change = function(c) {
-    c.ResetPassword.changePassword(c.body.token, c.body.password, function(err) {
-        if (err) {
-            c.sendError(err);
-        } else {
-            c.send({
-                status: 'success',
-                icon: 'info-sign',
-                message: 'Your password has been successfully reset. You may now login.'
-            });
-        }
+    c.ResetPassword.findOne({ where: { token: c.body.token }}, function (err, reset) {
+        reset.changePassword(c.body.token, c.body.password, function(err) {
+            if (err) {
+                c.sendError(err);
+            } else {
+                c.send({
+                    status: 'success',
+                    icon: 'info-sign',
+                    message: 'Your password has been successfully reset. You may now login.'
+                });
+            }
+        });
     });
 };
