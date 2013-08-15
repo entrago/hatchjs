@@ -21,5 +21,5 @@
 
 module.exports = function routing(map) {
     map.get('auth', 'facebook#auth');
-    map.get('callback', 'facebook#callback');
+    map.get('callback/:domain?', 'facebook#callback');
 };

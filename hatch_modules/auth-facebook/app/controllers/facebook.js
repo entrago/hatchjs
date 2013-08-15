@@ -35,6 +35,11 @@ function FacebookAuthController(init) {
             );
         };
         this.redirectUri = 'http://' + c.req.headers.host + c.pathTo.callback;
+
+        if (c.compound.app.get('facebookAuthUri')) {
+            this.redirectUri = c.compound.app.get('facebookAuthUri') + '/' + (c.req.params.domain || c.req.headers.host);
+        }
+
         c.next();
     });
 };
@@ -52,10 +57,16 @@ FacebookAuthController.prototype.auth = function facebookAuth(c) {
 };
 
 FacebookAuthController.prototype.callback = function facebookCallback(c) {
+    if (c.req.params.domain && c.req.params.domain !== c.req.headers.host) {
+        console.log('Forwarding to domain-specific Facebook auth URL');
+        return c.redirect('//' + c.req.params.domain + c.pathTo.callback + '?code=' + c.req.query.code);
+    }
+
     var consumer = this.consumer;
     with (c) {
         consumer().getOAuthAccessToken(req.query.code, { redirect_uri: this.redirectUri }, function (err, token) {
             if (err) {
+                console.log(err);
                 return next(err);
             }
 
