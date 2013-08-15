@@ -3,14 +3,14 @@ module.exports =
     { "driver":   "redis-hq"
     , "prefix":   "dev"
     , "database": 0
-    , "fulltext": {database: 5}
+    , "fulltext": {driver: 'solr', database: 5}
     , "session": {database: 10}
     }
   , "test":
     { "driver":   "redis-hq"
     , "prefix":   "test"
     , "database": 1
-    , "fulltext": {database: 5}
+    , "fulltext": {driver: 'reds', database: 5}
     , "session": {database: 10}
     }
   , "production":
