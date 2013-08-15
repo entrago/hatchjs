@@ -105,8 +105,6 @@ function loadMembers(c, next) {
                 setMemberships(members);
             }
 
-            
-
             c.locals.members = members;
             c.locals.allMembersCount = count;
 

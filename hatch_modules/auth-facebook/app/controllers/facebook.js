@@ -41,7 +41,7 @@ function FacebookAuthController(init) {
 
 FacebookAuthController.prototype.auth = function facebookAuth(c) {
     with (c) {
-        var url= this.consumer().getAuthorizeUrl({
+        var url = this.consumer().getAuthorizeUrl({
             redirect_uri : this.redirectUri,
             scope: 'email',
             display: 'page'
@@ -54,7 +54,7 @@ FacebookAuthController.prototype.auth = function facebookAuth(c) {
 FacebookAuthController.prototype.callback = function facebookCallback(c) {
     var consumer = this.consumer;
     with (c) {
-        consumer().getOAuthAccessToken(req.query.code, {redirect_uri: this.redirectUri}, function (err, token) {
+        consumer().getOAuthAccessToken(req.query.code, { redirect_uri: this.redirectUri }, function (err, token) {
             if (err) {
                 return next(err);
             }
@@ -70,7 +70,7 @@ FacebookAuthController.prototype.callback = function facebookCallback(c) {
                         profile = JSON.parse(profile);
                         
                         var data = {
-                            username: profile.first_name+profile.last_name,
+                            username: profile.first_name + profile.last_name,
                             displayName: profile.name,
                             email: profile.email,
                             facebookId: profile.id
