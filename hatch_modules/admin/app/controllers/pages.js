@@ -241,6 +241,7 @@ PagesController.prototype.update = function(c) {
 
     this.page = page;
     c.body.groupId = c.req.group.id;
+    c.body.hideFromNavigation = /true/i.test(c.body.hideFromNavigation);
 
     c.flash('info', c.t('models.Page.messages.saved'));
     delete c.body.undefined;
