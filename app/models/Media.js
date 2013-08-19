@@ -425,7 +425,8 @@ module.exports = function (compound, Media) {
         }
 
         Media.all({ where: { id: { inq: ids }}}, function (err, items) {
-            items.forEach(function (media) {
+            ids.forEach(function (id) {
+                var media = _.find(items, function (media) { return media.id == id });
                 media.assignToContent(post);
             });
 
