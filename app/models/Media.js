@@ -315,7 +315,7 @@ module.exports = function (compound, Media) {
                     '_' + size + '.' + data.filename.split('.').slice(-1)[0];
 
                 //resize and upload each file
-                im.resize({
+                im.crop({
                     srcPath: data.filename,
                     dstPath: resizeFilename,
                     width: width,
