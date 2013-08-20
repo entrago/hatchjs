@@ -35,6 +35,15 @@ module.exports = function (compound, User) {
     User.validatesUniquenessOf('email', {message: 'This email address is taken'});
     User.validatesUniquenessOf('username', {message: 'This username is taken'});
 
+    // defines the possible sort orders for users
+    User.tagSortOrders = [
+        { name: 'ID', value: 'id DESC' },
+        { name: 'Username', value: 'username ASC' },
+        { name: 'Last name', value: 'lastname ASC' },
+        { name: 'First name', value: 'firstname ASC' },
+        { name: 'Date registered', value: 'createdAt DESC' }
+    ];
+
     /**
      * Get the first letter of the last name for this user.
      * 

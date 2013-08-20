@@ -41,6 +41,14 @@ module.exports = function (compound, Content) {
     // register the functions which can be called from the REST api
     Content.allowedApiActions = ['like', 'getLike', 'vote', 'postComment', 'flag', 'clearFlags', 'destroyAndBan', 'registerView'];
 
+    // standard list of tag sort orders
+    Content.tagSortOrders = [
+        { name: 'ID', value: 'id DESC' },
+        { name: 'Date', value: 'createdAt DESC' },
+        { name: 'Popularity', value: 'score DESC' },
+        { name: 'Comments', value: 'commentsTotal DESC' },
+        { name: 'Likes', value: 'likesTotal DESC' }
+    ];
 
     /**
      * gets the popularity score for this content
