@@ -168,8 +168,10 @@ module.exports = function (compound, Content) {
                 return done();
             }
 
-            //generate url
-            Content.generateUrl(data, group, done);
+            Tag.applyMatchingTags(data, function (err, data) {
+                //generate url
+                Content.generateUrl(data, group, done);
+            });
         });
     };
 

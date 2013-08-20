@@ -124,7 +124,7 @@ TagController.prototype.tagCounts = function (c) {
  */
 TagController.prototype.edit = TagController.prototype.new = function (c) {
     var self = this;
-    this.defaultFilter = 'filter = function(content) {\n\treturn false; ' +
+    this.defaultFilter = 'return function(obj, callback) {\n\treturn false; ' +
         '//add your filter criteria here\n};';
 
     // create the recursive renderPermissions function
