@@ -575,6 +575,10 @@ module.exports = function (compound, Tag) {
                         title: tag.title,
                         filter: true
                     });
+
+                    setTimeout(function () { 
+                        tag.updateCount();
+                    }, 500);
                 }
             });
 
