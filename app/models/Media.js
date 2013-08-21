@@ -315,7 +315,7 @@ module.exports = function (compound, Media) {
                     '_' + size + '.' + data.filename.split('.').slice(-1)[0];
 
                 //resize and upload each file
-                im.resize({
+                im.crop({
                     srcPath: data.filename,
                     dstPath: resizeFilename,
                     width: width,
@@ -425,7 +425,8 @@ module.exports = function (compound, Media) {
         }
 
         Media.all({ where: { id: { inq: ids }}}, function (err, items) {
-            items.forEach(function (media) {
+            ids.forEach(function (id) {
+                var media = _.find(items, function (media) { return media.id == id });
                 media.assignToContent(post);
             });
 

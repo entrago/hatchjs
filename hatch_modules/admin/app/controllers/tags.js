@@ -47,7 +47,7 @@ function loadTags(c) {
     c.Tag.all({ where: { groupIdByType: c.req.group.id + '-' + this.modelName }}, function (err, tags) {
         tags.forEach(function (tag) {
             tag.sortOrder = tag.sortOrder &&
-            _.find(getSortOrders(c.params.section), function (sortOrder) {
+            _.find(getSortOrders(c, c.params.section), function (sortOrder) {
                 return sortOrder.value === tag.sortOrder;
             }).name;
         });
@@ -74,25 +74,13 @@ function findTag (c) {
 }
 
 // gets the sort orders for the active model
-function getSortOrders (type) {
+function getSortOrders (c, type) {
     switch(type) {
         case 'content':
-            return [
-                { name: 'ID', value: 'id DESC' },
-                { name: 'Date', value: 'createdAt DESC' },
-                { name: 'Popularity', value: 'score DESC' },
-                { name: 'Comments', value: 'commentsTotal DESC' },
-                { name: 'Likes', value: 'likesTotal DESC' }
-            ];
+            return c.Content.tagSortOrders;
         
         case 'users':
-            return [
-                { name: 'ID', value: 'id DESC' },
-                { name: 'Username', value: 'username ASC' },
-                { name: 'Last name', value: 'lastname ASC' },
-                { name: 'First name', value: 'firstname ASC' },
-                { name: 'Date registered', value: 'createdAt DESC' }
-            ];
+            return c.User.tagSortOrders;
     }
 }
 
@@ -102,7 +90,7 @@ function getSortOrders (type) {
  * @param  {HttpContext} c - http context
  */
 TagController.prototype.index = function (c) {
-    c.locals.sortOrders = getSortOrders(this.type);
+    c.locals.sortOrders = getSortOrders(c, this.type);
     c.render();
 };
 
@@ -124,7 +112,7 @@ TagController.prototype.tagCounts = function (c) {
  */
 TagController.prototype.edit = TagController.prototype.new = function (c) {
     var self = this;
-    this.defaultFilter = 'filter = function(content) {\n\treturn false; ' +
+    this.defaultFilter = 'return function(obj, callback) {\n\treturn false; ' +
         '//add your filter criteria here\n};';
 
     // create the recursive renderPermissions function
@@ -148,7 +136,7 @@ TagController.prototype.edit = TagController.prototype.new = function (c) {
     };
 
     c.locals.permissions = c.compound.hatch.permissions;
-    c.locals.sortOrders = getSortOrders(this.type);
+    c.locals.sortOrders = getSortOrders(c, this.type);
     c.render();
 };
 

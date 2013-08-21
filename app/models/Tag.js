@@ -344,7 +344,7 @@ module.exports = function (compound, Tag) {
         if (!this.filter) {
             throw new Error('No filter defined');
         }
-        return new Function('obj', this.filter);
+        return new Function(this.filter);
     };
 
     /**
@@ -353,11 +353,17 @@ module.exports = function (compound, Tag) {
      * @param  {object}   obj -object to test
      * @return {Boolean}       true or false
      */
-    Tag.prototype.matchFilter = function (obj) {
+    Tag.prototype.matchFilter = function (obj, callback) {
         if (!this.filter) {
-            return false;
+            return callback(null, false);
         }
-        return this.filterFn()(obj);
+        var fn = this.filterFn()();
+
+        var res = fn.call({ compound: compound }, obj, callback);
+        
+        if (typeof res === 'boolean') {
+            callback(null, res);
+        }
     };
 
     /**
@@ -517,18 +523,29 @@ module.exports = function (compound, Tag) {
         Tag.all({ where: { type: obj.constructor.modelName }}, function (err, tags) {
             var matchingTags = [];
 
-            tags.forEach(function (tag) {
+            async.forEach(tags, function (tag, done) {
                 // skip group specific tags for other groups
                 if (tag.groupId && tag.groupId != obj.groupId) {
-                    return;
+                    return done();
                 }
 
-                if (tag.matchFilter(obj)) {
-                    matchingTags.push(tag);
-                }
+                tag.matchFilter(obj, function (err, result) {
+                    if (err) {
+                        console.log('Error matching tag');
+                        console.log(err);
+
+                        return done();
+                    }
+
+                    if (result) {
+                        matchingTags.push(tag);
+                    }
+
+                    done();
+                });
+            }, function (err) {
+                callback(err, matchingTags);
             });
-
-            callback(err, matchingTags);
         });
     };
 
@@ -540,14 +557,28 @@ module.exports = function (compound, Tag) {
      * @param  {Function}   callback - callback function
      */
     Tag.applyMatchingTags = function (obj, callback) {
-        Tag.getMatchingTags(obj, function (err, tags) {
+        // first remove all filter tags
+        obj.tags = _.reject(obj.tags, function (tag) {
+            return tag.filter;
+        });
 
+        Tag.getMatchingTags(obj, function (err, tags) {
             tags.forEach(function (tag) {
-                if (!obj.tags.find[tag.id, 'id']) {
+                if (!obj.tags) {
+                    obj.tags = [];
+                }
+                if (!_.find(obj.tags, function (t) {
+                    return t.id == tag.id;
+                })) {
                     obj.tags.push({
                         id: tag.id,
-                        title: tag.title
+                        title: tag.title,
+                        filter: true
                     });
+
+                    setTimeout(function () { 
+                        tag.updateCount();
+                    }, 500);
                 }
             });
 

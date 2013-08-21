@@ -42,13 +42,14 @@
     "mime": "latest",
     "google": "~0.3.0",
     "google-images": "~0.1.0",
-    "yaml-js": ">0",
-    "ntwitter": ">0",
-    "oauth": ">0",
+    "yaml-js": "latest",
+    "ntwitter": "latest",
+    "oauth": "latest",
     "express-mobile-agent": "https://github.com/cjroebuck/express-mobile-agent/tarball/master",
     "dox": "~0.4.3",
     "textract": "latest",
-    "raven": "latest"
+    "raven": "latest",
+    "co-docs": "latest"
   },
   "devDependencies": {
     "mocha": "1.8.1",
