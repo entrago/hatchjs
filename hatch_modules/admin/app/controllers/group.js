@@ -77,6 +77,11 @@ GroupController.prototype.save = function(c) {
         });
     }
     else {
+        // stop circular reference to inst.module.compound
+        group.modules.items.forEach(function (inst) {
+            delete inst.module;
+        });
+
         group.updateAttributes(c.req.body, function (err, group) {
             if (err) {
                 return c.send({
