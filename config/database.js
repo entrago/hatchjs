@@ -4,7 +4,7 @@ module.exports =
     , "prefix":   "dev"
     , "database": 0
     , "fulltext": {
-        driver: 'solr'
+        driver: 'reds'
     }
     , "session": {database: 10}
     }
