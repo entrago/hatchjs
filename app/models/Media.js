@@ -373,13 +373,11 @@ module.exports = function (compound, Media) {
             }
         }
 
-        
-
         if (width > 0 || height > 0) {
             // check for larger/equal media
             for (i=0; i < sortedResized.length; i++) {
                 var resize = sortedResized.items && sortedResized.items[i] || sortedResized[i];
-                if (resize.width >= width && resize.height >= height) {
+                if (resize.size === size || (resize.width >= width && resize.height >= height)) {
                     if (resize.url) {
                         return resize.url;
                     } else {
