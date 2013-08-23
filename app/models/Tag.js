@@ -359,6 +359,12 @@ module.exports = function (compound, Tag) {
         }
         var fn = this.filterFn()();
 
+        // make sure obj is a concrete type
+        if (obj.constructor === {}.constructor) {
+            var type = compound.models[this.type];
+            obj = new type(obj);
+        }
+
         var res = fn.call({ compound: compound }, obj, callback);
         
         if (typeof res === 'boolean') {
