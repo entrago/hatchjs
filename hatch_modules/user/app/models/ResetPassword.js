@@ -49,12 +49,12 @@ module.exports = function(compound, ResetPassword) {
     };
 
     ResetPassword.auth = function (token, cb) {
-        ResetPassword.findOne({token: token}, function (err, rp) {
+        ResetPassword.findOne({ where: { token: token }}, function (err, rp) {
             if (err) return cb(err);
             if (!rp) {
                 return cb(new Error('User not found'));
             }
-            if (Date.now() - rp.createdAt > ResetPassword.TOKEN_EXPIRATION_LIMIT) {
+            if ((Date.now() - new Date(rp.createdAt)) > ResetPassword.TOKEN_EXPIRATION_LIMIT) {
                 return cb(new Error('Token expired'));
             }
 
