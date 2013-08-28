@@ -162,27 +162,27 @@ module.exports = function (compound, Tag) {
             // and insert the command to update the tag counts
             var save = obj.save;
 
-            if (!save) {
+            if (save) {
+                obj.save = function (options, callback) {
+                    if (typeof options === 'function') {
+                        callback = options;
+                        options = {};
+                    }
+
+                    save.call(obj, options, function (err, obj) {
+                        runTagUpdate();
+
+                        if (callback) {
+                            callback(err, obj);
+                        }
+                    });
+                };
+            } else {
                 // we still need a timeout if the obj is not a db entity. this
                 // can happen if we are updating the data to be used to create
                 // a new db entity
                 setTimeout(runTagUpdate, 500);
             }
-
-            obj.save = function (options, callback) {
-                if (typeof options === 'function') {
-                    callback = options;
-                    options = {};
-                }
-
-                save.call(obj, options, function (err, obj) {
-                    runTagUpdate();
-
-                    if (callback) {
-                        callback(err, obj);
-                    }
-                });
-            };
 
             callback(err, obj);
         });
