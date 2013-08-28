@@ -1,37 +1,33 @@
 //
-// Hatch.js is a CMS and social website building framework built in Node.js 
+// Hatch.js is a CMS and social website building framework built in Node.js
 // Copyright (C) 2013 Inventures Software Ltd
-// 
+//
 // This file is part of Hatch.js
-// 
+//
 // Hatch.js is free software: you can redistribute it and/or modify it under the terms of the
 // GNU General Public License as published by the Free Software Foundation, version 3
-// 
+//
 // Hatch.js is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 // without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-// 
+//
 // See the GNU General Public License for more details. You should have received a copy of the GNU
 // General Public License along with Hatch.js. If not, see <http://www.gnu.org/licenses/>.
-// 
+//
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
 
 var async = require('async');
 var httpPost = require('http-post');
-var _ = require('underscore');
 
 module.exports = function (compound, Tag) {
     'use strict';
-
-    var api = compound.hatch.api;
-    var TagPermissions = compound.models.TagPermissions;
 
     Tag.validatesPresenceOf('title', {message: 'Please enter a title'});
     Tag.validatesUniquenessOf('name', {message: 'This tag name is taken'});
 
     /**
      * Get the 'groupId-type' shortcut index.
-     *  
+     *
      * @return {String} groupId+type
      */
     Tag.getter.groupIdByType = function () {
@@ -41,7 +37,7 @@ module.exports = function (compound, Tag) {
     /**
      * Before this tag is created, make sure it has a name value - this is auto-
      * calculated from groupId + title.
-     * 
+     *
      * @param  {Function} next - continuation function
      */
     Tag.beforeSave = function (next) {
@@ -59,12 +55,11 @@ module.exports = function (compound, Tag) {
     /**
      * Before this tag is destroyed, make sure all objects referencing it are
      * de-refernced (removed) from it's collection.
-     * 
+     *
      * @param  {Function} next - continuation function
      */
     Tag.beforeDestroy = function (next) {
         var tag = this;
-        var model = compound.models[tag.type];
 
         // remove this tag from all of it's results
         tag.getResults({}, function (err, results) {
@@ -78,11 +73,11 @@ module.exports = function (compound, Tag) {
     };
 
     /**
-     * Assign tags to an object from req.body data containing an array of tag 
+     * Assign tags to an object from req.body data containing an array of tag
      * ids. This function will automatically recalculate the tag counts for all
      * tags involved in this transaction - both those being removed and added to
      * the object tags list.
-     * 
+     *
      * @param  {Object}   obj      - db entity to assign tags for
      * @param  {Object}   data     - req.body.tags containing tag ids
      * @param  {Function} callback - callback function
@@ -121,6 +116,22 @@ module.exports = function (compound, Tag) {
         // assign the tags from the body data
         async.forEach(data, function (tagId, done) {
             Tag.find(tagId, function (err, tag) {
+                function pushTag(tag) {
+                    // update the tag model
+                    tag.updateModel();
+
+                    obj.tags.push({
+                        id: tag.id,
+                        title: tag.title
+                    });
+
+                    if (updateTags.indexOf(tagId) === -1) {
+                        updateTags.push(tag.id);
+                    }
+
+                    done();
+                }
+
                 // if the tag was not found, create it
                 if (!tag && typeof tagId === 'string') {
                     // search for a tag with the same title and group
@@ -128,7 +139,7 @@ module.exports = function (compound, Tag) {
                         if (tag) {
                             pushTag(tag);
                         } else {
-                            var tag = {
+                            tag = {
                                 title: tagId,
                                 groupId: obj.groupId,
                                 type: data.tagModelName || obj.tagModelName || obj.constructor.modelName,
@@ -139,28 +150,10 @@ module.exports = function (compound, Tag) {
                                 pushTag(tag);
                             });
                         }
-                    })
+                    });
                 } else if(tag) {
                     pushTag(tag);
                 } else {
-                    done();
-                }
-
-                function pushTag(tag) {
-                    // update the tag model
-                    tag.updateModel();
-
-                    obj.tags.push({
-                        id: tag.id,
-                        title: tag.title
-                    });
-
-                    if (!_.find(updateTags, function (tagId) { 
-                        return tagId === tag.id
-                    })) {
-                        updateTags.push(tag.id);
-                    }
-
                     done();
                 }
             });
@@ -169,28 +162,27 @@ module.exports = function (compound, Tag) {
             // and insert the command to update the tag counts
             var save = obj.save;
 
-            if (save) {
-                obj.save = function (options, callback) {
-                    if (typeof options == 'function') {
-                        callback = options;
-                        options = {};
-                    }
-                    var oldCallback = callback;
-                    callback = function (err, obj) {
-                        runTagUpdate();
-                        
-                        if(oldCallback) {
-                            oldCallback(err, obj);
-                        }
-                    }
-                    save.call(obj, options, callback);
-                }
-            } else {
+            if (!save) {
                 // we still need a timeout if the obj is not a db entity. this
                 // can happen if we are updating the data to be used to create
                 // a new db entity
                 setTimeout(runTagUpdate, 500);
             }
+
+            obj.save = function (options, callback) {
+                if (typeof options === 'function') {
+                    callback = options;
+                    options = {};
+                }
+
+                save.call(obj, options, function (err, obj) {
+                    runTagUpdate();
+
+                    if (callback) {
+                        callback(err, obj);
+                    }
+                });
+            };
 
             callback(err, obj);
         });
@@ -206,7 +198,7 @@ module.exports = function (compound, Tag) {
 
     /**
      * Find a tag by it's name.
-     * 
+     *
      * @param  {string}   name     - name of the tag
      * @param  {Function} callback - callback function
      */
@@ -218,7 +210,7 @@ module.exports = function (compound, Tag) {
 
     /**
      * Get the results of this tag by querying the database.
-     * 
+     *
      * @param  {Object}   params     - standard jugglingdb query params
      * @param  {Function} callback   - callback function
      */
@@ -250,7 +242,7 @@ module.exports = function (compound, Tag) {
 
     /**
      * Check to see if this tag has been updated since the specified date.
-     * 
+     *
      * @param  {Date}    since - date to check
      * @return {Boolean}       - whether the tag has been updated
      */
@@ -263,9 +255,9 @@ module.exports = function (compound, Tag) {
      * Update the compound model for the specified tag to make sure the custom
      * sort order is defined for the specified tag.
      *
-     * This is needed before any items that use this tag can be saved so that 
+     * This is needed before any items that use this tag can be saved so that
      * the sort orders are correct when they are queried by tag.
-     * 
+     *
      * @param  {Tag} tag - tag to check for
      */
     Tag.updateModel = function (tag) {
@@ -287,7 +279,7 @@ module.exports = function (compound, Tag) {
      * Updates the compound model for the specified tag to make sure the custom
      * sort order is defined for the specified tag.
      *
-     * This is needed before any items that use this tag can be saved so that 
+     * This is needed before any items that use this tag can be saved so that
      * the sort orders are correct when they are queried by tag.
      */
     Tag.prototype.updateModel = function () {
@@ -305,7 +297,7 @@ module.exports = function (compound, Tag) {
     /**
      * Rebuild the index for this tag. This should be used if the sort order
      * for this tag has been modified.
-     * 
+     *
      * @param  {Tag} tag - tag to rebuild index for
      */
     Tag.rebuildIndex = function (tag) {
@@ -323,7 +315,7 @@ module.exports = function (compound, Tag) {
     /**
      * Get the filter function for this tag.
      *
-     * A filter function is used to automatically tag objects based on a 
+     * A filter function is used to automatically tag objects based on a
      * javascript. The filter is contained as a string within this.filter
      * property and the signature is always function (obj) { ... }.
      *
@@ -331,13 +323,13 @@ module.exports = function (compound, Tag) {
      *
      * Examples:
      *
-     *     // Here we are checking a content entity (obj) to see whether it has 
-     *     // more than 5 likes. We are returning true so that the 'popular' 
+     *     // Here we are checking a content entity (obj) to see whether it has
+     *     // more than 5 likes. We are returning true so that the 'popular'
      *     // tag is added to it's list of tags.
      *     function (obj) {
      *         return obj.likesTotal > 5;
      *     }
-     * 
+     *
      * @return {Function} - the filter function (if any)
      */
     Tag.prototype.filterFn = function () {
@@ -349,7 +341,7 @@ module.exports = function (compound, Tag) {
 
     /**
      * Get whether an object matches this tag's filter function.
-     * 
+     *
      * @param  {object}   obj -object to test
      * @return {Boolean}       true or false
      */
@@ -361,21 +353,21 @@ module.exports = function (compound, Tag) {
 
         // make sure obj is a concrete type
         if (obj.constructor === {}.constructor) {
-            var type = compound.models[this.type];
-            obj = new type(obj);
+            var Type = compound.models[this.type];
+            obj = new Type(obj);
         }
 
         var res = fn.call({ compound: compound }, obj, callback);
-        
+
         if (typeof res === 'boolean') {
             callback(null, res);
         }
     };
 
     /**
-     * Update the count for this tag by querying the database and caching the 
+     * Update the count for this tag by querying the database and caching the
      * result.
-     * 
+     *
      * @param  {Function} callback - callback function
      */
     Tag.prototype.updateCount = function (callback) {
@@ -386,7 +378,7 @@ module.exports = function (compound, Tag) {
             }
             return;
         }
-    
+
         compound.model(this.type, false).count({ tags: tag.id }, function (err, count) {
             tag.count = count;
             tag.updatedAt = new Date();
@@ -398,10 +390,10 @@ module.exports = function (compound, Tag) {
     };
 
     /**
-     * Update the tag count for the specified db entity object. This is often 
+     * Update the tag count for the specified db entity object. This is often
      * useful when the object is deleted from the database, to decrement all of
      * the referenced tag counts.
-     * 
+     *
      * @param  {Object}   obj      - db entity object
      * @param  {Function} callback - callback function
      */
@@ -437,7 +429,7 @@ module.exports = function (compound, Tag) {
         Tag.all(query, function (err, tags) {
             async.forEach(tags, function (tag, next) {
                 tag.updateCount(next);
-            }, function (err, results) {
+            }, function () {
                 if (callback) {
                     callback();
                 }
@@ -448,7 +440,7 @@ module.exports = function (compound, Tag) {
     /**
      * Subscribe to this tag and receive pingbacks when the contents of this tag
      * are updated.
-     * 
+     *
      * @param  {string}   url      - pingback url to be posted to on updates
      * @param  {Number}   lease    - subscriber lease time in ms
      * @param  {Function} callback - callback function
@@ -471,8 +463,8 @@ module.exports = function (compound, Tag) {
         };
 
         //remove any duplicate subscribers
-        this.subscribers = _.reject(this.subscribers, function (subscriber) {
-            return subscriber.url === url;
+        this.subscribers = this.subscribers.filter(function (subscriber) {
+            return subscriber.url !== url;
         });
 
         this.subscribers.push(subscriber);
@@ -485,17 +477,24 @@ module.exports = function (compound, Tag) {
      *
      * The subscribers will then decide whether to re-query the API and retrieve
      * the new contents of this tag.
-     * 
+     *
      * @param  {Function} callback - callback function
      */
     Tag.prototype.pingSubscribers = function (callback) {
         var tag = this;
-        var now = new Date().getTime();
+        var now = Date.now();
 
         //remove expired subscribers
-        this.subscribers.items = _.reject(this.subscribers.items, function (subscriber) {
-            return !subscriber || subscriber.invalid ||
-                subscriber.createdAt + subscriber.lease < now;
+        this.subscribers.items = this.subscribers.items.filter(function (subscriber) {
+            if (!subscriber) {
+                return false;
+            }
+
+            if (subscriber.invalid) {
+                return false;
+            }
+
+            return now <= subscriber.createdAt + subscriber.lease;
         });
 
         async.forEach(this.subscribers, function (subscriber, done) {
@@ -511,7 +510,7 @@ module.exports = function (compound, Tag) {
                     done();
                 });
             });
-        }, function (err, results) {
+        }, function () {
             if (callback) {
                 callback();
             }
@@ -521,7 +520,7 @@ module.exports = function (compound, Tag) {
     /**
      * Get all of the matching tags for the specified object by running the
      * tag filter functions (see above) to find matches.
-     * 
+     *
      * @param  {Object}     obj      - object to get matching tags for
      * @param  {Function}   callback - callback function
      */
@@ -531,7 +530,7 @@ module.exports = function (compound, Tag) {
 
             async.forEach(tags, function (tag, done) {
                 // skip group specific tags for other groups
-                if (tag.groupId && tag.groupId != obj.groupId) {
+                if (tag.groupId && tag.groupId !== obj.groupId) {
                     return done();
                 }
 
@@ -558,14 +557,14 @@ module.exports = function (compound, Tag) {
     /**
      * Apply matching tags to this object by running the
      * tag filter functions to find matches (see above).
-     * 
+     *
      * @param  {Object}     obj      - object to apply matching tags for
      * @param  {Function}   callback - callback function
      */
     Tag.applyMatchingTags = function (obj, callback) {
         // first remove all filter tags
-        obj.tags = _.reject(obj.tags, function (tag) {
-            return tag.filter;
+        obj.tags = (obj.tags.items || obj.tags || []).filter(function (tag) {
+            return !tag.filter;
         });
 
         Tag.getMatchingTags(obj, function (err, tags) {
@@ -573,16 +572,19 @@ module.exports = function (compound, Tag) {
                 if (!obj.tags) {
                     obj.tags = [];
                 }
-                if (!_.find(obj.tags, function (t) {
-                    return t.id == tag.id;
-                })) {
+
+                var matching = obj.tags.some(function (t) {
+                    return t.id === tag.id;
+                });
+
+                if (!matching) {
                     obj.tags.push({
                         id: tag.id,
                         title: tag.title,
                         filter: true
                     });
 
-                    setTimeout(function () { 
+                    setTimeout(function () {
                         tag.updateCount();
                     }, 500);
                 }
@@ -594,7 +596,7 @@ module.exports = function (compound, Tag) {
 
     /**
      * Add an object to this tag collection.
-     * 
+     *
      * @param {Object}   obj      - db entity object
      * @param {Function} callback - callback function
      */
@@ -608,7 +610,7 @@ module.exports = function (compound, Tag) {
         this.updateModel();
 
         // wait to update count because this needs to happen *after* save
-        setTimeout(function () { 
+        setTimeout(function () {
             self.updateCount();
         }, 500);
 
@@ -625,7 +627,7 @@ module.exports = function (compound, Tag) {
 
     /**
      * Remove an object from this tag collection.
-     * 
+     *
      * @param  {Object}   obj      - db entity object
      * @param  {Function} callback - callback function
      */
@@ -639,7 +641,7 @@ module.exports = function (compound, Tag) {
         this.updateModel();
 
         // wait to update count because this needs to happen *after* save
-        setTimeout(function () { 
+        setTimeout(function () {
             self.updateCount();
         }, 500);
 
@@ -655,8 +657,8 @@ module.exports = function (compound, Tag) {
     function slugify(text) {
         text = text.toLowerCase();
         text = text.replace(/[^-a-zA-Z0-9\s]+/ig, '');
-        text = text.replace(/-/gi, "_");
-        text = text.replace(/\s/gi, "-");
+        text = text.replace(/-/gi, '_');
+        text = text.replace(/\s/gi, '-');
         return text;
     }
 };
