@@ -1,5 +1,5 @@
 exports.development = {
-    driver: 'Stub'
+    driver: 'sendmail'
 };
 
 exports.production = {
