@@ -59,7 +59,7 @@ TwitterAuthController.prototype.callback = function twitterCallback(c) {
             c.req.session.twitterAccess = token;
             c.req.session.twitterSecret = secret;
             c.consumer().get(
-                'http://api.twitter.com/1.1/account/verify_credentials.json',
+                'https://api.twitter.com/1.1/account/verify_credentials.json',
                 token,
                 secret,
                 function (err, profile, response) {
