@@ -52,9 +52,12 @@ TwitterAuthController.prototype.callback = function twitterCallback(c) {
         c.req.query.oauth_verifier,
         function (err, token, secret) {
             if (err) {
-                console.log('Twitter auth error');
                 console.log(err);
-                return c.next(err);
+                        
+                return c.sendError({
+                    message: 'Could not verify with Twitter',
+                    error: err
+                });
             }
             c.req.session.twitterAccess = token;
             c.req.session.twitterSecret = secret;
