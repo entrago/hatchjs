@@ -65,7 +65,11 @@ TwitterAuthController.prototype.callback = function twitterCallback(c) {
                 function (err, profile, response) {
                     if (err) {
                         console.log(err);
-                        return c.next(err);
+                        
+                        return c.sendError({
+                            message: 'Could not authenticate with Twitter',
+                            error: err
+                        });
                     }
 
                     var profile = JSON.parse(profile);
