@@ -34,9 +34,13 @@ SessionController.prototype.create = function(c) {
                                 delete user.password;
                             }
 
-                            c.send({user: user, message: message});
+                            c.send({
+                                user: user, 
+                                message: message,
+                                redirect: c.req.session.redirect || '/'
+                            });
                         } else {
-                            c.redirect(c.req.pagePath || '/');
+                            c.redirect(c.req.session.redirect || c.req.pagePath || '/');
                         }
                     });
                 });

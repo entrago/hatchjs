@@ -346,7 +346,7 @@ module.exports = function (compound, User) {
                 c.req.session.userId = user.id;
             }
             if (user.email && user.password && user.type != 'temporary') {
-                c.redirect('//' + c.req.group.url);
+                c.redirect(c.session.redirect || ('//' + c.req.group.url));
             } else {
                 //set user type to temporary and complete the registration
                 user.type = 'temporary';
