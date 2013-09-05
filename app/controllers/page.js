@@ -18,6 +18,8 @@ PageController.prototype.show = function (c) {
             return c.next(new c.errors.NotFound(c.req, 'Page not found'));
         }
 
+        // c.compound.hatch.audit.track(c.req.group.id, 'pageview', {url: c.req.url});
+
         c.req.page = page;
 
         c.compound.hatch.hooks.hook(c, 'page.show', { page: page, req: c.req, group: c.req.group, user: c.req.user }, function () {

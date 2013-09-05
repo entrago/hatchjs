@@ -89,6 +89,8 @@ exports.routes = function (map) {
         page.del('destroy', 'pages#destroy', {as: 'deletePage'});
     });
 
+    map.resources('events');
+
     map.post('/page/columns', 'page#updateColumns');
     map.post('/page/grid', 'page#updateGrid');
     map.post('/page/image', 'page#image');

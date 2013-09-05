@@ -12,6 +12,7 @@ en:
     pages: Pages
     group: Settings
     modules: Modules
+    audit: Audit
   users:
     headers:
       filter: Filter

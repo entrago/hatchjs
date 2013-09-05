@@ -14,7 +14,8 @@ var app = module.exports = function getServerInstance(parent) {
         { name: 'content',    url: 'content',    rank: 20 },
         { name: 'pages',      url: 'pages',      rank: 30 },
         { name: 'group',      url: 'group',      rank: 40 },
-        { name: 'modules',    url: 'modules',    rank: 50 }
+        { name: 'modules',    url: 'modules',    rank: 50 },
+        { name: 'audit',      url: 'events',     rank: 50 }
     ];
 
     if (parent) {

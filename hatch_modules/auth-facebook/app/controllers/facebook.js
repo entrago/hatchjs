@@ -67,6 +67,14 @@ FacebookAuthController.prototype.callback = function facebookCallback(c) {
         consumer().getOAuthAccessToken(req.query.code, { redirect_uri: this.redirectUri }, function (err, token) {
             if (err) {
                 console.log(err);
+                compound.hatch.audit.track(req.group.id, 'facebook-auth-failure', {
+                    stage: 'access-token',
+                    url: req.url,
+                    headers: req.headers,
+                    redirectUri: this.redirectUri,
+                    code: req.query.code,
+                    error: err
+                });
                 return next(err);
             }
 
@@ -76,6 +84,12 @@ FacebookAuthController.prototype.callback = function facebookCallback(c) {
                 token,
                 function (err, profile, response) {
                     if (err) {
+                        compound.hatch.audit.track(req.group.id, 'facebook-auth-failure', {
+                            stage: 'user-information',
+                            url: req.url,
+                            headers: req.headers,
+                            error: err
+                        });
                         next(err);
                     } else {
                         profile = JSON.parse(profile);
@@ -91,6 +105,13 @@ FacebookAuthController.prototype.callback = function facebookCallback(c) {
                             name: 'facebook', 
                             idFields: 'email' 
                         };
+
+                        compound.hatch.audit.track(req.group.id, 'facebook-login', {
+                            stage: 'user-information',
+                            url: req.url,
+                            facebookId: profile.id,
+                            error: err
+                        });
 
                         c.User.authenticate(provider, data, c);
                     }
