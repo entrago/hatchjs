@@ -271,6 +271,7 @@ module.exports = function (compound, Group) {
         newUrl = newUrl.replace(/\/$/, '');
 
         var pages, group;
+        var pageIds = {};
 
         Page.findOne({where: { url: newUrl }}, function (err, p) {
             if (p) {
@@ -310,6 +311,8 @@ module.exports = function (compound, Group) {
                     var oldId = p.id;
                     delete p.id;
                     Page.create(p, function (err, page) {
+                        pageIds[oldId] = page.id;
+
                         group.homepage.id = page.id;
                         group.save(done);
                         pages.forEach(function (p) {
@@ -327,10 +330,13 @@ module.exports = function (compound, Group) {
             pages.forEach(function (p) {
                 if (p.type === 'template') {
                     var oldTemplateId = p.id;
+
                     delete p.id;
                     delete p.parentId;
                     wait += 1;
                     Page.create(p, function (err, page) {
+                        pageIds[oldTemplateId] = page.id;
+
                         pages.forEach(function (p) {
                             if (p.templateId === oldTemplateId) {
                                 p.templateId = page.id;
@@ -346,23 +352,26 @@ module.exports = function (compound, Group) {
             function ok() {
                 if (--wait === 0) done();
             }
-
         }
 
         function createPages() {
             var p = pages.shift();
             if (!p) {
-                Page.updateGroup(group.id);
-                return callback(null, group);
+                Page.updateGroup(group.id, function (err, group) {
+                    callback(null, group);
+                });
+                return;
             }
             var oldId = p.id;
             delete p.id;
+
+            p.parentId = pageIds[p.parentId];
+
             Page.create(p, function (err, page) {
-                pages.forEach(function (p) {
-                    if (p.parentId == oldId) {
-                        p.parentId = page.id;
-                    }
-                });
+                if (oldId) {
+                    pageIds[oldId] = page.id;
+                }
+
                 createPages();
             });
         }

@@ -422,7 +422,9 @@ module.exports = function (compound, Page) {
         var Group = compound.models.Group;
         Group.find(groupId, function (err, group) {
             if(!group) {
-                if(next) next();
+                if(next) {
+                    next(err, group);
+                }
                 return;
             }
             Page.all({where: {groupId: groupId}}, function (err, pages) {
@@ -437,7 +439,9 @@ module.exports = function (compound, Page) {
                 group.pagesCache = Page.tree(group.pagesCache);
                 group.save();
 
-                if (next) next();
+                if (next) {
+                    next(err, group);
+                }
             });
         });
     };
