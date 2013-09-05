@@ -8,7 +8,7 @@ function AuditController(init) {
 
 AuditController.prototype.index = function(c) {
     var audit = c.compound.hatch.audit;
-    var eventTypes = ['pageview', 'facebook-login', 'facebook-auth-failure'];
+    var eventTypes = ['facebook-login', 'facebook-auth-failure'];
     audit.eventsBreakdown(c.req.groupId, eventTypes, function(err, breakdown) {
         c.locals.breakdown = breakdown;
         c.render();
