@@ -34,7 +34,7 @@ function FacebookAuthController(init) {
                 'https://graph.facebook.com'
             );
         };
-        this.redirectUri = 'http://' + c.req.headers.host + c.pathTo.callback;
+        this.redirectUri = 'http://' + c.req.headers.host + c.pathTo.callback + '/';
 
         if (c.compound.app.get('facebookAuthUri')) {
             this.redirectUri = c.compound.app.get('facebookAuthUri') + '/' + (c.req.params.domain || c.req.headers.host);
@@ -70,6 +70,7 @@ FacebookAuthController.prototype.callback = function facebookCallback(c) {
                 compound.hatch.audit.track(req.group.id, 'facebook-auth-failure', {
                     stage: 'access-token',
                     url: req.url,
+                    query: req.query,
                     headers: req.headers,
                     redirectUri: this.redirectUri,
                     code: req.param('code'),
