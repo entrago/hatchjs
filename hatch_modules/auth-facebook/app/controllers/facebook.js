@@ -64,6 +64,10 @@ FacebookAuthController.prototype.callback = function facebookCallback(c) {
 
     var consumer = this.consumer;
     with (c) {
+        if (req.param('error') === 'access_denied') {
+            console.log('Access denied redirecting to //' + req.group.url);
+            return res.redirect('//' + req.group.url);
+        }
         var redirectUri = this.redirectUri;
         consumer().getOAuthAccessToken(req.param('code'), { redirect_uri: redirectUri }, function (err, token) {
             if (err) {
