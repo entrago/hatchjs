@@ -109,8 +109,7 @@ FacebookAuthController.prototype.callback = function facebookCallback(c) {
                         compound.hatch.audit.track(req.group.id, 'facebook-login', {
                             stage: 'user-information',
                             url: req.url,
-                            facebookId: profile.id,
-                            error: err
+                            facebookId: profile.id
                         });
 
                         c.User.authenticate(provider, data, c);
