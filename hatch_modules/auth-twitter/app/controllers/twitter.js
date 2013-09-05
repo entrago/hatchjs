@@ -42,14 +42,14 @@ TwitterAuthController.prototype.auth = function twitterAuth(c) {
 };
 
 TwitterAuthController.prototype.callback = function twitterCallback(c) {
-    if (c.req.query.denied) {
+    if (c.req.param('denied')) {
         return c.redirect('/');
     }
 
     c.consumer().getOAuthAccessToken(
         c.req.session.twitterOauthRequestToken,
         c.req.session.twitterOauthRequestTokenSecret,
-        c.req.query.oauth_verifier,
+        c.req.param('oauth_verifier'),
         function (err, token, secret) {
             if (err) {
                 console.log(err);

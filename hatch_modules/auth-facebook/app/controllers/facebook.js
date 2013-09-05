@@ -64,7 +64,7 @@ FacebookAuthController.prototype.callback = function facebookCallback(c) {
 
     var consumer = this.consumer;
     with (c) {
-        consumer().getOAuthAccessToken(req.query.code, { redirect_uri: this.redirectUri }, function (err, token) {
+        consumer().getOAuthAccessToken(req.param('code'), { redirect_uri: this.redirectUri }, function (err, token) {
             if (err) {
                 console.log(err);
                 compound.hatch.audit.track(req.group.id, 'facebook-auth-failure', {
@@ -72,7 +72,7 @@ FacebookAuthController.prototype.callback = function facebookCallback(c) {
                     url: req.url,
                     headers: req.headers,
                     redirectUri: this.redirectUri,
-                    code: req.query.code,
+                    code: req.param('code'),
                     error: err
                 });
                 return next(err);
