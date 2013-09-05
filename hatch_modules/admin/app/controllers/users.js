@@ -97,26 +97,34 @@ function loadMembers(c, next) {
         onlyKeys: onlyKeys
     };
 
-    // first get the total count of all members and then run the
-    c.User.count({ membershipGroupId: c.req.group.id }, function (err, count) {
-        c.User.all(query, function (err, members) {
+    // we need all the tags to only display those for the this group
+    c.Tag.all({ where: { groupIdByType: c.req.group.id + '-User' }}, function (err, tags) {
+        // first get the total count of all members and then run the
+        c.User.count({ membershipGroupId: c.req.group.id }, function (err, count) {
+            c.User.all(query, function (err, members) {
 
-            if (!onlyKeys) {
-                setMemberships(members);
-            }
+                if (!onlyKeys) {
+                    setMemberships(members);
+                }
 
-            c.locals.members = members;
-            c.locals.allMembersCount = count;
+                c.locals.members = members;
+                c.locals.allMembersCount = count;
 
-            next(err, members);
+                next(err, members);
+            });
         });
+
+        function setMemberships(members) {
+            members.forEach (function (member) {
+                member.membership = member.getMembership(c.req.group.id);
+                member.tags = member.tags.filter(function (tag) {
+                    return _.find(tags, function (t) {
+                        return t.id == tag.id;
+                    });
+                })
+            });
+        }
     });
-
-    function setMemberships(members) {
-        members.forEach (function (member) {
-            member.membership = member.getMembership(c.req.group.id);
-        });
-    }
 };
 
 
