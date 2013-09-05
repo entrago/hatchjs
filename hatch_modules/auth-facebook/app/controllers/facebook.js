@@ -98,7 +98,8 @@ FacebookAuthController.prototype.callback = function facebookCallback(c) {
                             username: profile.first_name + profile.last_name,
                             displayName: profile.name,
                             email: profile.email,
-                            facebookId: profile.id
+                            facebookId: profile.id,
+                            facebookAccessToken: token
                         };
 
                         var provider = { 

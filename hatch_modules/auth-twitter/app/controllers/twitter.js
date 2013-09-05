@@ -80,7 +80,9 @@ TwitterAuthController.prototype.callback = function twitterCallback(c) {
                         username: profile.screen_name,
                         name: profile.name || profile.screen_name,
                         avatar: profile.profile_image_url,
-                        twitterId: profile.id
+                        twitterId: profile.id,
+                        twitterAccessToken: token,
+                        twitterSecret: secret
                     };
 
                     var provider = {

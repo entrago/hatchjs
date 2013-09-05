@@ -25,6 +25,7 @@ module.exports = function (c) {
     c.once('models', function(m) {
         var User = m.User;
         User.defineProperty('facebookId', {type: String, index: true});
+        User.defineProperty('facebookAccessToken', {type: String});
     });
 
     c.on('render', function(viewContext) {

@@ -26,6 +26,8 @@ module.exports = function (c) {
 
     var User = c.model('user');
     User.defineProperty('twitterId',  { type: String, index: true });
+    User.defineProperty('twitterAccessToken',  { type: String });
+    User.defineProperty('twitterSecret',  { type: String });
 
     // module.api.content.registerContentType('twitter', __dirname + '/content/twitter');
 
