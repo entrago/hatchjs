@@ -80,7 +80,7 @@ describe('Tag', function() {
             name: 'more-5-likes',
             title: 'Content with more than 5 likes',
             sortOrder: 'likesTotal DESC',
-            filter: 'return obj.likesTotal > 5'
+            filter: 'return function(obj) { return obj.likesTotal > 5; }'
         });
 
         moreThan5Likes.save(function(err, moreThan5Likes) {
