@@ -1,7 +1,7 @@
 var should = require('./'), app, Event, audit;
 var async = require('async');
 
-describe.only('api/audit', function() {
+describe('api/audit', function() {
 
     before(function(done) {
         app = getApp(function() {
@@ -12,19 +12,19 @@ describe.only('api/audit', function() {
     });
 
     it('should track event', function(done) {
-        audit.track('event', {foo: 'bar'}, function() {
+        audit.track(1, 'event', {foo: 'bar'}, function() {
             done();
         });
     });
 
     it('should retrieve events by particular type', function(done) {
-        Event.all({where: {type: 'event'}}, function(err, events) {
+        Event.all({where: {type: '1-event'}}, function(err, events) {
             done();
         });
     });
 
     it('should retrieve events for particular day', function(done) {
-        Event.all({where: {day: 'event-' + Math.floor(Date.now() / 86400000)}}, function(err, events) {
+        Event.all({where: {day: '1-event-' + Math.floor(Date.now() / 86400000)}}, function(err, events) {
             console.log(events);
             done();
         });
