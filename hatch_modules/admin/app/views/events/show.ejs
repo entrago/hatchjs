@@ -1,0 +1,11 @@
+<table class="table table-striped table-bordered table-condensed">
+    <tr>
+        <th>Date</th>
+        <th>Details</th>
+    </tr>
+<% events.forEach(function(e) { %>
+    <tr>
+        <td><%- e.createdAt %></td>
+        <td><pre><%- JSON.stringify(e.details, ' ', '  ') %></pre></td>
+    </tr>
+<% }) %>

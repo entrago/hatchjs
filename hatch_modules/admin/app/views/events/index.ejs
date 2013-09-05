@@ -1,0 +1,12 @@
+<table class="table table-striped table-bordered table-condensed">
+    <tr>
+        <th>Event type</th>
+        <th>Events count</th>
+    </tr>
+<% breakdown.forEach(function(br){ %>
+    <tr>
+        <td><%- linkTo(br.type, pathTo.event(br.type)) %></td>
+        <td><%- br.count %></td>
+    </tr>
+<% }) %>
+</table>

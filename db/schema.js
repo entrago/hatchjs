@@ -305,3 +305,12 @@ var ResetPassword = define('ResetPassword', function() {
     property('createdAt', Date);
     property('token', { type: String, index: true });
 });
+
+var Event = define('Event', function() {
+    property('groupId', Number, {index: true});
+    property('type', String, {index: true});
+    property('day', String, {index: true});
+    property('week', String, {index: true});
+    property('details', JSON);
+    property('createdAt', Date);
+});
