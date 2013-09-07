@@ -6,8 +6,8 @@ UsersController.prototype.create = function(c) {
     var User = c.User;
     var user = c.req.user || new User();
 
-    user.username = c.body.username;
-    user.email = c.body.email;
+    user.username = c.body.username.toLowerCase();
+    user.email = c.body.email.toLowerCase();
     user.password = c.body.password;
     user.hasPassword = c.body.hasPassword;
     user.type = 'registered';

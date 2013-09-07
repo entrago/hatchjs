@@ -169,18 +169,18 @@ module.exports = function (compound, User) {
      * 
      * @param  {Function} next - continuation function
      */
-    User.beforeCreate = User.beforeSave = function (next) {
+    User.beforeCreate = User.beforeSave = function (next, data) {
         // lowercase username and email
-        if (this.email) {
-            this.email = this.email.toLowerCase();
+        if (data.email) {
+            data.email = data.email.toLowerCase();
         }
-        if (this.username) {
-            this.username = this.username.toLowerCase();
+        if (data.username) {
+            data.username = data.username.toLowerCase();
         }
 
         // set the default profile pic
-        if (!this.avatar) {
-            this.avatar = '/img/default-profile-pic.png';
+        if (!data.avatar) {
+            data.avatar = '/img/default-profile-pic.png';
         }
 
         next();
