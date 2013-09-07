@@ -15,7 +15,7 @@ PageController.prototype.show = function (c) {
         if (err) {
             return c.next(err);
         } else if (!page) {
-            return c.next(new c.errors.NotFound(c.req, 'Page not found'));
+            return c.next(new c.errors.NotFound(c.req, 'Page not found for url: ' + c.req.url));
         }
 
         // c.compound.hatch.audit.track(c.req.group.id, 'pageview', {url: c.req.url});
