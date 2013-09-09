@@ -282,7 +282,7 @@ UsersController.prototype.upgrade = function(c) {
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.downgrade = function(c) {
-    this.member.setMembership(c.req.group.id, 'member', function (err, user) {
+    this.member.setMembershipRole(c.req.group.id, 'member', function (err, user) {
         c.send('ok');
     });
 };
