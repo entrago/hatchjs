@@ -179,7 +179,7 @@ module.exports = function (compound, User) {
         }
 
         // set the default profile pic
-        if (!data.avatar) {
+        if (!this.avatar) {
             data.avatar = '/img/default-profile-pic.png';
         }
 
