@@ -201,11 +201,11 @@ UsersController.prototype.resetPassword = function resetPassword(c) {
     var User = c.User;
 
     //get the user to send the password reset link to
-    User.findOne({where: {email: c.body.email}}, function (err, user) {
+    User.findOne({ where: { email: c.body.email.toLowerCase() }}, function (err, user) {
         if (user) {
             sendResetLink(user);
         } else {
-            User.findOne({where: {username: c.body.email}}, function (err, user) {
+            User.findOne({ where: { username: c.body.email.toLowerCase() }}, function (err, user) {
                 if (user) {
                     sendResetLink(user);
                 } else {
