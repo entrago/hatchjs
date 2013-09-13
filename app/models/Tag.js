@@ -35,16 +35,26 @@ module.exports = function (compound, Tag) {
     };
 
     /**
+     * Before this tag is validated, make sure it has a name value - this is auto-
+     * calculated from groupId + title.
+     *
+     * @param  {Function} next - continuation function
+     */
+    Tag.beforeValidate = function (next) {
+        if (!this.name) {
+            this.name = (this.groupId ? (this.groupId + '-') : '') + slugify(this.title);
+        }
+
+        next();
+    };
+
+    /**
      * Before this tag is created, make sure it has a name value - this is auto-
      * calculated from groupId + title.
      *
      * @param  {Function} next - continuation function
      */
     Tag.beforeSave = function (next) {
-        if (!this.name) {
-            this.name = (this.groupId ? (this.groupId + '-') : '') + slugify(this.title);
-        }
-
         if (!this.count) {
             this.count = 0;
         }
