@@ -24,6 +24,7 @@ module.exports = function (compound, Content) {
     var Comment = compound.models.Comment;
     var Like = compound.models.Like;
     var Media = compound.models.Media;
+    var Tag = compound.models.Tag;
 
     var Group = compound.models.Group;
     var redis = Content.schema.adapter;
