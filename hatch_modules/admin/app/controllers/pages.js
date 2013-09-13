@@ -174,7 +174,8 @@ PagesController.prototype.create = function(c) {
         {type: 'core-widgets/mainmenu', id: 2}
     ];
     
-    var defaultPage = c.compound.hatch.page.get('default').defaultPage;
+    var defaults = c.compound.hatch.page.get('default');
+    var defaultPage = defaults && defaults.defaultPage;
 
     if (defaultPage) {
         c.body.grid = defaultPage.grid;
