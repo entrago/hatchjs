@@ -1,18 +1,18 @@
 //
-// Hatch.js is a CMS and social website building framework built in Node.js 
+// Hatch.js is a CMS and social website building framework built in Node.js
 // Copyright (C) 2013 Inventures Software Ltd
-// 
+//
 // This file is part of Hatch.js
-// 
+//
 // Hatch.js is free software: you can redistribute it and/or modify it under the terms of the
 // GNU General Public License as published by the Free Software Foundation, version 3
-// 
+//
 // Hatch.js is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 // without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-// 
+//
 // See the GNU General Public License for more details. You should have received a copy of the GNU
 // General Public License along with Hatch.js. If not, see <http://www.gnu.org/licenses/>.
-// 
+//
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
 
@@ -78,7 +78,7 @@ function getSortOrders (c, type) {
     switch(type) {
         case 'content':
             return c.Content.tagSortOrders;
-        
+
         case 'users':
             return c.User.tagSortOrders;
     }
@@ -86,7 +86,7 @@ function getSortOrders (c, type) {
 
 /**
  * Show the full list of tags within this section.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 TagController.prototype.index = function (c) {
@@ -96,7 +96,7 @@ TagController.prototype.index = function (c) {
 
 /**
  * Render the tag counts for this section.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 TagController.prototype.tagCounts = function (c) {
@@ -107,7 +107,7 @@ TagController.prototype.tagCounts = function (c) {
 
 /**
  * Show the new/edit form for the specified tag.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 TagController.prototype.edit = TagController.prototype.new = function (c) {
@@ -118,9 +118,9 @@ TagController.prototype.edit = TagController.prototype.new = function (c) {
     // create the recursive renderPermissions function
     c.locals.renderPermissions = function(permission) {
         var tag = self.theTag;
-        var html = '<li><label class="checkbox"><input type="checkbox" name="permission-' + 
-            permission.name + '" ' + 
-            (tag.permissions && tag.permissions.find(permission.name, 'id') ? 'checked="checked"':'') + 
+        var html = '<li><label class="checkbox"><input type="checkbox" name="permission-' +
+            permission.name + '" ' +
+            (tag.permissions && tag.permissions.find(permission.name, 'id') ? 'checked="checked"':'') +
             ' /> ' + permission.title + '</label>';
 
         if((permission.permissions || []).length > 0) {
@@ -130,7 +130,7 @@ TagController.prototype.edit = TagController.prototype.new = function (c) {
             });
             html += '</ul>';
         }
-        
+
         html += '</li>';
         return html;
     };
@@ -142,7 +142,7 @@ TagController.prototype.edit = TagController.prototype.new = function (c) {
 
 /**
  * Save changes to a tag.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 TagController.prototype.update = TagController.prototype.create = function (c) {
@@ -151,7 +151,7 @@ TagController.prototype.update = TagController.prototype.create = function (c) {
     c.body.groupId = c.req.group.id;
     c.body.type = this.modelName;
     c.body.filter = c.body.filterEnabled && c.body.filter;
-    
+
     // fix the permissions in req.body
     c.body.permissions = [];
 
@@ -183,7 +183,7 @@ TagController.prototype.update = TagController.prototype.create = function (c) {
 
 /**
  * Delete a tag from the database.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 TagController.prototype.destroy = function (c) {
@@ -198,7 +198,7 @@ TagController.prototype.destroy = function (c) {
 
 /**
  * Add one or more objects to a tag collection.
- * 
+ *
  * @param {HttpContext} c - http context
  */
 TagController.prototype.add = function (c) {
@@ -219,7 +219,7 @@ TagController.prototype.add = function (c) {
 
 /**
  * Remove one or more objects from a tag collection.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 TagController.prototype.remove = function (c) {
