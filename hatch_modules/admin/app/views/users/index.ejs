@@ -41,7 +41,7 @@
                                 <% tags.forEach(function(tag) { %>
                                     <% if (!tag) return; %>
                                     <li><%- linkTo(icon('tag') + tag.title,
-                                        pathTo.removeFromTag('users', tag.id), 
+                                        pathTo.removeFromTag('users', tag.id),
                                         {rel: 'multiAjaxLink'}) %></li>
                                 <% }) %>
                             </ul>
@@ -133,7 +133,7 @@
                 // reset the selected content array with only the "all" value
                 $.ajax('<%- pathTo.userIds %>?filterBy=<%- filterBy %>&sSearch=' + $('#members-table_filter input').val(), {
                     success: function (data) {
-                        window.selectedUsers = data.ids;        
+                        window.selectedUsers = data.ids;
                     }
                 });
             }
@@ -215,7 +215,7 @@
                         return html;
                     }
                 },
-                { "mDataProp": "membership.role", 
+                { "mDataProp": "membership.role",
                     "fnRender": function(obj, val) {
                         var html = '';
                         var user = obj.aData;
@@ -228,7 +228,7 @@
 
                         html += user.membership.role;
                         return html;
-                    } 
+                    }
                 },
                 { "mDataProp": "membership.timeSince" },
                 { "mDataProp": null,

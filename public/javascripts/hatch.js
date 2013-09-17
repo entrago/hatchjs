@@ -1,32 +1,39 @@
 //main javascript controllers
+
 var search = new SearchController();
 
 //pathTo is the client side routing function
 window.pathTo = function pathTo(action) {
+    'use strict';
     return (window.location.pathname.split('/do/')[0] + '/do/' + action).replace('//', '/');
 };
 
 //init everything on page load
 $(document).ready(function() {
+    'use strict';
+
     hatchInit();
     hatchModalInit();
 
     //PJAX - only allow for browsers that support replaceState
-    if(window.history.replaceState) {
+    if (window.history.replaceState) {
         $.pjax.enable();
-        $.pjax.defaults.headers = { "Content-Type" : "" };
-        $.pjax.defaults.dataType = "";
+        $.pjax.defaults.headers = { 'Content-Type' : '' };
+        $.pjax.defaults.dataType = '';
 
         $('#all').pjax('#main .nav a:not([rel=nopjax]), #main .breadcrumb a:not([rel=nopjax])');
-        $('#all').on('pjax:end', function() { hatchInit(); })
+        $('#all').on('pjax:end', function() { hatchInit(); });
     }
 
     //validation and default ajax handlers
     //redirect or show message
-    $(document).on("ajax:success", '*[data-remote=true]', function(e, data) {
+    $(document).on('ajax:success', '*[data-remote=true]', function(e, data) {
         var timeout = data.message && 2000 || 0;
         if (data.redirect) {
-            console && console.error('Deprecated redirect to ' + data.redirect);
+            if (console) {
+                console.error('Deprecated redirect to ' + data.redirect);
+            }
+
             setTimeout(function() {
                 window.location = data.redirect;
             }, timeout);
@@ -39,21 +46,27 @@ $(document).ready(function() {
         }
     });
     //errors
-    $(document).on("ajax:error", '*[data-remote=true]', function(xhr, status, error) {
+    $(document).on('ajax:error', '*[data-remote=true]', function(xhr, status, error) {
         var data = JSON.parse(status.responseText);
         var message = '';
         var fields = [];
 
         //parse the error message
-        if(typeof data.message != "string") {
+        if (typeof data.message !== 'string') {
             Object.keys(data.message).forEach(function(key, i) {
                 var field = data.message[key];
-                message += (field.message || field) + (i < Object.keys(data.message).length ? '<br/>':'');
-                if(field.name) fields.push(field.name);
-                else fields.push(key);
+
+                message += (field.message || field) + (i < Object.keys(data.message).length ? '<br/>': '');
+
+                if (field.name) {
+                    fields.push(field.name);
+                } else {
+                    fields.push(key);
+                }
             });
+        } else {
+            message = data.message;
         }
-        else message = data.message;
 
         if (data.loginRequired) {
             //hide existing notys
@@ -70,106 +83,116 @@ $(document).ready(function() {
     });
 
     //ajax modals
-    $(document).on('click', "a[data-toggle=modal]", function (e) {
-        target = $(this).attr('data-target');
-        url = $(this).attr('href');
-        if(url.indexOf('#') == -1) {
+    $(document).on('click', 'a[data-toggle=modal]', function (e) {
+        var target = $(this).attr('data-target');
+        var url = $(this).attr('href');
+
+        if (url.indexOf('#') === -1) {
             $(target).load(url);
         }
     });
 
     //setup autogrow textarea
     $('.autogrow-shadow').remove();
-    $("textarea[rel*=autogrow]").autogrow();
+    $('textarea[rel*=autogrow]').autogrow();
 
     //focus comment links on the textarea below
-    $("a[rel=comment]").on("click", function() {
-        var $post = $(this).parents("div[data-remote-id]:first");
+    $('a[rel=comment]').on("click", function() {
+        var $post = $(this).parents('div[data-remote-id]:first');
         $post.find('.comments-and-likes').removeClass('hidden');
-        $post.find("textarea").focus();
+        $post.find('textarea').focus();
         return false;
     });
 
     //submit on enter textareas
-    $("textarea[rel*=submitenter]").on("keypress", function(e) {
-        if(e.charCode === 13 && !e.shiftKey) {
-            $(this).parents("form").submit();
+    $('textarea[rel*=submitenter]').on('keypress', function(e) {
+        if (e.charCode === 13 && !e.shiftKey) {
+            $(this).parents('form').submit();
             return false;
         }
     });
-    $("textarea[rel*=submitcommandenter]").on("focus", function() {
+
+    $('textarea[rel*=submitcommandenter]').on('focus', function() {
         var textarea = this;
-        $(window).unbind('keydown').bind("keydown", function(e) {
-            if(e.keyCode === 13 && (e.metaKey || e.ctrlKey)) {
-                $(textarea).parents("form").submit();
+        $(window).unbind('keydown').bind('keydown', function(e) {
+            if (e.keyCode === 13 && (e.metaKey || e.ctrlKey)) {
+                $(textarea).parents('form').submit();
             }
         });
-    });
-    $("textarea[rel*=submitcommandenter]").on("blur", function() {
-        $(window).unbind("keydown");
     });
 
-    $('body').on(
-        'server:error', 'form[data-remote=true]',
-        function(ev, error) {
-            var $form = $(this), data;
-            if ($form.is('form')) {
-                data = $form.serializeArray();
-            }
-            var text = '';
-            if (error.context) {
-                text = t('errors.' + error.context + '.' + error.name);
-            }
-            if (!text && (error.name || error.message)) {
-                text = t('errors.default.' + error.name, error.message);
-            } else if (Object.keys(error).length > 0) {
-                Object.keys(error).forEach(function (key) {
-                    text += error[key] + '<br/>';
-                });
-            } else {
-                text = 'An error has occured';
-            }
-            $.noty({
-                type: 'error',
-                text: '<i class="icon-warning-sign"></i> ' + text
+    $('textarea[rel*=submitcommandenter]').on('blur', function() {
+        $(window).unbind('keydown');
+    });
+
+    $('body').on('server:error', 'form[data-remote=true]', function(ev, error) {
+        var $form = $(this), data;
+
+        if ($form.is('form')) {
+            data = $form.serializeArray();
+        }
+
+        var text = '';
+
+        if (error.context) {
+            text = t('errors.' + error.context + '.' + error.name);
+        }
+
+        if (!text && (error.name || error.message)) {
+            text = t('errors.default.' + error.name, error.message);
+        } else if (Object.keys(error).length > 0) {
+            Object.keys(error).forEach(function (key) {
+                text += error[key] + '<br/>';
             });
-            if (error.codes && data) {
-                var $el;
-                for (var i = 0; i < data.length; i++) {
-                    var name = data[i].name;
-                    if (name in error.codes || name.replace(/^.*?\[|\]$/g, '') in error.codes) {
-                        var $el = $form.find('[name="' + name + '"]');
-                        // $el.addClass('validation-error');
-                        $el.parents('.control-group').addClass('error');
-                        $el.one('focus', function() {
-                            $el.parents('.control-group').removeClass('error');
-                        });
-                    }
+        } else {
+            text = 'An error has occurred.';
+        }
+
+        $.noty({
+            type: 'error',
+            text: '<i class="icon-warning-sign"></i> ' + text
+        });
+
+        function removeClass() {
+            $el.parents('.control-group').removeClass('error');
+        }
+
+        if (error.codes && data) {
+            for (var i = 0; i < data.length; i++) {
+                var name = data[i].name;
+
+                if (name in error.codes || name.replace(/^.*?\[|\]$/g, '') in error.codes) {
+                    var $el = $form.find('[name="' + name + '"]');
+                    // $el.addClass('validation-error');
+                    $el.parents('.control-group').addClass('error');
+                    $el.one('focus', removeClass);
                 }
             }
-        });
+        }
+    });
 });
 
 //main init function
 function hatchInit() {
-    if($.fn.chosen) {
-        $(".content .chzn-select-create").chosen({ 
+    if ($.fn.chosen) {
+        $(".content .chzn-select-create").chosen({
             create_option: true,
             create_option_text: 'Press enter to add'
         });
-        $(".content .chzn-select").chosen();
+        $('.content .chzn-select').chosen();
     }
 
     //show number of notifications pending
     displayPendingNotifications();
 
     //check to see if we should launch a modal
-    if(window.location.hash && window.location.hash.length > 1) {
-        if(window.location.hash.indexOf('/') > -1) return;
+    if (window.location.hash && window.location.hash.length > 1) {
+        if (window.location.hash.indexOf('/') > -1) return;
 
         try {
             var el = $(window.location.hash);
-            if(el.hasClass('modal')) {
+
+            if (el.hasClass('modal')) {
                 el.modal();
             }
         } catch(ex) {
@@ -213,25 +236,24 @@ function hatchInit() {
     var isTouchDevice = 'ontouchstart' in document.documentElement;
 
     //only do certain things for non-mobile
-    if(!isTouchDevice) {
+    if (!isTouchDevice) {
         //initialise the search controller for search autocomplete
         search.init();
 
         //setup tooltips
-        $("*[rel=tooltip]").tooltip();
+        $('*[rel=tooltip]').tooltip();
         //hide tooltips on click to stop stray tooltips from hanging around
-        $("*[rel=tooltip]").on("click", function() {
-            $(".tooltip").hide();
+        $('*[rel=tooltip]').on('click', function() {
+            $('.tooltip').hide();
         });
-        $("*[rel=popover]").popover({ placement: "top", trigger: "hover", animation: false, delay: { show: 20, hide: 400 } });
+        $('*[rel=popover]').popover({ placement: 'top', trigger: 'hover', animation: false, delay: { show: 20, hide: 400 } });
 
         //setup hovercards
         $('*[rel=hovercard]').hovercard();
 
         //setup editing functionality
-        if(typeof canEdit != 'undefined' && canEdit) {
-            if($("#editConsoleHolder").length > 0)
-            {
+        if (typeof canEdit !== 'undefined' && canEdit) {
+            if ($('#editConsoleHolder').length > 0) {
                 //initialise drag and drop
                 dragdrop.init();
             }
@@ -241,7 +263,9 @@ function hatchInit() {
 
             //setup the widget settings
             $('#modal-container').on('show', function() {
-                if($('#modal-settings').length == 0) return;
+                if ($('#modal-settings').length === 0) {
+                    return;
+                }
 
                 $('a[rel=widget-privacy]').bind('click', function() {
                     var value = JSON.parse($(this).attr('data-value'));
@@ -272,44 +296,49 @@ function hatchInit() {
 
                     return false;
                 });
-            })
+            });
 
             toggleEditConsole = function(show) {
-                if(typeof show == 'undefined') show = !$(".edit-console").is(":visible");
+                if (typeof show === 'undefined') {
+                    show = !$('.edit-console').is(':visible');
+                }
 
                 //set the cookie
-                $.cookie("edit-console-visible", show, { path : '/' });
-                
-                if(show) showEditConsole();
-                else hideEditConsole();
+                $.cookie('edit-console-visible', show, { path : '/' });
+
+                if (show) {
+                    showEditConsole();
+                } else {
+                    hideEditConsole();
+                }
 
             };
 
             //hides the edit console
-            hideEditConsole = function() {
+            hideEditConsole = function () {
                 $('#edit-page-link i.icon-eye-close').show();
                 $('#edit-page-link i.icon-eye-open').hide();
 
                 //set the cookie
-                $.cookie("edit-console-visible", null, { path : '/' });
+                $.cookie('edit-console-visible', null, { path : '/' });
 
-                $(".edit-console").fadeOut();
-            }
+                $('.edit-console').fadeOut();
+            };
 
             //shows the edit console
             showEditConsole = function() {
                 $('#edit-page-link i.icon-eye-open').show();
                 $('#edit-page-link i.icon-eye-close').hide();
 
-                if($("#editConsole").length == 0) {
-                    $("#editConsoleHolder").load(pathTo("admin/page/editconsole"), function() {
-                        $(".edit-console").fadeIn();
+                if ($('#editConsole').length === 0) {
+                    $('#editConsoleHolder').load(pathTo('admin/page/editconsole'), function() {
+                        $('.edit-console').fadeIn();
 
                         //set the position
                         positionEditConsole();
 
                         //allow widget dragging
-                        $("#edit-console-widgets li span.widget").draggable({ 
+                        $('#edit-console-widgets li span.widget').draggable({
                             appendTo: 'body',
                             helper: function(event) {
                                 return $('<div class="drag-helper">' + $(this).html() + '</div>');
@@ -323,7 +352,9 @@ function hatchInit() {
                                 var col = $el.parent().attr('id');
 
                                 //if we don't have a column, give up
-                                if(!col) return;
+                                if (!col) {
+                                    return;
+                                }
 
                                 col = col.replace('col-', '');
 
@@ -340,45 +371,50 @@ function hatchInit() {
                         styleeditor.init();
 
                         //attach events
-                        $(".edit-console .close").bind("click", hideEditConsole);
-                        $(".edit-console").draggable({
-                            handle: "div.console-header",
+                        $('.edit-console .close').bind('click', hideEditConsole);
+                        $('.edit-console').draggable({
+                            handle: 'div.console-header',
                             stop: function() {
-                                $.cookie("edit-console-xy", JSON.stringify($(".edit-console").position()), { path : '/' });
+                                $.cookie('edit-console-xy', JSON.stringify($('.edit-console').position()), { path : '/' });
                             }
                         });
-                        $("#column-layout-choices input").bind("click", function() {
+                        $('#column-layout-choices input').bind('click', function() {
                             $('#templates-layouts, #columns-layouts').hide();
                             $('#' + this.value + '-layouts').show();
                         });
                     });
                 }
                 else {
-                    $("#editConsole").fadeIn();
+                    $('#editConsole').fadeIn();
                     positionEditConsole();
 
                     //reload the layouts tab
-                    $("#edit-console-layouts").load(pathTo("admin/page/editconsole?tab=layouts"));
+                    $('#edit-console-layouts').load(pathTo('admin/page/editconsole?tab=layouts'));
                 }
-            }
+            };
 
             //positions the edit console with the value in the cookie
             positionEditConsole = function() {
                 //position the edit console
-                var editConsolePosition = $.cookie("edit-console-xy");
-                if(editConsolePosition) {
+                var editConsolePosition = $.cookie('edit-console-xy');
+                if (editConsolePosition) {
                     editConsolePosition = JSON.parse(editConsolePosition);
 
                     //make sure the position is within the bounds of the window
-                    if(editConsolePosition.left + $(".edit-console").outerWidth() > $(window).width()) editConsolePosition.left = Math.max(0, $(window).width() - $(".edit-console").outerWidth());
-                    if(editConsolePosition.top + $(".edit-console").outerHeight() > $(window).height()) editConsolePosition.top = Math.max(0, $(window).height() - $(".edit-console").outerHeight());
+                    if (editConsolePosition.left + $('.edit-console').outerWidth() > $(window).width()) {
+                        editConsolePosition.left = Math.max(0, $(window).width() - $('.edit-console').outerWidth());
+                    }
 
-                    $(".edit-console").css({left: editConsolePosition.left + "px", top: editConsolePosition.top + "px"});
+                    if (editConsolePosition.top + $('.edit-console').outerHeight() > $(window).height()) {
+                        editConsolePosition.top = Math.max(0, $(window).height() - $('.edit-console').outerHeight());
+                    }
+
+                    $('.edit-console').css({left: editConsolePosition.left + 'px', top: editConsolePosition.top + 'px'});
                 }
-            }
+            };
 
             //show the edit console?
-            if($("#editConsoleHolder").length > 0 && $.cookie("edit-console-visible")) {
+            if ($('#editConsoleHolder').length > 0 && $.cookie('edit-console-visible')) {
                 toggleEditConsole(true);
             }
 
@@ -405,40 +441,50 @@ function hatchInit() {
     });
 
     // fix sub nav on scroll
-    var $win = $(window)
-        , $nav = $('.subnav.fixed-top')
-        , navHeight = ($('body.navbar-fixed').length > 0 && $('.navbar.navbar-fixed-top').height() || 0)
-        , navTop = $('.subnav').length && $('.subnav').offset().top - navHeight
-        , isFixed = 0
+    var $win = $(window);
+    var $nav = $('.subnav.fixed-top');
+    var navHeight = ($('body.navbar-fixed').length > 0 && $('.navbar.navbar-fixed-top').height() || 0);
+    var navTop = $('.subnav').length && $('.subnav').offset().top - navHeight;
+    var isFixed = 0;
 
-    if($nav.length > 0) {
-        processScroll()
-
-        $win.on('scroll', processScroll)
-
-        function processScroll() {
-            var i, scrollTop = $win.scrollTop()
-            if (scrollTop >= navTop && !isFixed) {
-                isFixed = 1
-                $nav.addClass('subnav-fixed')
-                $nav.css({ top: navHeight + 'px' });
-            } else if (scrollTop <= navTop && isFixed) {
-                isFixed = 0
-                $nav.removeClass('subnav-fixed')
-                $nav.css({ top: 'auto' });
-            }
+    function processScroll() {
+        var i, scrollTop = $win.scrollTop()
+        if (scrollTop >= navTop && !isFixed) {
+            isFixed = 1
+            $nav.addClass('subnav-fixed')
+            $nav.css({ top: navHeight + 'px' });
+        } else if (scrollTop <= navTop && isFixed) {
+            isFixed = 0
+            $nav.removeClass('subnav-fixed')
+            $nav.css({ top: 'auto' });
         }
+    }
+
+    if ($nav.length > 0) {
+        processScroll();
+
+        $win.on('scroll', processScroll);
     }
 }
 
 //sets up richtext editors with the default options
 function setupRichtextEditors(selector, options) {
-    if(!selector) selector = '.richtext';
-    if(!options) options = {};
+    'use strict';
+
+    if (!selector) {
+        selector = '.richtext';
+    }
+
+    if (!options) {
+        options = {};
+    }
 
     //convert richtexts
     $(selector).each(function(i, el) {
-        if($(el).data('redactor')) return;
+        if ($(el).data('redactor')) {
+            return;
+        }
+
         var editor = setupRichtextEditor(el, options);
     });
 
@@ -457,12 +503,20 @@ function setupRichtextEditors(selector, options) {
 
 //sets up a single richtext editor
 function setupRichtextEditor(el, options) {
+    'use strict';
+
     //create the redactor modal
     window.$redactorModal = $('#redactor-modal');
-    if(window.$redactorModal.length == 0) window.$redactorModal = $('<div class="modal" id="redactor-modal" style="display: none;"></div>').appendTo($('body'));
+
+    if (window.$redactorModal.length === 0) {
+        window.$redactorModal = $('<div class="modal" id="redactor-modal" style="display: none;"></div>').appendTo($('body'));
+    }
 
     if (typeof RLANG === 'undefined') {
-        console && console.error('RLANG is not defined');
+        if (console) {
+            console.error('RLANG is not defined');
+        }
+
         return;
     }
 
@@ -534,25 +588,31 @@ function setupRichtextEditor(el, options) {
 }
 
 function hatchModalInit() {
-    if($.fn.chosen) {
-        $(".modal-body .chzn-select-create").chosen({ create_option: true });
-        $(".modal-body .chzn-select").chosen();
+    'use strict';
+
+    if ($.fn.chosen) {
+        $('.modal-body .chzn-select-create').chosen({ create_option: true });
+        $('.modal-body .chzn-select').chosen();
     }
 }
 
 // displays pending notifications for this user
 function displayPendingNotifications() {
-    if($('#notifications-menu-link').length == 0) return;
+    if ($('#notifications-menu-link').length === 0) {
+        return;
+    }
 
     //do nothing if there is no logged in user
     var userId = $('meta[name=userid]').attr('content');
-    if(!userId) return;
+    if (!userId) {
+        return;
+    }
 
     var notificationsCount = $.cookie('notificationsCount');
-    if(notificationsCount != null) {
+
+    if (notificationsCount !== null && notificationsCount !== undefined) {
         setNotificationsCount(notificationsCount);
-    }
-    else {
+    } else {
         $.ajax({
             url: pathTo('notifications/count'),
             success: function(data) {
@@ -571,7 +631,9 @@ function displayPendingNotifications() {
         $('#notifications-menu-link .badge').remove();
 
         //display new notification count
-        if(count > 0) $('#notifications-menu-link span').append(' <small class="badge badge-important">' + count + '</small>');
+        if (count > 0) {
+            $('#notifications-menu-link span').append(' <small class="badge badge-important">' + count + '</small>');
+        }
     }
 
     //setup notifications menu
@@ -581,7 +643,10 @@ function displayPendingNotifications() {
 
     function loadNotificationsMenu(clickId) {
         var url = pathTo('notifications/list');
-        if(clickId) url = pathTo('notifications/click/') + clickId;
+
+        if (clickId) {
+            url = pathTo('notifications/click/') + clickId;
+        }
 
         $.ajax({
             url: url,
@@ -614,14 +679,16 @@ function displayPendingNotifications() {
 }
 
 function fixImageWidths() {
+    'use strict';
+
     var images = $('img');
     images.each(function(i, img) {
         //if image dimensions are not explictly defined, add them
-        if(img.src && img.src.indexOf('dim=') == -1) {
+        if (img.src && img.src.indexOf('dim=') == -1) {
             var $img = $(img);
             var width = $img.width();
 
-            if(!width) {
+            if (!width) {
                 $parent = $img.parent();
 
                 while(!width) {
@@ -630,7 +697,7 @@ function fixImageWidths() {
                 }
             }
 
-            if(width > 16 && !$img.height()) { 
+            if (width > 16 && !$img.height()) {
                 var dim = '0x' + width;
                 $img.attr('src', $img.attr('src') + ($img.attr('src').indexOf('?') > -1 ? '&':'?') + 'dim=' + dim);
             }
