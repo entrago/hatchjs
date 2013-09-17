@@ -116,12 +116,16 @@ $(document).ready(function() {
             if ($form.is('form')) {
                 data = $form.serializeArray();
             }
-            var text;
+            var text = '';
             if (error.context) {
                 text = t('errors.' + error.context + '.' + error.name);
             }
             if (!text && (error.name || error.message)) {
                 text = t('errors.default.' + error.name, error.message);
+            } else if (Object.keys(error).length > 0) {
+                Object.keys(error).forEach(function (key) {
+                    text += error[key] + '<br/>';
+                });
             } else {
                 text = 'An error has occured';
             }
