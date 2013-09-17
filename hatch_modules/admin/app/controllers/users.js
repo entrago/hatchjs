@@ -1,18 +1,18 @@
 //
-// Hatch.js is a CMS and social website building framework built in Node.js 
+// Hatch.js is a CMS and social website building framework built in Node.js
 // Copyright (C) 2013 Inventures Software Ltd
-// 
+//
 // This file is part of Hatch.js
-// 
+//
 // Hatch.js is free software: you can redistribute it and/or modify it under the terms of the
 // GNU General Public License as published by the Free Software Foundation, version 3
-// 
+//
 // Hatch.js is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 // without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-// 
+//
 // See the GNU General Public License for more details. You should have received a copy of the GNU
 // General Public License along with Hatch.js. If not, see <http://www.gnu.org/licenses/>.
-// 
+//
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
 
@@ -89,10 +89,10 @@ function loadMembers(c, next) {
     var onlyKeys = c.req.query.onlyKeys;
 
     var query = {
-        where: cond, 
-        fulltext: search, 
-        order: orderBy, 
-        offset: offset, 
+        where: cond,
+        fulltext: search,
+        order: orderBy,
+        offset: offset,
         limit: limit,
         onlyKeys: onlyKeys
     };
@@ -130,7 +130,7 @@ function loadMembers(c, next) {
 
 /**
  * Display the main user list or loads the main user list in JSON format.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.index = function (c) {
@@ -154,7 +154,7 @@ UsersController.prototype.index = function (c) {
                     aaData: c.locals.members
                 });
             });
-        }); 
+        });
     });
 };
 
@@ -162,7 +162,7 @@ UsersController.prototype.index = function (c) {
  * Return only the IDs for a search query. This is used when a user clicks the
  * 'select all' checkbox so that we can get ALL of the ids of the users rather
  * than just the ids of the users on the current page of results.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.ids = function ids(c) {
@@ -182,7 +182,7 @@ UsersController.prototype.ids = function ids(c) {
 
 /**
  * Remove the specified user from the community.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.remove = function(c) {
@@ -191,9 +191,31 @@ UsersController.prototype.remove = function(c) {
     });
 };
 
+
+/**
+ * Destroy the specified user.
+ *
+ * @param  {HttpContext} c - http context
+ */
+UsersController.prototype.destroy = function(c) {
+    'use strict';
+    console.log('HERE>>>>>>>')
+
+    this.member.destroy(function (err) {
+        if (err) {
+            return c.error({
+                status: 'error',
+                message: 'Failed to delete user.'
+            });
+        }
+
+        c.send('ok');
+    });
+};
+
 /**
  * Remove multiple selected members from the community.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.removeMembers = function(c) {
@@ -204,7 +226,7 @@ UsersController.prototype.removeMembers = function(c) {
     async.forEach(selectedUsers, function(userId, done) {
         //load each user
         c.User.find(userId, function (err, user) {
-            user.removeMembership(c.req.group.id, done);   
+            user.removeMembership(c.req.group.id, done);
             count++;
         });
     }, function() {
@@ -218,7 +240,7 @@ UsersController.prototype.removeMembers = function(c) {
 
 /**
  * Black-list multiple selected members from the community.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.blacklistMembers = function(c) {
@@ -228,7 +250,7 @@ UsersController.prototype.blacklistMembers = function(c) {
     //blacklist each of the members
     async.forEach(selectedUsers, function(userId, done) {
         c.User.find(userId, function (err, user) {
-            user.setMembershipState(c.req.group.id, 'blacklisted', done);   
+            user.setMembershipState(c.req.group.id, 'blacklisted', done);
             count++;
         });
     }, function() {
@@ -242,7 +264,7 @@ UsersController.prototype.blacklistMembers = function(c) {
 
 /**
  * Un-black-list multiple selected members from the community.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.unblacklistMembers = function(c) {
@@ -252,7 +274,7 @@ UsersController.prototype.unblacklistMembers = function(c) {
     //un-blacklist each of the members
     async.forEach(selectedUsers, function(userId, done) {
         c.User.find(userId, function (err, user) {
-            user.setMembershipState(c.req.group.id, 'accepted', done);   
+            user.setMembershipState(c.req.group.id, 'accepted', done);
             count++;
         });
     }, function() {
@@ -266,8 +288,8 @@ UsersController.prototype.unblacklistMembers = function(c) {
 
 
 /**
- * Upgrade the selected member to an editor. 
- * 
+ * Upgrade the selected member to an editor.
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.upgrade = function(c) {
@@ -278,7 +300,7 @@ UsersController.prototype.upgrade = function(c) {
 
 /**
  * Downgrade the selected editor to a member.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.downgrade = function(c) {
@@ -289,7 +311,7 @@ UsersController.prototype.downgrade = function(c) {
 
 /**
  * Accept the selected pending member's join request.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.accept = function(c) {
@@ -300,7 +322,7 @@ UsersController.prototype.accept = function(c) {
 
 /**
  * Resend an invitation to the selected member.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.resendInvite = function(c) {
@@ -311,7 +333,7 @@ UsersController.prototype.resendInvite = function(c) {
 
 /**
  * Redirect to the send message form for the selected members (or entire community).
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.sendMessageTo = function(c) {
@@ -325,7 +347,7 @@ UsersController.prototype.sendMessageTo = function(c) {
 
 /**
  * Show the send message form for the selected members (or entire community).
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.sendMessageForm = function(c) {
@@ -336,7 +358,7 @@ UsersController.prototype.sendMessageForm = function(c) {
 
 /**
  * Send a message to selected members.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.sendMessage = function(c) {
@@ -375,7 +397,7 @@ UsersController.prototype.sendMessage = function(c) {
 
 /**
  * Show the invite form.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.inviteForm = function(c) {
@@ -384,7 +406,7 @@ UsersController.prototype.inviteForm = function(c) {
 
 /**
  * Send invitations to the specified usernames/email addresses.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.sendInvites = function(c) {
@@ -441,7 +463,7 @@ UsersController.prototype.sendInvites = function(c) {
 
 /**
  * Show the custom profile fields form.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.profileFields = function(c) {
@@ -453,7 +475,7 @@ UsersController.prototype.profileFields = function(c) {
 
 /**
  * Show the edit form for the specified custom profile field.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.newProfileField = UsersController.prototype.editProfileField = function(c) {
@@ -466,7 +488,7 @@ UsersController.prototype.newProfileField = UsersController.prototype.editProfil
 
 /**
  * Save a custom profile field to the current group.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.saveProfileField = function(c) {
@@ -488,7 +510,7 @@ UsersController.prototype.saveProfileField = function(c) {
 
 /**
  * Re-order the custom profile fields within this group.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.reorderProfileFields = function(c) {
@@ -508,7 +530,7 @@ UsersController.prototype.reorderProfileFields = function(c) {
 
 /**
  * Delete a custom profile field.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.deleteProfileField = function(c) {
@@ -519,7 +541,7 @@ UsersController.prototype.deleteProfileField = function(c) {
 
 /**
  * Show the data export form.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.exportForm = function(c) {
@@ -528,7 +550,7 @@ UsersController.prototype.exportForm = function(c) {
 
 /**
  * Export the entire member list as JSON or CSV.
- * 
+ *
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.export = function(c) {
