@@ -67,7 +67,7 @@
                             <th width="130">
                                 <%- t('users.headers.since') %>
                             </th>
-                            <th width="60">
+                            <th width="80">
                                 <%- t('users.headers.actions') %>
                             </th>
                         </tr>
@@ -241,23 +241,27 @@
                             return '-';
                         }
                         //requested = show approve
-                        else if(user.membership.state == 'pending' && user.membership.requested) {
+                        else if(user.membership.state === 'pending' && user.membership.requested) {
                             html += '<a href="<%- pathTo.community %>/' + user.id + '/accept" data-remote="true" rel="tooltip" title="<%- t('users.labels.approveMembership') %>" data-success="<%- t('users.help.membershipApproved') %>"><i class="icon-ok"></i></a>';
                         }
                         //pending = show resent invite
-                        else if(user.membership.state == 'pending') {
+                        else if (user.membership.state === 'pending') {
                             html += '<a href="<%- pathTo.community %>/' + user.id + '/resendinvite" data-remote="true" rel="tooltip" title="<%= t('users.labels.resendInvite') %>" data-success="<%= t('users.help.inviteResent') %>"><i class="icon-envelope-alt"></i></a>';
                         }
                         //member = show upgrade to editor
-                        else if(user.membership.role == 'member') {
+                        else if (user.membership.role === 'member') {
                             html += '<a href="<%- pathTo.community %>/' + user.id + '/upgrade" data-remote="true" rel="tooltip" title="<%= t('users.labels.upgradeToEditor') %>" data-success="<%= t('users.help.memberUpgraded') %>"><i class="icon-thumbs-up"></i></a>';
                         }
                         //editor = show downgrade to member
-                        else if(user.membership.role == 'editor') {
+                        else if (user.membership.role === 'editor') {
                             html += '<a href="<%- pathTo.community %>/' + user.id + '/downgrade" data-remote="true" rel="tooltip" title="<%= t('users.labels.downgradeToMember') %>" data-success="<%= t('users.help.editorDowngraded') %>"><i class="icon-thumbs-down"></i></a>';
                         }
 
                         html += ' &nbsp; <a href="<%- pathTo.community %>/' + user.id + '/remove" data-remote="true" data-confirm="<%= t('users.help.removeMember') %>" rel="tooltip" title="<%= t('users.labels.removeMember') %>" data-success="<%= t('users.help.memberRemoved') %>"><i class="icon-remove"></i></a>';
+
+                        <% if (req.user.type === 'administrator') { %>
+                            html += ' &nbsp; <a href="<%- pathTo.community %>/' + user.id + '/destroy" data-remote="true" data-confirm="<%= t('users.help.destroyUser') %>" rel="tooltip" title="<%= t('users.labels.destroyUser') %>" data-success="<%= t('users.help.destroyedUser') %>"><i class="icon-trash"></i></a>';
+                        <% } %>
 
                         return html;
                     }
