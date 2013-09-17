@@ -82,7 +82,7 @@ en:
       inviteUsers: 'Enter the email addresses and/or usernames of the users you wish to invite to join this group'
       enterUsernames: 'Enter email addresses and/or usernames'
       sendMessage: This will send a message to
-      profileFields: Edit the custom profile fields for users within this group 
+      profileFields: Edit the custom profile fields for users within this group
       deleteProfileField: 'Are you sure you wish to delete this profile field?'
       removed: '% user(s) removed from community'
       blacklisted: '% user(s) blacklisted'
@@ -122,6 +122,7 @@ en:
       createdAt: Publish date
       popularity: Popularity
       actions: Actions
+      author: Author
     loading: Loading content
     all: All content
     blogpost: Blog posts
