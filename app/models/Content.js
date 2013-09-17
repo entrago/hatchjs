@@ -733,60 +733,6 @@ module.exports = function (compound, Content) {
         });
     };
 
-    var allContent = Content.all;
-    Content.all = function all(query, cb) {
-        if (typeof query === 'function') {
-            cb = query;
-            query = null;
-        }
-        allContent.call(Content, query, function(err, posts) {
-            if (err) {
-                return cb(err, posts);
-            }
-            if (query) {
-                delete query.skip;
-            }
-            var futurePosts = 0;
-            var futurePostsTotal = 0;
-            if (!query || !query.future) {
-                futurePosts = posts.length;
-                var now = new Date();
-                var countBeforeLimit = posts && posts.countBeforeLimit;
-                posts = posts && posts.filter(function(post) {
-                    return post.createdAt < now;
-                });
-                posts.countBeforeLimit = countBeforeLimit;
-                futurePosts -= posts.length;
-                futurePostsTotal = futurePosts;
-
-                if (futurePosts > 0 && query && query.limit) {
-                    query.offset = (query.offset || 0) + query.limit;
-                    query.limit = futurePosts;
-                    Content.all(query, function(err, morePosts) {
-                        if (err) {
-                            return cb(err, morePosts);
-                        }
-
-                        if (!posts.futurePosts) { 
-                            posts.futurePosts = futurePostsTotal;
-                        }
-                        posts.futurePosts += morePosts.futurePosts;
-                        morePosts.forEach(function(post) {
-                            posts.push(post);
-                        });
-                        cb(err, posts);
-                    });
-                } else {
-                    posts.futurePosts = futurePostsTotal;
-                    cb(err, posts);
-                }
-            } else {
-                posts.futurePosts = futurePostsTotal;
-                cb(err, posts);
-            }
-        });
-    };
-
     /**
      * Load content and set the the doesLike properties for a list of content 
      * items for the specified user.
