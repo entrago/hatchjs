@@ -110,7 +110,7 @@ FacebookAuthController.prototype.callback = function facebookCallback(c) {
 
                         var provider = { 
                             name: 'facebook', 
-                            idFields: 'email' 
+                            idFields: ['facebookId', 'email']
                         };
 
                         compound.hatch.audit.track(req.group.id, 'facebook-login', {

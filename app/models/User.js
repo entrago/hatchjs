@@ -358,6 +358,35 @@ module.exports = function (compound, User) {
     };
 
     /**
+     * Find one user by the full where clause or either property of the where clause.
+     * 
+     * @param  {Object}   cond     - where clause condition
+     * @param  {Function} callback - callback function
+     */
+    User.findOneEither = function (cond, callback) {
+        User.findOne({ where: cond }, function (err, user) {
+            if (!user) {
+                async.forEach(Object.keys(cond), function (key, done) {
+                    where = {};
+                    where[key] = cond[key];
+
+                    User.findOne({ where: where }, function (err, u) {
+                        if (!user && u) {
+                            user = u;
+                        }
+
+                        done();
+                    });
+                }, function (err) {
+                    callback(err, user);
+                })
+            } else {
+                callback(err, user);
+            }
+        })
+    };
+
+    /**
      * Find a user if it already exists, otherwise create a new user with the 
      * data.
      * 
@@ -379,7 +408,7 @@ module.exports = function (compound, User) {
         console.log('Authenticate user with:');
         console.log(cond);
 
-        User.findOne({ where: cond }, function (err, user) {
+        User.findOneEither({ where: cond }, function (err, user) {
             if (user) {
                 // don't allow it to update username or email
                 delete data.username;
