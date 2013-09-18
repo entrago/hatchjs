@@ -38,6 +38,9 @@ module.exports = function (compound) {
 
         compound.injectMiddlewareAt(2, hatch.middleware.timeLogger(compound));
 
+        // trust proxy for proper https guessing
+        app.enable('trust proxy');
+
         app.use(express.static(app.root + '/public', { maxAge: 86400000 }));
         app.use(express.bodyParser());
         app.use(express.cookieParser('secret'));
