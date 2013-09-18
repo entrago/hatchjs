@@ -25,7 +25,7 @@ var Application = module.exports = function Application(init) {
         if (this.admin) {
             c.next();
         } else {
-            c.next(new Error('403'));
+            c.redirect('//' + c.req.page.url)
         }
     });
 
