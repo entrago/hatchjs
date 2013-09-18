@@ -5,7 +5,7 @@
     <div class="span10">
         <div class="module">
             <div class="content content-table-content">
-                
+
                 <% var caret = ' <span class="caret"></span>'; %>
 
                 <div class="pull-left">
@@ -28,6 +28,9 @@
                                 <%- inputTag({type: 'checkbox', class: 'checkbox',
                                     id: 'selectAllContent'}) %>
                             </th>
+                            <th width="70">
+                                <%= t('content.tableHead.author') %>
+                            </th>
                             <th>
                                 <%= t('content.tableHead.text') %>
                             </th>
@@ -44,7 +47,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td colspan="6">
+                            <td colspan="7">
                                 <div class="loading-spacer"><%= t('content.loading') %></div>
                             </td>
                         </tr>
@@ -58,6 +61,8 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
+        var profilePath = '<%- specialPagePath('profile') %>';
+
         // setup ajax links
         $("a[rel=multiAjaxLink]").on("click", function() {
             if(window.selectedContent.length > 0) {
@@ -119,7 +124,7 @@
                 // reset the selected content array with only the "all" value
                 $.ajax('<%- pathTo.moderationIds %>?type=<%- type %>&sSearch=' + $('#content-table_filter input').val(), {
                     success: function (data) {
-                        window.selectedContent = data.ids;        
+                        window.selectedContent = data.ids;
                     }
                 });
             }
@@ -181,9 +186,18 @@
                     }
                 },
                 { "mDataProp": null,
+                    fnRender: function (obj, val) {
+                        var content = obj.aData;
+                        var author = content.author.username;
+                        var profileUrl = profilePath + '?username=' + content.author.username;
+                        return '<a href="' + profileUrl + '" class="title">' + content.author.username + '</a>';
+                    }
+                },
+                { "mDataProp": null,
                     fnRender: function(obj, val) {
                         var content = obj.aData;
                         var text = content.title || content.text;
+
                         text = text.substring(0, Math.min(32, text.length)) + (text.length > 32 ? '...':'');
                         text = text || '<span class="muted"><%= __('untitled post') %></span>';
 

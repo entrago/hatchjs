@@ -124,6 +124,7 @@ en:
       createdAt: Publish date
       popularity: Popularity
       actions: Actions
+      author: Author
     loading: Loading content
     all: All content
     blogpost: Blog posts
