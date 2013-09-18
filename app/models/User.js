@@ -705,7 +705,7 @@ module.exports = function (compound, User) {
      */
     User.prototype.setMembershipRole = function (groupId, role, callback) {
         var membership = this.memberships.find(groupId, 'groupId');
-        if (membership) {
+        if (membership && membership.role !== 'owner') {
             membership.role = role;
         }
         this.save(callback);
