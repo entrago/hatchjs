@@ -1,18 +1,18 @@
 //
-// Hatch.js is a CMS and social website building framework built in Node.js 
+// Hatch.js is a CMS and social website building framework built in Node.js
 // Copyright (C) 2013 Inventures Software Ltd
-// 
+//
 // This file is part of Hatch.js
-// 
+//
 // Hatch.js is free software: you can redistribute it and/or modify it under the terms of the
 // GNU General Public License as published by the Free Software Foundation, version 3
-// 
+//
 // Hatch.js is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 // without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-// 
+//
 // See the GNU General Public License for more details. You should have received a copy of the GNU
 // General Public License along with Hatch.js. If not, see <http://www.gnu.org/licenses/>.
-// 
+//
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
 
@@ -46,16 +46,16 @@ module.exports = function (compound, User) {
 
     /**
      * Get the first letter of the last name for this user.
-     * 
-     * @return {String} 
+     *
+     * @return {String}
      */
-    User.getter.lastnameLetter = function () { 
-        return (this.lastname && this.lastname[0] || '').toLowerCase(); 
+    User.getter.lastnameLetter = function () {
+        return (this.lastname && this.lastname[0] || '').toLowerCase();
     };
 
     /**
      * get the tag names as a single string for this user
-     * 
+     *
      * @return {String} - concatenated tag names
      */
     User.getter.tagNames = function () {
@@ -65,12 +65,12 @@ module.exports = function (compound, User) {
     /**
      * Get the best display name for this user. Prefers firstname + lastname but
      * falls back to username.
-     * 
-     * @return {String} 
+     *
+     * @return {String}
      */
-    User.getter.displayName = function() { 
-        return (this.firstname && this.lastname) ? 
-            (this.firstname + ' ' + this.lastname) : this.username; 
+    User.getter.displayName = function() {
+        return (this.firstname && this.lastname) ?
+            (this.firstname + ' ' + this.lastname) : this.username;
     };
 
     // Builds group index by membership state
@@ -90,7 +90,7 @@ module.exports = function (compound, User) {
     /**
      * Get an array of ids for all groups this user is a member of with any
      * state/role (member, pending, editor).
-     * 
+     *
      * @return {Array} - an array of group ids
      */
     User.getter.membershipGroupId = function() {
@@ -100,7 +100,7 @@ module.exports = function (compound, User) {
     /**
      * Get an array of ids for all groups this user is a member of with role
      * of 'member'.
-     * 
+     *
      * @return {Array} - an array of group ids
      */
     User.getter.memberGroupId = function() {
@@ -110,7 +110,7 @@ module.exports = function (compound, User) {
     /**
      * Get an array of ids for all groups this user is a member of with state
      * of 'pending'.
-     * 
+     *
      * @return {Array} - an array of group ids
      */
     User.getter.pendingGroupId = function() {
@@ -120,7 +120,7 @@ module.exports = function (compound, User) {
     /**
      * Get an array of ids for all groups this user is a member of with role
      * of 'editor'.
-     * 
+     *
      * @return {Array} - an array of group ids
      */
     User.getter.editorGroupId = function() {
@@ -130,7 +130,7 @@ module.exports = function (compound, User) {
     /**
      * Get an array of invitation codes for all groups this user is a pending
      * to become a member of.
-     * 
+     *
      * @return {Array} - an array of invitation codes
      */
     User.getter.inviteGroupId = function() {
@@ -140,7 +140,7 @@ module.exports = function (compound, User) {
     /**
      * Get an array of ids for all groups this user is a member of with state
      * of 'blacklisted'.
-     * 
+     *
      * @return {Array} - an array of group ids
      */
     User.getter.blacklistedGroupId = function() {
@@ -149,11 +149,11 @@ module.exports = function (compound, User) {
 
     /**
      * Get the text for the fulltext index for this user.
-     * 
+     *
      * @return {String} - username+firstname+lastname+oneLiner
      */
     User.getter.fulltext = function() {
-        return 
+        return
         [
             this.username,
             this.firstname,
@@ -166,7 +166,7 @@ module.exports = function (compound, User) {
      * Performs functions before a user is saved to the database.
      * - fixes username and email
      * - set the default profile pic
-     * 
+     *
      * @param  {Function} next - continuation function
      */
     User.beforeCreate = User.beforeSave = function (next, data) {
@@ -188,7 +188,7 @@ module.exports = function (compound, User) {
 
     /**
      * Find a user by their username/email address.
-     * 
+     *
      * @param  {String}   username - username or email address
      * @param  {Function} callback - callback function
      */
@@ -206,7 +206,7 @@ module.exports = function (compound, User) {
 
     /**
      * Notify this user by either email, top bar notification or both.
-     * 
+     *
      * @param  {String}     type     - the name of the notification to send
      * @param  {Object}     params   - notification parameters
      * @param  {Function}   callback - continuation function
@@ -250,7 +250,7 @@ module.exports = function (compound, User) {
 
     /**
      * Follow the specified user.id
-     * 
+     *
      * @param  {Number}   id       - id of user to follow
      * @param  {Function} callback - continuation function
      */
@@ -271,7 +271,7 @@ module.exports = function (compound, User) {
 
     /**
      * Unfollow the specified user.id
-     * 
+     *
      * @param  {Number}   id       - id of user to unfollow
      * @param  {Function} callback - continuation function
      */
@@ -285,8 +285,8 @@ module.exports = function (compound, User) {
                 return callback(err);
             }
             user.following = user.following || [];
-            user.following = _.reject(user.following, function(userId) { 
-                return userId == id; 
+            user.following = _.reject(user.following, function(userId) {
+                return userId == id;
             });
             user.save(callback);
         });
@@ -294,7 +294,7 @@ module.exports = function (compound, User) {
 
     /**
      * Get the followers of the specified user.
-     * 
+     *
      * @param  {Number}     userId   - id of the user to get followers for
      * @param  {Function}   callback - continuation function
      */
@@ -307,7 +307,7 @@ module.exports = function (compound, User) {
 
     /**
      * Get the followers for this user.
-     * 
+     *
      * @param  {Function} callback - continuation function
      */
     User.prototype.followers = function (callback) {
@@ -332,7 +332,7 @@ module.exports = function (compound, User) {
     /**
      * Authenticate a user. This either registers a new user or logs them in if
      * they already exist.
-     * 
+     *
      * @param  {String}      provider - facebook, twitter, linkedin etc
      * @param  {Object}      data     - data to auth/register with
      * @param  {HttpContext} c        - http context
@@ -359,11 +359,14 @@ module.exports = function (compound, User) {
 
     /**
      * Find one user by the full where clause or either property of the where clause.
-     * 
+     *
      * @param  {Object}   cond     - where clause condition
      * @param  {Function} callback - callback function
      */
     User.findOneEither = function (cond, callback) {
+        if (cond.where) {
+            cond = cond.where;
+        }
         User.findOne({ where: cond }, function (err, user) {
             if (!user) {
                 async.forEach(Object.keys(cond), function (key, done) {
@@ -387,9 +390,9 @@ module.exports = function (compound, User) {
     };
 
     /**
-     * Find a user if it already exists, otherwise create a new user with the 
+     * Find a user if it already exists, otherwise create a new user with the
      * data.
-     * 
+     *
      * @param  {Object}   provider - provider of the data
      * @param  {Object}   data     - user data
      * @param  {Function} callback - continuation function
@@ -413,8 +416,8 @@ module.exports = function (compound, User) {
                 // don't allow it to update username or email
                 delete data.username;
                 delete data.email;
-                
-                // don't update the user avatar if they already have one which 
+
+                // don't update the user avatar if they already have one which
                 // isn't the default avatar
                 if (user.avatar && user.avatar !== '/img/default-profile-pic.png') {
                     delete data.avatar;
@@ -450,7 +453,7 @@ module.exports = function (compound, User) {
     /**
      * Create a user with a unique username - automatically appends 1,2,etc to
      * the end of username until it finds one which is free.
-     * 
+     *
      * @param  {Object}   data - user creation data
      * @param  {Function} done - continuation function
      * @param  {Number}   num  - leave this blank
@@ -486,7 +489,7 @@ module.exports = function (compound, User) {
 
     /**
      * Merge 2 user accounts into 1.
-     * 
+     *
      * @param  {Object}   data     - first user
      * @param  {Object}   newUser  - second user
      * @param  {Function} callback - continuation function
@@ -525,10 +528,10 @@ module.exports = function (compound, User) {
 
     /**
      * Verify a user's password.
-     * 
+     *
      * @param  {String}   password     - password to check
      * @param  {String}   userPassword - password to check against
-     * @return {Boolean}  
+     * @return {Boolean}
      */
     User.verifyPassword = function (password, userPassword) {
         if (userPassword === null) return true;
@@ -541,7 +544,7 @@ module.exports = function (compound, User) {
 
     /**
      * Set the user's password hash to store in the database.
-     * 
+     *
      * @param  {String} pwd - original password
      */
     User.setter.password = function (pwd) {
@@ -549,9 +552,9 @@ module.exports = function (compound, User) {
     };
 
     /**
-     * Validate that the user has entered all of the mandatory profile fields 
+     * Validate that the user has entered all of the mandatory profile fields
      * for the specified group.
-     * 
+     *
      * @param  {Group}   group - group to check profile fields for
      * @return {Boolean}
      */
@@ -568,7 +571,7 @@ module.exports = function (compound, User) {
 
     /**
      * Get a user who matches the specified invitation code.
-     * 
+     *
      * @param  {Number}   groupId        - id of the group
      * @param  {String}   invitationCode - invitation code hash to load invitation for
      * @param  {Function} callback       - continuation function
@@ -586,7 +589,7 @@ module.exports = function (compound, User) {
 
     /**
      * Send a reset password link to this user.
-     * 
+     *
      * @param  {HttpContext}   c        - http context
      * @param  {Function}      callback - callback function
      */
@@ -656,7 +659,7 @@ module.exports = function (compound, User) {
                 // if there is already an invite - approve
                 if (!membership.requested) {
                     state = 'accepted';
-                } 
+                }
                 // if there is already a request to join - do nothing
                 else {
                     return callback();
@@ -684,7 +687,7 @@ module.exports = function (compound, User) {
 
     /**
      * Get the membership record for the specified group.
-     * 
+     *
      * @param  {Number} groupId - group.id
      * @return {Object}         - membership record or null
      */
@@ -698,7 +701,7 @@ module.exports = function (compound, User) {
 
     /**
      * Set a user's membership role within the specified group.
-     * 
+     *
      * @param {Number}   groupId  - group.id
      * @param {String}   role     - role to set
      * @param {Function} callback - callback function
@@ -713,7 +716,7 @@ module.exports = function (compound, User) {
 
     /**
      * Set a user's membership state within the specified group.
-     * 
+     *
      * @param {Number}   groupId  - group.id
      * @param {String}   state    - state to set
      * @param {Function} callback - callback function
@@ -744,7 +747,7 @@ module.exports = function (compound, User) {
 
     /**
      * Send an email invitation to this user for the specified group.
-     * 
+     *
      * @param  {Number}   groupId  - id of the group to invite to
      * @param  {String}   subject  - email subject
      * @param  {String}   body     - email body
@@ -776,7 +779,7 @@ module.exports = function (compound, User) {
 
     /**
      * Accept a join request for the specified group.
-     * 
+     *
      * @param  {Number}   groupId  - id of the group to accept for
      * @param  {Function} callback - callback function
      */
@@ -788,7 +791,7 @@ module.exports = function (compound, User) {
 
     /**
      * Remove a membership to the specified group.
-     * 
+     *
      * @param  {Number}   groupId  - group.id
      * @param  {Function} callback - callback function
      */
@@ -802,7 +805,7 @@ module.exports = function (compound, User) {
         // remove any tags for this group
         compound.models.Tag.all({ where: { groupId: groupId }}, function (err, tags) {
             var tagIds = _.pluck(tags, 'id');
-            user.tags.items = _.reject(user.tags.items, function (tag) { 
+            user.tags.items = _.reject(user.tags.items, function (tag) {
                 return tagIds.indexOf(tag) > -1;
             });
             user.save(callback);
@@ -810,9 +813,9 @@ module.exports = function (compound, User) {
     };
 
     /**
-     * Output the publicObject representation of this user - automatically 
+     * Output the publicObject representation of this user - automatically
      * removes sensitive information such as email address, password hash etc.
-     * 
+     *
      * @return {Object} - JSON representation of user
      */
     User.prototype.toPublicObject = function () {
@@ -839,13 +842,13 @@ module.exports = function (compound, User) {
 
     /**
      * Get whether this user accepts the specified type of email notification.
-     * 
+     *
      * @param  {String} type - type of notification
      * @return {Boolean}
      */
     User.prototype.canReceiveEmail = function(type) {
         var setting = (this.mailSettings || {})[type];
-        
+
         if (!setting || setting == 'true') {
             return true;
         } else {
@@ -855,7 +858,7 @@ module.exports = function (compound, User) {
 
     /**
      * encrypts a password
-     * 
+     *
      * @param  {[string]} payload [password to encrypyt]
      * @return {[string]}         [encrypted password]
      */
@@ -865,9 +868,9 @@ module.exports = function (compound, User) {
 
     /**
      * calculates a sha1 of the specified string
-     * 
-     * @param  {[String]} payload 
-     * @return {[String]}         
+     *
+     * @param  {[String]} payload
+     * @return {[String]}
      */
     function calcSha(payload) {
         if (!payload) return '';
@@ -932,7 +935,7 @@ module.exports = function (compound, User) {
     /**
      * Populate all of the memberships with full group info for the specified
      * list of users.
-     * 
+     *
      * @param  {Array}    users    - list of users
      * @param  {Function} callback - callback function
      */
