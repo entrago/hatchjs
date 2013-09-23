@@ -1,21 +1,21 @@
 //
-// Hatch.js is a CMS and social website building framework built in Node.js 
+// Hatch.js is a CMS and social website building framework built in Node.js
 // Copyright (C) 2013 Inventures Software Ltd
-// 
+//
 // This file is part of Hatch.js
-// 
+//
 // Hatch.js is free software: you can redistribute it and/or modify it under the
 // terms of the GNU General Public License as published by the Free Software
 // Foundation, version 3
-// 
+//
 // Hatch.js is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
 // A PARTICULAR PURPOSE.
-// 
+//
 // See the GNU General Public License for more details. You should have received
 // a copy of the GNU General Public License along with Hatch.js. If not, see
 // <http://www.gnu.org/licenses/>.
-// 
+//
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
 
@@ -57,7 +57,7 @@ function setDateTimeFormat (c) {
 function renderInputForm(c, next) {
     var type = c.locals.post.type;
     var contentType = c.compound.hatch.contentType.getContentType(type);
-    
+
     c.prepareViewContext();
     c.locals.editForm = c.renderContent(c.locals.post, 'editForm');
 
@@ -81,7 +81,7 @@ function loadContent(c, callback) {
             cond.type = filterBy;
         }
     }
-    
+
     var query = c.req.query;
     var limit = parseInt(query.iDisplayLength || query.limit || 10, 10);
     var offset = parseInt(query.iDisplayStart || query.offset || 0, 10);
@@ -90,7 +90,7 @@ function loadContent(c, callback) {
     var orderBy = query.iSortCol_0 > 0 ?
         (colNames[query.iSortCol_0] + ' ' + query.sSortDir_0.toUpperCase()) :
         null;
-   
+
     // count the total number of records so that we can show count before filter
     c.Content.count({ groupId: c.req.group.id }, function(err, count) {
         if (err) {
@@ -137,7 +137,7 @@ function findContent (c) {
 
 /**
  * Show the content list for this group.
- * 
+ *
  * @param  {HttpContext} c - http context
  *                       c.limit  - limit to n records
  *                       c.offset - offset to nth record
@@ -177,7 +177,7 @@ ContentController.prototype.index = function index(c) {
  * Return only the IDs for a search query. This is used when a user clicks the
  * 'select all' checkbox so that we can get ALL of the ids of the content rather
  * than just the ids of the content on the current page of results.
- * 
+ *
  * @param  {HttpContext} c - http context
  *                       c.filterBy - filter by type or tag
  *                       c.search   - search filter
@@ -195,7 +195,7 @@ ContentController.prototype.ids = function ids(c) {
 
 /**
  * Show the new content input form.
- * 
+ *
  * @param  {HttpContext} c - http context
  *                       c.type - content type
  */
@@ -211,7 +211,7 @@ ContentController.prototype.new = function(c) {
 
 /**
  * Show the edit content input form.
- * 
+ *
  * @param  {HttpContext} c - http context
  *                       c.id - content item id
  */
@@ -223,7 +223,7 @@ ContentController.prototype.edit = function edit(c) {
 
 /**
  * Create a new content record with the data from the form body.
- * 
+ *
  * @param  {HttpContext} c - http context
  *                       c.Content - content params
  */
@@ -263,7 +263,7 @@ ContentController.prototype.create = function create(c) {
 
 /**
  * Update an existing content record with the data from the form body.
- * 
+ *
  * @param  {HttpContext} c - http context
  *                       c.Content - content params
  */
@@ -271,14 +271,14 @@ ContentController.prototype.update = function update(c) {
     var Content = c.Content;
     var id = c.params.id;
     var group = c.req.group;
-    var data = c.body.Content;
+    var data = c.body.Content || c.req.body;
     var post = this.post;
 
     // parse the date format with moment
     data.createdAt = moment(data.createdAt, c.app.get('datetimeformat')).toDate();
     data.updatedAt = new Date();
 
-    c.Tag.assignTagsForObject(post, c.req.body.Content_tags, function () {
+    c.Tag.assignTagsForObject(post, data.Content_tags || data.tags, function () {
         delete data.tags;
 
         // update the keys manually
@@ -305,7 +305,7 @@ ContentController.prototype.update = function update(c) {
 
 /**
  * Delete a single content record.
- * 
+ *
  * @param  {HttpContext} c - http context
  *                       c.id - content item id
  */
@@ -321,7 +321,7 @@ ContentController.prototype.destroy = function(c) {
 
 /**
  * Delete multiple content records.
- * 
+ *
  * @param  {HttpContext} c - http context
  *                       c.selectedContent - ids of the content items to delete
  */
@@ -380,7 +380,7 @@ ContentController.prototype.destroyAll = function(c) {
 
 /**
  * Remove flags from the specified content.
- * 
+ *
  * @param  {HttpContext} c - http context
  *                       c.id - content item id to unflag
  */
@@ -396,7 +396,7 @@ ContentController.prototype.clearFlags = function (c) {
 
 /**
  * Delete a flagged content item and ban it's author.
- * 
+ *
  * @param  {HttpContext} c - http context
  *                       c.id - content item id to delete and ban author
  */

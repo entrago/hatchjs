@@ -346,12 +346,17 @@ module.exports = function (compound, User) {
                 c.req.session.userId = user.id;
             }
             if (user.email && user.password && user.type != 'temporary') {
-                c.redirect(c.session.redirect || ('//' + c.req.group.url));
+                compound.hatch.hooks.hook(c, 'User.afterLogin', { user: user }, function() {
+                    c.redirect(c.session.redirect || ('//' + c.req.group.url));
+                });
             } else {
                 //set user type to temporary and complete the registration
                 user.type = 'temporary';
+
                 user.save(function() {
-                    c.redirect(c.specialPagePath('register') + '?redirect=' + escape(c.pathFor('user').join()));
+                    compound.hatch.hooks.hook(c, 'User.afterRegister', { user: user }, function() {
+                        c.redirect(c.specialPagePath('register') + '?redirect=' + escape(c.pathFor('user').join()));
+                    });
                 });
             }
         });

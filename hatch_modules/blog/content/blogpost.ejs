@@ -1,61 +1,54 @@
 <% if(typeof displayComments === 'undefined') displayComments = false; %>
 <% if(typeof permalink === 'undefined' && typeof render === 'undefined') { %>
-<div class="content-item clearfix" data-id="<%- content.id %>">
+<div class="content-item clearfix" data-id="<%- post.id %>">
     <div class="post-header">
         <h3>
-            <a href="//<%- content.url %>"><%- content.title %></a>
+            <a href="//<%- post.url %>"><%- post.title %></a>
         </h3>
 
         <div class="content-metadata">
             <div class="links clearfix">
-                <span class="link">
-                    <%- __('By') %> <a href="<%- specialPagePath('profile', { username: content.author.username }) %>" rel="hovercard" data-url="<%- pathFor('user').hovercard(content.author.id) %>"><%- content.author.displayName %></a>
-                </span>
+                <% if (post.author) { %>
+                    <span class="link">
+                        <%- __('By') %> <a href="<%- specialPagePath('profile', { username: post.author.username }) %>" rel="hovercard" data-url="<%- pathFor('user').hovercard(post.author.id) %>"><%- post.author.displayName %></a>
+                    </span>
+                <% } %>
 
                 <span class="link">
-                    <a href="//<%- content.url %>#comments" class="link">
-                        <% if((content.comments || []).length === 0) { %>
+                    <a href="//<%- post.url %>#comments" class="link">
+                        <% if((post.comments || []).length === 0) { %>
                             <%- __('No comments') %>
-                        <% } else if(content.comments.length === 1) { %>
+                        <% } else if(post.comments.length === 1) { %>
                             <%- __('1 comment') %>
                         <% } else { %>
-                            <%- __('%s comments', content.comments.length) %> 
+                            <%- __('%s comments', post.comments.length) %> 
                         <% } %>
                     </a>
                 </span>
 
-                <span class="link dropdown hidden-phone">
-                    <a href="#share" class="" data-toggle="dropdown"><%- __('Share') %></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="<%- pathFor('content').share(content.id, 'facebook') %>" rel="popup"><i class="icon-facebook-sign"></i> <%- __('Share on Facebook') %></a></li>
-                        <li><a href="<%- pathFor('content').share(content.id, 'twitter') %>" rel="popup"><i class="icon-twitter-sign"></i> <%- __('Share on Twitter') %></a></li>
-                        <li><a href="<%- pathFor('content').share(content.id, 'linkedin') %>" rel="popup"><i class="icon-linkedin-sign"></i> <%- __('Share on LinkedIn') %></a></li>
-                    </ul>
-                </span>
+                <span><%- fromNow(post.createdAt) %></span>
 
-                <span><%- content.timeSince() %></span>
-
-                <% if(content.location) { %>
-                    <span><%- content.location %></span>
+                <% if(post.location) { %>
+                    <span><%- post.location %></span>
                 <% } %>
             </div>
         </div>
     </div>
 
     <div class="post-text">
-        <div class="<%- content.previewImage ? 'row':'' %>">
-            <% if(content.previewImage) { %>
+        <div class="<%- post.previewImage ? 'row':'' %>">
+            <% if(post.previewImage) { %>
                 <div class="pull-left span2">
-                    <a href="//<%- content.url %>" class="img-rounded">
-                        <img src="<%- content.previewImage %>?dim=0x200"  />
+                    <a href="//<%- post.url %>" class="img-rounded">
+                        <img src="<%- post.previewImage %>?dim=0x200"  />
                     </a>
                 </div>
             <% } %>
 
-            <div class="<%- content.previewImage ? 'offset2':'' %>">
+            <div class="<%- post.previewImage ? 'offset2':'' %>">
                 <p>
-                    <%- content.excerpt || stripHtml(content.text, 400) %>
-                    <a href="//<%- content.url %>"><%- __('Read more') %> &raquo;</a>
+                    <%- post.excerpt || stripHtml(post.text, 400) %>
+                    <a href="//<%- post.url %>"><%- __('Read more') %> &raquo;</a>
                 </p>
             </div>
         </div>
@@ -68,28 +61,28 @@
     <div class="content-footer"></div>
 </div>
 <% } else { %>
-<%- remotePanelFor(content, {
+<%- remotePanelFor(post, {
     class: 'content-item clearfix permalink',
     id: content.id
     }) %>
     <div class="post-header">
         <h2>
-            <%- content.title %>
+            <%- post.title %>
         </h2>
         <div class="content-metadata">
             <div class="links clearfix">
                 <span class="link">
-                    By <a href="<%- specialPagePath('profile', { username: content.author.username }) %>" rel="hovercard" data-url="<%- pathFor('user').hovercard(content.author.id) %>"><%- content.author.displayName %></a>
+                    By <a href="<%- specialPagePath('profile', { username: post.author.username }) %>" rel="hovercard" data-url="<%- pathFor('user').hovercard(post.author.id) %>"><%- post.author.displayName %></a>
                 </span>
 
                 <span class="link">
                     <a href="#comments" class="link">
-                        <% if((content.comments || []).length === 0) { %>
+                        <% if((post.comments || []).length === 0) { %>
                             <%- __('No comments') %>
-                        <% } else if(content.comments.length === 1) { %>
+                        <% } else if(post.comments.length === 1) { %>
                             <%- __('1 comment') %>
                         <% } else { %>
-                            <%- __('%s comments', content.comments.length) %>
+                            <%- __('%s comments', post.comments.length) %>
                         <% } %>
                     </a>
                 </span>
@@ -97,23 +90,23 @@
                 <span class="link dropdown hidden-phone">
                     <a href="#share" class="" data-toggle="dropdown"><%- __('Share') %></a>
                     <ul class="dropdown-menu">
-                        <li><a href="<%- pathFor('content').share(content.id, 'facebook') %>" rel="popup"><i class="icon-facebook-sign"></i> <%- __('Share on Facebook') %></a></li>
-                        <li><a href="<%- pathFor('content').share(content.id, 'twitter') %>" rel="popup"><i class="icon-twitter-sign"></i> <%- __('Share on Twitter') %></a></li>
-                        <li><a href="<%- pathFor('content').share(content.id, 'linkedin') %>" rel="popup"><i class="icon-linkedin-sign"></i> <%- __('Share on LinkedIn') %></a></li>
+                        <li><a href="<%- pathFor('content').share(post.id, 'facebook') %>" rel="popup"><i class="icon-facebook-sign"></i> <%- __('Share on Facebook') %></a></li>
+                        <li><a href="<%- pathFor('content').share(post.id, 'twitter') %>" rel="popup"><i class="icon-twitter-sign"></i> <%- __('Share on Twitter') %></a></li>
+                        <li><a href="<%- pathFor('content').share(post.id, 'linkedin') %>" rel="popup"><i class="icon-linkedin-sign"></i> <%- __('Share on LinkedIn') %></a></li>
                     </ul>
                 </span>
 
-                <span><%- content.timeSince() %></span>
+                <span><%- post.timeSince() %></span>
 
-                <% if(content.location) { %>
-                <span><%- content.location %></span>
+                <% if(post.location) { %>
+                <span><%- post.location %></span>
                 <% } %>
             </div>
         </div>
     </div>
 
     <div class="post-text">
-        <%- content.text %>
+        <%- post.text %>
     </div>
 
     <div class="clearfix"></div>

@@ -1,3 +1,5 @@
+var _ = require('underscore');
+
 module.exports = UsersController;
 
 function UsersController() {}
@@ -35,7 +37,7 @@ UsersController.prototype.create = function(c) {
                     c.compound.hatch.hooks.hook(c, 'User.afterRegister', { user: user }, function() {
                         // authenticate user
                         c.req.session.userId = user.id;
-                        
+
                         if (user.type === 'temporary') {
                             c.send({ redirect: c.specialPagePath('register') + '?redirect=' + c.pathTo.join() });
                         } else {
@@ -119,10 +121,12 @@ UsersController.prototype.update = function(c) {
 
     //finally save and return
     user.save(function() {
-        c.send({
-            status: 'success',
-            icon: 'ok',
-            message: 'Account details saved successfully'
+        compound.hatch.hooks.hook(c, 'User.afterUpdate', { user: user }, function() {
+            c.send({
+                status: 'success',
+                icon: 'ok',
+                message: 'Account details saved successfully'
+            });
         });
     });
 };
@@ -184,9 +188,6 @@ UsersController.prototype.hovercard = function(c) {
             c.req.user.ifollow || [], function(id) { return id == user.id; });
 
         c.locals.user = user;
-        c.locals.profileFields = _.filter(c.group().profileFields(),
-            function(field) { return field.privacy == 'public'; });
-
         c.render({ layout: false });
     });
 }
@@ -217,10 +218,12 @@ UsersController.prototype.resetPassword = function resetPassword(c) {
 
     function sendResetLink(user) {
         user.resetPassword(c, function () {
-            c.send({
-                status: 'success',
-                icon: 'info-sign',
-                message: 'A reset password link has been sent to your registered email address.'
+            c.hatch.hooks.hook(c, 'User.afterResetPassword', { user: user }, function() {
+                c.send({
+                    status: 'success',
+                    icon: 'info-sign',
+                    message: 'A reset password link has been sent to your registered email address.'
+                });
             });
         });
     }

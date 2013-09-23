@@ -20,10 +20,12 @@ PasswordController.prototype.request = function resetPassword(c) {
             return c.sendError(err || new Error('User not found'));
         }
         user.resetPassword(c, function () {
-            c.send({
-                status: 'success',
-                icon: 'info-sign',
-                message: 'A reset password link has been sent to your registered email address.'
+            c.compound.hatch.hooks.hook(c, 'User.afterResetPassword', { user: user }, function() {
+                c.send({
+                    status: 'success',
+                    icon: 'info-sign',
+                    message: 'A reset password link has been sent to your registered email address.'
+                });
             });
         });
     });

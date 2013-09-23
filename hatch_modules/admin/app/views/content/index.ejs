@@ -252,7 +252,7 @@
                         var content = obj.aData;
                         var html = '<div class="pull-right">';
 
-                        if (content.type == 'blogpost') html += '<a href="<%- pathTo.content %>/' + content.id + '/edit"><%= t('content.actions.edit') %></a>';
+                        if (content.canEdit || true) html += '<a href="<%- pathTo.content %>/' + content.id + '/edit"><%= t('content.actions.edit') %></a>';
                         html += ' &nbsp; <a href="<%- pathTo.content %>/' + content.id + '" data-remote="true" data-method="DELETE" data-confirm="<%= t('content.actions.destroyConfirm') %>" rel="tooltip" title="<%- t('content.actions.destroy') %>" data-success="<%= t('content.actions.destroyed') %>"><i class="icon-remove"></i></a>';
 
                         html += '</div>';
