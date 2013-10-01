@@ -32,6 +32,13 @@ mainmenu:
   icon: icon-sitemap
   settings:
     fields:
+      align:
+        type: select
+        title: Alignement
+        options:
+          - 'left:Left'
+          - 'right:Right'
+        default: 'left'
       fixedTop:
         type: select
         title: 'Fix to top'

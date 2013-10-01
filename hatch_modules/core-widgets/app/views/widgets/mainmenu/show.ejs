@@ -3,7 +3,7 @@
 <div class="">
     <% var breadcrumbPages = breadcrumb(page); %>
 
-    <div class="subnav <%- breadcrumbPages.length > 0 ? 'withBreadcrumb':'' %> <%- widget.settings.fixedTop == 'yes' ? 'fixed-top':'' %>">
+    <div class="subnav <%- breadcrumbPages.length > 0 ? 'withBreadcrumb':'' %> <%- widget.settings.fixedTop == 'yes' ? 'fixed-top':'' %> <%- widget.settings.align === 'right' ? 'pull-right': '' %>">
         <ul class="nav nav-pills">
             <!-- level 0 and 1 pages are displayed here -->
             <% group.pagesCache.forEach(function (p) { %>
