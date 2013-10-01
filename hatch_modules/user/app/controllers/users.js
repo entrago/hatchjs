@@ -121,7 +121,7 @@ UsersController.prototype.update = function(c) {
 
     //finally save and return
     user.save(function() {
-        compound.hatch.hooks.hook(c, 'User.afterUpdate', { user: user }, function() {
+        c.compound.hatch.hooks.hook(c, 'User.afterUpdate', { user: user }, function() {
             c.send({
                 status: 'success',
                 icon: 'ok',

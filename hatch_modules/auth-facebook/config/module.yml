@@ -12,3 +12,6 @@ settings:
       type: text
       title: Facebook App Secret
       required: true
+    scope:
+      type: text
+      title: Facebook access scope

@@ -1,18 +1,18 @@
 //
-// Hatch.js is a CMS and social website building framework built in Node.js 
+// Hatch.js is a CMS and social website building framework built in Node.js
 // Copyright (C) 2013 Inventures Software Ltd
-// 
+//
 // This file is part of Hatch.js
-// 
+//
 // Hatch.js is free software: you can redistribute it and/or modify it under the terms of the
 // GNU General Public License as published by the Free Software Foundation, version 3
-// 
+//
 // Hatch.js is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 // without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-// 
+//
 // See the GNU General Public License for more details. You should have received a copy of the GNU
 // General Public License along with Hatch.js. If not, see <http://www.gnu.org/licenses/>.
-// 
+//
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
 
@@ -45,10 +45,11 @@ function FacebookAuthController(init) {
 };
 
 FacebookAuthController.prototype.auth = function facebookAuth(c) {
+    var scope = c.req.group.getSetting('auth-facebook.scope') || 'email';
     with (c) {
         var url = this.consumer().getAuthorizeUrl({
             redirect_uri : this.redirectUri,
-            scope: 'email',
+            scope: scope,
             display: 'page'
         });
 
@@ -99,7 +100,7 @@ FacebookAuthController.prototype.callback = function facebookCallback(c) {
                         next(err);
                     } else {
                         profile = JSON.parse(profile);
-                        
+
                         var data = {
                             username: profile.first_name + profile.last_name,
                             displayName: profile.name,
@@ -108,8 +109,8 @@ FacebookAuthController.prototype.callback = function facebookCallback(c) {
                             facebookAccessToken: token
                         };
 
-                        var provider = { 
-                            name: 'facebook', 
+                        var provider = {
+                            name: 'facebook',
                             idFields: ['facebookId', 'email']
                         };
 
