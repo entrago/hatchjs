@@ -16,7 +16,7 @@ $(document).ready(function() {
     hatchModalInit();
 
     //PJAX - only allow for browsers that support replaceState
-    if (window.history.replaceState) {
+    if (window.history.replaceState && $('.no-pjax').length === 0) {
         $.pjax.enable();
         $.pjax.defaults.headers = { 'Content-Type' : '' };
         $.pjax.defaults.dataType = '';
