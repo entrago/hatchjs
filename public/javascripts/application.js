@@ -19,6 +19,11 @@ $(function () {
 
     $(document).on('click', '.module-controls > .delete', function (e) {
         e.stopPropagation();
+
+        if (!confirm('Are you sure you wish to delete this widget?')) {
+            return false;
+        }
+
         var $module = $(this).closest('.module');
         removeWidget($module);
         return false;
