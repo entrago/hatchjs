@@ -554,13 +554,13 @@ UsersController.prototype.exportForm = function(c) {
  * @param  {HttpContext} c - http context
  */
 UsersController.prototype.export = function(c) {
-    var filename = 'users-' + (new Date().getTime()) + '.' + c.req.body.format;
+    var format = c.req.body.format;
+    var filename = 'users-' + (new Date().getTime()) + '.' + format;
 
-    // make sure we get aall users
-    c.req.query.limit = 1000000;
-
-    loadMembers(c, function(err, members) {
-        c.compound.hatch.exportData.export(c, members, filename);
+    c.compound.hatch.exportData[format](c.User, { where: { memberGroupId: c.req.group.id }}, function (err, data) {
+        c.res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+        c.res.setHeader('Content-Type', 'text/' + format);
+        c.send(data);
     });
 };
 
