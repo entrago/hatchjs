@@ -248,7 +248,7 @@ ContentController.prototype.create = function create(c) {
     data.updatedAt = new Date();
 
     // assign tags to the new object and then save after that
-    c.Tag.assignTagsForObject(data, c.req.body.Content_tags, function () {
+    c.Tag.assignTagsForObject(data, data.Content_tags || data.tags, function () {
         c.Content.create(data, function(err, content) {
             if (err) {
                 err.message = 'One or more fields have errors'
