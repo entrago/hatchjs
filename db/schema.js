@@ -98,6 +98,7 @@ var Group = define('Group', function () {
     property('tags', [], {index: true});
     property('importStreams', JSON);
     property('createdAt', Date, {sort: true});
+    property('locale', String);
 
     set('ignoreNullValues', true);
     set('defaultSort', 'name');
