@@ -137,6 +137,7 @@ TagController.prototype.edit = TagController.prototype.new = function (c) {
 
     c.locals.permissions = c.compound.hatch.permissions;
     c.locals.sortOrders = getSortOrders(c, this.type);
+    c.locals.app = c.compound;
     c.render();
 };
 
