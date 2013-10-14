@@ -1,18 +1,18 @@
 //
-// Hatch.js is a CMS and social website building framework built in Node.js 
+// Hatch.js is a CMS and social website building framework built in Node.js
 // Copyright (C) 2013 Inventures Software Ltd
-// 
+//
 // This file is part of Hatch.js
-// 
+//
 // Hatch.js is free software: you can redistribute it and/or modify it under the terms of the
 // GNU General Public License as published by the Free Software Foundation, version 3
-// 
+//
 // Hatch.js is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 // without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-// 
+//
 // See the GNU General Public License for more details. You should have received a copy of the GNU
 // General Public License along with Hatch.js. If not, see <http://www.gnu.org/licenses/>.
-// 
+//
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
 
@@ -32,7 +32,7 @@ module.exports = function (compound, Media) {
 
     /**
      * Before a media item is created, make sure the type is set.
-     * 
+     *
      * @param  {Function} next - continuation function
      * @param  {Object}   data - data to create with
      */
@@ -54,12 +54,11 @@ module.exports = function (compound, Media) {
 
     /**
      * Before a media item is saved, replace spaces from data.url with %20 so as not to change the url.
-     * 
+     *
      * @param  {Function} next - continuation function
      * @param  {Object}   data - data to create with
      */
     Media.beforeSave = function (next, data) {
-        
         if (data.url.indexOf(' ') >= 0) {
             data.url = data.url.replace(/ /g, '%20');
         }
@@ -70,9 +69,9 @@ module.exports = function (compound, Media) {
     /**
      * After a media item is updated, make sure to update the content records in
      * which it is referenced as an attachment.
-     * 
+     *
      * @param  {Function} next - continuation function
-     * @param  {Object    data - data to save 
+     * @param  {Object    data - data to save
      */
     Media.afterSave = function (next, data) {
         this.updateContent(next);
@@ -81,7 +80,7 @@ module.exports = function (compound, Media) {
     /**
      * Create a new media object with a URL of a file on the web. The file will
      * be downloaded to disk before a new media object is created.
-     * 
+     *
      * @param  {String}   url      - URL of the original file
      * @param  {Object}   params   - additional creation params
      * @param  {Function} callback - callback function
@@ -89,7 +88,7 @@ module.exports = function (compound, Media) {
     Media.createWithUrl = function (url, params, callback) {
         var uploadPath = compound.app.get('upload path');
         var filename = path.join(uploadPath, new Date().getTime() + '-' + slugify(url.split('/').slice(-1)[0]));
-        
+
         // check for the existing file
         Media.findOne({ where: { originalUrl: url }}, function (err, media) {
             if (media) {
@@ -102,12 +101,24 @@ module.exports = function (compound, Media) {
             }
         });
 
+        function download(callback) {
+            request.get(url, function (err, resp, body) {
+                if(err) {
+                    console.log('Error downloading '+url);
+                    console.log(err);
+                    return callback(err);
+                }
+                console.log('creating with filename: '+filename);
+                Media.createWithFilename(filename, params, callback);
+            }).pipe(fs.createWriteStream(filename));
+        }
+
         function create() {
             // videos we just create directly with the url
             if (Media.isVideo(filename)) {
                 var data = { url: url };
                 data = _.extend(data, params);
-    
+
                 // if we have a video encoder, run now
                 if (Media.encodeVideo && !params.skipEncode) {
                     Media.encodeVideo(data, {}, function (err, data) {
@@ -119,25 +130,26 @@ module.exports = function (compound, Media) {
                 } else {
                     Media.create(data, callback);
                 }
-            } 
-            // other files we download first and then re-upload 
+            }
+            // don't download before saving
+            else if (params.saveBeforeUpload) {
+                params.url = url;
+                Media.create(params, function (err, media) {
+                    params.id = media.id;
+                    callback(err, media);
+                    download(function () { });
+                })
+            }
+            // other files we download first and then re-upload
             else {
-                request.get(url, function (err, resp, body) {
-                    if(err) {
-                        console.log('Error downloading '+url);
-                        console.log(err);
-                        return callback(err);
-                    }
-                    console.log('creating with filename: '+filename);
-                    Media.createWithFilename(filename, params, callback);
-                }).pipe(fs.createWriteStream(filename));
+                download(callback);
             }
         }
     };
 
     /**
      * Create a new media object from an HttpRequest files collection.
-     * 
+     *
      * @param  {Object}   files    - http request files collection
      * @param  {Object}   params   - additional creation params
      * @param  {Function} callback - callback function
@@ -160,14 +172,14 @@ module.exports = function (compound, Media) {
     };
 
     /**
-     * Create a new media object from a filename. 
+     * Create a new media object from a filename.
      *
      * If the file is an image, it will be resized to the standard image sizes
      * before creating the media object.
      *
      * If there is a uploadToCDN function defined, this will be called to upload
      * the file to CDN storage before creating the media object.
-     * 
+     *
      * @param  {String}   filename - filename of the file to create with
      * @param  {Object}   params   - additional creation params
      * @param  {Function} callback - callback function
@@ -187,7 +199,7 @@ module.exports = function (compound, Media) {
                     console.log('Error trying to im.identify '+ filename);
                     console.log(err);
                     return callback(err);
-                } 
+                }
                 if(!features){
                     console.log('Error: could not im.identify '+filename);
                     return callback(new Error('Error: could not im.identify '+filename));
@@ -210,7 +222,7 @@ module.exports = function (compound, Media) {
 
         function upload(data) {
             // if there is a CDN upload function defined, upload and continue
-            if (Media.uploadToCDN) { 
+            if (Media.uploadToCDN) {
                 Media.uploadToCDN(data, params, function (err, data) {
                     create(data);
                 });
@@ -222,15 +234,21 @@ module.exports = function (compound, Media) {
         }
 
         function create(data) {
-            Media.create(data, callback);
+            if (data.id) {
+                Media.find(data.id, function (err, media) {
+                    media.updateAttributes(data, callback);
+                });
+            } else {
+                Media.create(data, callback);
+            }
         }
     };
 
     /**
      * Work out whether a file is an image file.
-     * 
+     *
      * @param  {String}  filename - filename to check
-     * @return {Boolean}          
+     * @return {Boolean}
      */
     Media.isImage = function (filename) {
         var ext = filename.split('.').slice(-1)[0].toLowerCase();
@@ -241,7 +259,7 @@ module.exports = function (compound, Media) {
 
     /**
      * Work out whether a file is a video file.
-     * 
+     *
      * @param  {String}  filename - filename to check
      * @return {Boolean}
      */
@@ -254,9 +272,9 @@ module.exports = function (compound, Media) {
 
     /**
      * Work out whether a file is a document.
-     * 
+     *
      * @param  {String}  filename - filename to check
-     * @return {Boolean}          
+     * @return {Boolean}
      */
     Media.isDocument = function (filename) {
         var ext = filename.split('.').slice(-1)[0].toLowerCase();
@@ -280,7 +298,7 @@ module.exports = function (compound, Media) {
 
     /**
      * Resize an image file to the dimensions in the application config.
-     * 
+     *
      * @param  {Object}   data     - media or media creation data
      * @param  {Function} callback - callback function
      */
@@ -351,7 +369,7 @@ module.exports = function (compound, Media) {
     /**
      * Get the media URL for the specified size. Will retrive the media equal to
      * or greater than the specified size.
-     * 
+     *
      * @param  {String} size - media size to look for
      * @return {String}      - URL for the resized media
      */
@@ -367,10 +385,10 @@ module.exports = function (compound, Media) {
         var sortedResized;
 
         if(Array.isArray(this.resized)) {
-            sortedResized = _.sortBy(this.resized, 'width');   
+            sortedResized = _.sortBy(this.resized, 'width');
         } else {
             if(Array.isArray(this.resized.items)) {
-                sortedResized = _.sortBy(this.resized.items, 'width');    
+                sortedResized = _.sortBy(this.resized.items, 'width');
             } else {
                 return this.url;
             }
@@ -408,7 +426,7 @@ module.exports = function (compound, Media) {
 
     /**
      * Assign multiple media items to a content post.
-     * 
+     *
      * @param  {Array}    ids      - array of media ids
      * @param  {Content}  post     - content item
      * @param  {Function} callback - callback function
@@ -437,7 +455,7 @@ module.exports = function (compound, Media) {
 
     /**
      * Assign this media item to a content entry.
-     * 
+     *
      * @param  {Content} post - post to add this media to as an attachment
      */
     Media.prototype.assignToContent = function (post) {
@@ -456,7 +474,7 @@ module.exports = function (compound, Media) {
             post.attachments = [];
         }
 
-        // insert the media item in the same position it already was 
+        // insert the media item in the same position it already was
         // or just add to the end of the array
         var index = post.attachments.indexOf(_.findWhere(post.attachments, { id: self.id }));
 
@@ -469,7 +487,7 @@ module.exports = function (compound, Media) {
 
     /**
      * Update all content records that this media item is already attached to.
-     * 
+     *
      * @param  {Function} callback - callback function
      */
     Media.prototype.updateContent = function (callback) {
@@ -484,7 +502,7 @@ module.exports = function (compound, Media) {
                 }
                 if (!post) {
                     console.log("didn't find content with id: "+id+" going to remove from Media.contentIds for Media object", self.id);
-                    
+
                     // add to temp array, we will remove from the media object and re-save the media at the end
                     missingContentIds.push(id);
                     return done();
@@ -498,17 +516,17 @@ module.exports = function (compound, Media) {
             }
             // Find and remove id from contentIds
             if(missingContentIds.length > 0) {
-                console.log('missing content ids: '+missingContentIds);
-                console.log('contentIds: '+self.contentIds);
+                console.log('missing content ids: ' + missingContentIds);
+                console.log('contentIds: ' + self.contentIds);
                 var newContentIds = _.difference(self.contentIds, missingContentIds);
-                console.log('new contentIds: '+newContentIds);
+                console.log('new contentIds: ' + newContentIds);
                 self.contentIds = newContentIds;
                 self.save(function(err, saved_media) {
                     if(err) {
                         console.log('error saving media');
                         return done(err);
                     }
-                    console.log('updated media ' + self.id + ' after removing contentIds: '+missingContentIds);
+                    console.log('updated media ' + self.id + ' after removing contentIds: ' + missingContentIds);
                     if(callback) {
                         callback();
                     }
@@ -522,7 +540,7 @@ module.exports = function (compound, Media) {
     /**
      * Get the local filename for a media object so that we can do local
      * operations on the file.
-     * 
+     *
      * @param  {Media}    media    - media object
      * @param  {Function} callback - callback function
      */
