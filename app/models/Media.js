@@ -132,7 +132,7 @@ module.exports = function (compound, Media) {
                 }
             }
             // don't download before saving
-            else if (params.saveBeforeUpload) {
+            else if (params.saveBeforeResize) {
                 params.url = url;
                 Media.create(params, function (err, media) {
                     params.id = media.id;
