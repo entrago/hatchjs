@@ -265,6 +265,7 @@ en:
       url: URL
       headerfooter: Header and footer
       analytics: Analytics
+      locale: Locale setting
       changeUrl: Edit URL
     labels:
       title: Title
@@ -286,6 +287,7 @@ en:
       footerHtml: Footer HTML
       url: Enter a new URL
       googleAnalytics: Google Analytics ID
+      locale: Locale setting
     actions:
       uploadFavicon: Upload favicon
       save: Save changes
@@ -295,6 +297,7 @@ en:
       metaKeywords: Enter the default meta keywords for pages within this group
       faviconUpload: Upload a favicon for this group
       googleAnalytics: Copy and paste your Google Analytics ID to link up your account
+      locale: Enter the lcoale setting for this group. Default is "en"
       faviconUploaded: Favicon uploaded
   modules:
     headers:

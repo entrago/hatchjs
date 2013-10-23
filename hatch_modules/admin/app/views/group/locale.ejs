@@ -8,16 +8,16 @@
 
                 <%- formTagBegin({ action: pathTo.groupSave, id: 'settingsForm', class: 'form-vertical', method: 'post', enctype: 'multipart/form-data', remote: true }) -%>
 
-                    <h3><%- t('group.headers.analytics') %></h3>
+                    <h3><%- t('group.headers.locale') %></h3>
 
                     <hr/>
 
                     <div class="control-group">
-                        <label class="control-label" for="googleAnalyticsId"><%- t('group.labels.googleAnalytics') %></label>
+                        <label class="control-label" for="googleAnalyticsId"><%- t('group.labels.locale') %></label>
                         <div class="controls">
-                            <input type="text" class="input-xlarge" id="googleAnalyticsId" name="googleAnalyticsId" value="<%- group.googleAnalyticsId %>">
+                            <input type="text" class="input-xlarge" id="locale" name="locale" value="<%- group.locale %>">
                         </div>
-                        <span class="help-block"><%- t('group.help.googleAnalytics') %></span>
+                        <span class="help-block"><%- t('group.help.locale') %></span>
                     </div>
 
                     <div class="form-actions">

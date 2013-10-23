@@ -1,18 +1,18 @@
 //
-// Hatch.js is a CMS and social website building framework built in Node.js 
+// Hatch.js is a CMS and social website building framework built in Node.js
 // Copyright (C) 2013 Inventures Software Ltd
-// 
+//
 // This file is part of Hatch.js
-// 
+//
 // Hatch.js is free software: you can redistribute it and/or modify it under the terms of the
 // GNU General Public License as published by the Free Software Foundation, version 3
-// 
+//
 // Hatch.js is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 // without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-// 
+//
 // See the GNU General Public License for more details. You should have received a copy of the GNU
 // General Public License along with Hatch.js. If not, see <http://www.gnu.org/licenses/>.
-// 
+//
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
 //
 
@@ -31,7 +31,7 @@ module.exports = function (compound, Group) {
 
     /**
      * Before a group is saved, make sure the URLs are up to date.
-     * 
+     *
      * @param  {JSON}     data - data to save
      * @param  {Function} next - continuation function
      */
@@ -46,7 +46,7 @@ module.exports = function (compound, Group) {
 
     /**
      * Find a group for the specfied URL.
-     * 
+     *
      * @param  {String}   url      - URL to search for
      * @param  {Function} callback - callback function
      */
@@ -77,7 +77,7 @@ module.exports = function (compound, Group) {
 
     /**
      * Update a group's URLs by getting the updated list from the pages within.
-     * 
+     *
      * @param  {Group}    group    - group to update
      * @param  {Function} callback - callback function
      */
@@ -91,7 +91,7 @@ module.exports = function (compound, Group) {
 
     /**
      * Get the path part of the URL for this group's homepage.
-     * 
+     *
      * @return {String} - group path
      */
     Group.getter.path = function () {
@@ -100,8 +100,8 @@ module.exports = function (compound, Group) {
 
     /**
      * Get the value of a setting within a module in this group.
-     * 
-     * @param  {String} name - full dot-notation setting name - e.g. 
+     *
+     * @param  {String} name - full dot-notation setting name - e.g.
      *                         core-settings.settingName
      * @return {String}
      */
@@ -172,7 +172,7 @@ module.exports = function (compound, Group) {
 
     /**
      * Define the page for the current request context.
-     * 
+     *
      * @param  {String}        url      - current url
      * @param  {HttpContext}   c        - http context
      * @param  {Function}      callback - callback function
@@ -180,7 +180,7 @@ module.exports = function (compound, Group) {
     Group.prototype.definePage = function definePage(url, c, callback) {
         // remove trailing and leading slashes
         url = url.replace(/^\/|\/$/g, '');
-    
+
         var group = this;
         var path = url.split('?')[0];
         var page = c.req.page || this.matchSpecialPage(path);
@@ -225,7 +225,7 @@ module.exports = function (compound, Group) {
 
     /**
      * Get a cached page from this group's pagesCache.
-     * 
+     *
      * @param  {Number} id - page.id
      * @return {Page}      - page object
      */
@@ -241,7 +241,7 @@ module.exports = function (compound, Group) {
 
     /**
      * Clone this group and save the new group to the database.
-     * 
+     *
      * @param  {Object}     params   - clone parameters
      * @param  {Function}   callback - continuation function
      */
@@ -266,6 +266,7 @@ module.exports = function (compound, Group) {
         g.homepage.url = newUrl;
         g.pagesCache = [];
         g.name = newName;
+        g.locale = oldGroup.locale;
 
         // remove slash from the end of group url
         newUrl = newUrl.replace(/\/$/, '');
@@ -379,13 +380,13 @@ module.exports = function (compound, Group) {
 
     /**
      * Set the specified user as the owner of this group.
-     * 
+     *
      * @param {User}     user     - new owner
      * @param {Function} callback - callback function
      */
     Group.prototype.setOwner = function (user, callback) {
         var membership = user.memberships.find(this.id, 'groupId');
-        
+
         if (!membership) {
             membership = {
                 groupId: this.id,
@@ -396,7 +397,7 @@ module.exports = function (compound, Group) {
 
             user.memberships.push(membership);
         }
-        
+
         membership.role = 'owner';
         membership.state = 'accepted';
 
@@ -424,7 +425,7 @@ module.exports = function (compound, Group) {
         if (sph) {
             Page.find(pageId, function (err, page) {
                 env.req.page = page;
-                env.next = function() { 
+                env.next = function() {
                     env.res.send(env.res.html);
                 };
 
@@ -446,7 +447,7 @@ module.exports = function (compound, Group) {
 
     /**
      * creates a new group from a blank template
-     * 
+     *
      * @param  {[params]}   params [group creation parameters]
      * @param  {Function}   done   [continuation function]
      */
@@ -490,7 +491,7 @@ module.exports = function (compound, Group) {
 
     /**
      * Update the URL for this group.
-     * 
+     *
      * @param  {String} url - new URL
      */
     Group.prototype.updateUrl = function(url, next) {
@@ -503,7 +504,7 @@ module.exports = function (compound, Group) {
 
         //fix the url
         if(url.indexOf('http') > -1) url = url.substring(url.indexOf('//') + 2);
-        
+
         //validate the new url
         Page.all({ where: { url: url }}, function(err, pages) {
             if(pages.length > 0) return next(new Error('Sorry, the URL "' + url + '" is being used by another group.'));
@@ -535,7 +536,7 @@ module.exports = function (compound, Group) {
 
     /**
      * Get the specified module for this group.
-     * 
+     *
      * @param  {String} name - module name
      * @return {Module}      - module
      */
@@ -546,7 +547,7 @@ module.exports = function (compound, Group) {
 
     /**
      * Save a custom profile field for this group.
-     * 
+     *
      * @param  {Object}   field    - custom profile field object
      * @param  {Function} callback - callback function
      */
@@ -561,7 +562,7 @@ module.exports = function (compound, Group) {
 
     /**
      * Remove a custom profile field from this group.
-     * 
+     *
      * @param  {Number}   fieldId  - id of the field to remove
      * @param  {Function} callback - callback function
      */
