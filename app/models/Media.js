@@ -40,6 +40,8 @@ module.exports = function (compound, Media) {
         if (!data.type) {
             if (Media.isVideo(data.url)) {
                 data.type = 'video';
+            } else if (Media.isAudio(data.url)) {
+                data.type = 'audio';
             } else if (Media.isImage(data.url)) {
                 data.type = 'image';
             } else if (Media.isDocument(data.url)) {
@@ -114,7 +116,7 @@ module.exports = function (compound, Media) {
         }
 
         function create() {
-            // videos we just create directly with the url
+            // videos and audio clips we just create directly with the url
             if (Media.isVideo(filename)) {
                 var data = { url: url };
                 data = _.extend(data, params);
@@ -130,6 +132,12 @@ module.exports = function (compound, Media) {
                 } else {
                     Media.create(data, callback);
                 }
+            }
+            // audio clip - just create directly with url
+            else if (Media.isAudio(filename)) {
+                var data = { url: url };
+                data = _.extend(data, params);
+                Media.create(data, callback);
             }
             // don't download before saving
             else if (params.saveBeforeResize) {
@@ -268,6 +276,19 @@ module.exports = function (compound, Media) {
         var videoExtensions = ['mp4', 'mov', 'flv', 'ogg', 'webm', 'm3u8'];
 
         return videoExtensions.indexOf(ext) > -1;
+    };
+
+    /**
+     * Work out whether a file is an audio clip file.
+     *
+     * @param  {String}  filename - filename to check
+     * @return {Boolean}
+     */
+    Media.isAudio = function (filename) {
+        var ext = filename.split('.').slice(-1)[0].toLowerCase();
+        var audioExtensions = ['mp3', 'm4a'];
+
+        return audioExtensions.indexOf(ext) > -1;
     };
 
     /**
