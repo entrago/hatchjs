@@ -31,11 +31,13 @@ application on `/do/{moduleName}` route.
 
 Before running tests ensure you have installed dev dependencies:
 
-    ma
+    npm install
 
 Use `make test` command to run all tests. While debugging / TDD use `make
 testing` command which is the same as previous, but with `--watch` flag. For
 verbose output run `make test-verbose`.
+
+Every piece of code should be tested (ideally). Make sure tests included in pull request.
 
 ## Workflow
 
