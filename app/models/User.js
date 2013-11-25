@@ -226,10 +226,17 @@ module.exports = function (compound, User) {
 
         //send a notification email and create a notification at the same time
         async.parallel([
-            function(done) {
-                if (compound.structure.views['mail/user/' + type + '.html']) {
-                    compound.mailer.send('user/' + type, user, compound, params);
+            function (done) {
+                if (!compound.structure.views['mail/user/' + type + '.html']) {
+                    return done()
                 }
+
+                try {
+                    compound.mailer.send('user/' + type, user, compound, params);
+                } catch (e) {
+                    return done(e);
+                }
+
                 done();
             },
             function(done) {
@@ -241,8 +248,8 @@ module.exports = function (compound, User) {
                     done();
                 }
             }
-        ], function(err, results) {
-            if(callback) {
+        ], function (err, results) {
+            if (callback) {
                 callback();
             }
         })
