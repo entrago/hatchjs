@@ -6,7 +6,7 @@ describe('api/docsplit', function() {
     var docsplit = new DocSplit;
 
     it('should process pdf file', function(done) {
-        docsplit.extractTitle(__dirname + '/fixtures/About stacks.pdf', function(err, res) {
+        docsplit.extractTitle(__dirname + '/fixtures/About Stacks.pdf', function(err, res) {
             should.not.exist(err);
             res.should.equal('About Stacks\n');
             done();
