@@ -5,12 +5,12 @@
 // This file is part of Hatch.js
 //
 // Hatch.js is free software: you can redistribute it and/or modify it under the terms of the
-// GNU General Public License as published by the Free Software Foundation, version 3
+// GNU Affero General Public License as published by the Free Software Foundation, version 3
 //
 // Hatch.js is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 // without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 //
-// See the GNU General Public License for more details. You should have received a copy of the GNU
+// See the GNU Affero General Public License for more details. You should have received a copy of the GNU
 // General Public License along with Hatch.js. If not, see <http://www.gnu.org/licenses/>.
 //
 // Authors: Marcus Greenwood, Anatoliy Chakkaev and others
@@ -226,10 +226,17 @@ module.exports = function (compound, User) {
 
         //send a notification email and create a notification at the same time
         async.parallel([
-            function(done) {
-                if (compound.structure.views['mail/user/' + type + '.html']) {
-                    compound.mailer.send('user/' + type, user, compound, params);
+            function (done) {
+                if (!compound.structure.views['mail/user/' + type + '.html']) {
+                    return done()
                 }
+
+                try {
+                    compound.mailer.send('user/' + type, user, compound, params);
+                } catch (e) {
+                    return done(e);
+                }
+
                 done();
             },
             function(done) {
@@ -241,8 +248,8 @@ module.exports = function (compound, User) {
                     done();
                 }
             }
-        ], function(err, results) {
-            if(callback) {
+        ], function (err, results) {
+            if (callback) {
                 callback();
             }
         })

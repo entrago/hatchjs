@@ -297,7 +297,7 @@ en:
       metaKeywords: Enter the default meta keywords for pages within this group
       faviconUpload: Upload a favicon for this group
       googleAnalytics: Copy and paste your Google Analytics ID to link up your account
-      locale: Enter the lcoale setting for this group. Default is "en"
+      locale: Enter the locale setting for this group. Default is "en"
       faviconUploaded: Favicon uploaded
   modules:
     headers:

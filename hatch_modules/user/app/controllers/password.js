@@ -24,7 +24,7 @@ PasswordController.prototype.request = function resetPassword(c) {
                 c.send({
                     status: 'success',
                     icon: 'info-sign',
-                    message: 'A reset password link has been sent to your registered email address.'
+                    message: c.t('user.resetpassword', c.req.group.locale || 'en')
                 });
             });
         });
@@ -46,7 +46,7 @@ PasswordController.prototype.change = function(c) {
                 c.send({
                     status: 'success',
                     icon: 'info-sign',
-                    message: 'Your password has been successfully reset. You may now login.'
+                    message: c.t('user.resetsuccess', c.req.group.locale || 'en')
                 });
             }
         });

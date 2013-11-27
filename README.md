@@ -4,6 +4,15 @@ Hatch-compound is CMS platform with social features. This package is just
 express application which could be extended with additional modules. Any part of
 this application accesible via [CompoundJS API][compound-api].
 
+## Installation
+
+    npm install
+    gem install docsplit
+
+on mac:
+
+    brew install poppler
+
 ## Package Structure Overview
 
 ### ./index.js
