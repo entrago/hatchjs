@@ -57,7 +57,6 @@ function findPageAndWidget(c) {
  * @param  {ControllerContext} c - compound controller context
  */
 WidgetController.prototype.__missingAction = function __missingAction(c) {
-    //this.page.widgetAction(this.widget.id, c.requestedActionName, c.req.body, c.req, function (err, res) {
     this.page.renderWidgetAction(c.req, this.widget, c.requestedActionName, c.req.body, function (err, res) {
         if (typeof res === 'string') {
             c.send(res);
@@ -87,7 +86,7 @@ WidgetController.prototype.create = function(c) {
 
     // save the new widget, render and add to the page
     page.save(function (err) {
-        page.renderWidget(widget, c.req, function (err, html) {
+        page.renderWidgetAction(c.req, widget, function (err, html) {
             c.send({
                 code: err ? 500 : 200,
                 html: html,
@@ -120,7 +119,7 @@ WidgetController.prototype.remove = function (c) {
  * @param  {ControllerContext} c - compound controller context
  */
 WidgetController.prototype.render = function(c) {
-    this.page.renderWidget(this.widget, c.req, function (err, html) {
+    this.page.renderWidgetAction(c.req, this.widget, function (err, html) {
         c.send(html);
     });
 };
@@ -132,7 +131,7 @@ WidgetController.prototype.render = function(c) {
  */
 WidgetController.prototype.update = function(c) {
     var widgetId = parseInt(c.req.params.widgetId || c.req.params.id, 10);
-    this.page.performWidgetAction(widgetId, c.req, function (err, res) {
+    this.page.renderWidgetAction(c.req, widgetId, c.req.body.perform, c.req.body['with'], function (err, res) {
         c.send({
             code: err ? 500 : 200,
             res: res,

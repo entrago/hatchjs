@@ -25,8 +25,6 @@ var http = require('http');
 var _ = require('underscore');
 
 module.exports = function (compound, Page) {
-    var api = compound.hatch.api;
-
     Page.validatesPresenceOf('title', {message: 'Please enter a title'});
     Page.validatesUniquenessOf('url');
 
@@ -233,6 +231,8 @@ module.exports = function (compound, Page) {
 
                 return;
             }
+            // Data type is page, but no parent is defined
+            return done(new Error('Target parent page not found'));
         }
     }
 
@@ -277,7 +277,7 @@ module.exports = function (compound, Page) {
         var result = {}, self = this;
 
         async.forEach(self.widgets.items, function (widget, next) {
-            self.renderWidget(widget, req, function (err, html) {
+            self.renderWidgetAction(req, widget, function (err, html) {
                 if (!result[widget.id]) {
                     if (err) {
                         if (req.app.enabled('show errors')) {
@@ -326,15 +326,17 @@ module.exports = function (compound, Page) {
         }
     };
 
-    Page.prototype.renderWidget = function(widget, req, cb) {
-        return this.renderWidgetAction(req, widget, 'show', null, cb);
-    };
-
-    Page.prototype.performWidgetAction = function(widget, req, cb) {
-        return this.renderWidgetAction(req, widget, req.body.perform, req.body['with'], cb);
-    };
-
     Page.prototype.renderWidgetAction = function renderWidgetAction(parentRequest, widget, action, params, callback) {
+        if('function' == typeof(action)) {
+            callback = action;
+            action = 'show';
+            params = null;
+        }
+        else if('function' == typeof(params)) {
+            callback = params;
+            params = null;
+        }
+
         var widgetId;
         if (typeof widget === 'object' && widget.id) {
             widgetId = widget.id;
