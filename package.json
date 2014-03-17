@@ -58,5 +58,8 @@
   },
   "scripts": {
     "test": "nodeunit test/*/*"
+  },
+  "repository": {
+    "url": "https://github.com/entrago/hatchjs"
   }
 }
