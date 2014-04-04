@@ -27,7 +27,7 @@ module.exports = function (compound, User) {
     var Group = compound.models.Group;
 
     User.validatesPresenceOf('username', {message: 'Please enter a username'});
-    User.validatesPresenceOf('email', {message: 'Please enter an email address'});
+    // User.validatesPresenceOf('email', {message: 'Please enter an email address'});
     User.validatesPresenceOf('password', {message: 'Please enter a password'});
     User.validatesLengthOf('origPassword', {min: 6, allowNull: true});
     User.validatesFormatOf('username', {with: /^[-_\.a-z0-9]+$/i, message: 'Username only can contain latin letters, digits, and -_. characters', allowBlank: true});
