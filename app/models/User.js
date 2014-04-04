@@ -31,8 +31,8 @@ module.exports = function (compound, User) {
     User.validatesPresenceOf('password', {message: 'Please enter a password'});
     User.validatesLengthOf('origPassword', {min: 6, allowNull: true});
     User.validatesFormatOf('username', {with: /^[-_\.a-z0-9]+$/i, message: 'Username only can contain latin letters, digits, and -_. characters', allowBlank: true});
-    User.validatesFormatOf('email', {with: /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/i, message: 'Invalid email address', allowBlank: true});
-    User.validatesUniquenessOf('email', {message: 'This email address is taken'});
+    User.validatesFormatOf('email', {with: /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/i, message: 'Invalid email address', allowBlank: true, allowNull: true});
+    User.validatesUniquenessOf('email', {message: 'This email address is taken', allowBlank: true, allowNull: true});
     User.validatesUniquenessOf('username', {message: 'This username is taken'});
 
     // defines the possible sort orders for users
