@@ -669,7 +669,12 @@ qq.extend(qq.FileUploader.prototype, {
             var relatedTarget = document.elementFromPoint(e.clientX, e.clientY);
             // only fire when leaving document out
             if (qq.FileUploader.prototype._leaving_document_out(e)) {
-                for (i=0; i < dropzones.length; i++){ dropzones[i].style.display = 'none'; }
+                if (dropzones.length == 2) {
+                    dropzones[1].style.display = 'none';
+                    dropzones[0].style.display = 'block';
+                } else {
+                    for (i=0; i < dropzones.length; i++){ dropzones[i].style.display = 'none'; }
+                }
             }
         });
         qq.attach(document, 'drop', function(e){
