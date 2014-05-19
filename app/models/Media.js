@@ -461,12 +461,12 @@ module.exports = function (compound, Media) {
         if (typeof ids[0] === 'string') {
             ids = ids.filter(function (json) {
                 try {
-                  return !!JSON.parse(json).id;
+                  return !!JSON.parse(json);
                 } catch (e) {
                   return json !== 'undefined' && json;
                 }
             }).map(function (json) {
-                return JSON.parse(json).id;
+                return JSON.parse(json).id || json;
             });
         }
 
